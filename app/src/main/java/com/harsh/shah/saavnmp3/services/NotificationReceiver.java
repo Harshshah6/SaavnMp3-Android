@@ -55,9 +55,9 @@ public class NotificationReceiver extends BroadcastReceiver {
                 context.startActivity(new Intent(context, MusicOverviewActivity.class).putExtra("id", intent.getStringExtra("id")).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
                 break;
             default:
-                Log.i("NotificationReceiver", "onReceive: " + intent.getAction());
+                Log.i("NotificationReceiver", "onReceive: Unknown action: " + intent.getAction());
                 break;
         }
-        Log.i("NotificationReceiver", "onReceive: " + intent.getAction());
+        Log.i("NotificationReceiver", "onReceive: Action received - " + intent.getAction());
     }
 }

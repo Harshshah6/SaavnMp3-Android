@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Default configuration for all domains -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    
+    <!-- Allow cleartext traffic for specific domains -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">aac.saavncdn.com</domain>
+        <domain includeSubdomains="true">saavncdn.com</domain>
+        <domain includeSubdomains="true">jiosaavn.com</domain>
+        <domain includeSubdomains="true">jiocdn.com</domain>
+        <domain includeSubdomains="true">c.saavncdn.com</domain>
+        <domain includeSubdomains="true">www.jiosaavn.com</domain>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config> 

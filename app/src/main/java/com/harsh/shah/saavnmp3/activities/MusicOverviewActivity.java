@@ -76,16 +76,38 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             binding.shuffleIcon.setVisibility(View.INVISIBLE);
 
         binding.playPauseImage.setOnClickListener(view -> {
-            if (ApplicationClass.player.isPlaying()) {
-                handler.removeCallbacks(runnable);
-                ApplicationClass.player.pause();
-                binding.playPauseImage.setImageResource(com.harsh.shah.saavnmp3.R.drawable.play_arrow_24px);
-            } else {
-                ApplicationClass.player.play();
-                binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
-                updateSeekbar();
+            try {
+                if (ApplicationClass.player == null) {
+                    Log.e(TAG, "Player is null, cannot toggle playback");
+                    Toast.makeText(this, "Media player not ready. Try again.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                // Get application instance to control playback
+                ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
+                
+                if (ApplicationClass.player.isPlaying()) {
+                    // Handle pause action
+                    Log.i(TAG, "Pausing playback");
+                    handler.removeCallbacks(runnable);
+                    ApplicationClass.player.pause();
+                    binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
+                } else {
+                    // Handle play action
+                    Log.i(TAG, "Starting playback");
+                    ApplicationClass.player.play();
+                    binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
+                    updateSeekbar();
+                }
+                
+                // Update notification with correct playback state
+                boolean isPlaying = ApplicationClass.player.isPlaying();
+                Log.i(TAG, "Player state after click: isPlaying=" + isPlaying);
+                showNotification(isPlaying ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+            } catch (Exception e) {
+                Log.e(TAG, "Error toggling playback", e);
+                Toast.makeText(this, "Error controlling playback. Try again.", Toast.LENGTH_SHORT).show();
             }
-            showNotification(ApplicationClass.player.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
         });
 
         binding.seekbar.setMax(100);
@@ -301,14 +323,53 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     @Override
     protected void onResume() {
         super.onResume();
+        
+        // Set as current activity in ApplicationClass
+        ApplicationClass.setCurrentActivity(this);
+        
+        // Bind to the service
         Intent intent = new Intent(this, MusicService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
+        
+        // Update UI with current playback state
+        if (ApplicationClass.player != null) {
+            updateTrackInfo();
+            if (ApplicationClass.player.isPlaying()) {
+                updateSeekbar();
+            }
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unbindService(this);
+        
+        // Remove callbacks to prevent leaks
+        handler.removeCallbacks(runnable);
+        mHandler.removeCallbacks(mUpdateTimeTask);
+        
+        // Unbind from service
+        try {
+            unbindService(this);
+        } catch (Exception e) {
+            Log.e(TAG, "Error unbinding service", e);
+        }
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Ensure we're not updating UI when activity is in background
+        handler.removeCallbacks(runnable);
+        mHandler.removeCallbacks(mUpdateTimeTask);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Final cleanup
+        handler.removeCallbacks(runnable);
+        mHandler.removeCallbacks(mUpdateTimeTask);
     }
 
     @Override
@@ -318,7 +379,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         musicService.setCallback(MusicOverviewActivity.this);
         Log.e(TAG, "onServiceConnected: ");
     }
-
+    
     @Override
     public void onServiceDisconnected(ComponentName name) {
         Log.e(TAG, "onServiceDisconnected: ");
@@ -453,20 +514,86 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     }
 
     void prepareMediaPLayer() {
-        ((ApplicationClass) getApplicationContext()).prepareMediaPlayer();
-        binding.totalDuration.setText(convertDuration(ApplicationClass.player.getDuration()));
-        playClicked();
-        binding.playPauseImage.performClick();
+        try {
+            ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
+            applicationClass.prepareMediaPlayer();
+            
+            // Wait until player is actually ready
+            if (ApplicationClass.player != null && ApplicationClass.player.getDuration() > 0) {
+                binding.totalDuration.setText(convertDuration(ApplicationClass.player.getDuration()));
+            } else {
+                // If duration is not yet available, set a default or retry
+                binding.totalDuration.setText("00:00");
+                // Schedule a retry to get the duration
+                new Handler().postDelayed(() -> {
+                    if (ApplicationClass.player != null && ApplicationClass.player.getDuration() > 0) {
+                        binding.totalDuration.setText(convertDuration(ApplicationClass.player.getDuration()));
+                    }
+                }, 500);
+            }
+            
+            // Set play state
+            if (ApplicationClass.player.isPlaying()) {
+                binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
+                updateSeekbar();
+            } else {
+                binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
+            }
+            
+            // Update notification
+            showNotification(ApplicationClass.player.isPlaying() ? 
+                R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+        } catch (Exception e) {
+            Log.e(TAG, "Error preparing media player", e);
+            // Try to recover
+            Toast.makeText(this, "Error playing track. Retrying...", Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(this::prepareMediaPLayer, 1000);
+        }
     }
 
     private final Runnable runnable = this::updateSeekbar;
 
     void updateSeekbar() {
-        if (ApplicationClass.player.isPlaying()) {
-            binding.seekbar.setProgress((int) (((float) ApplicationClass.player.getCurrentPosition() / ApplicationClass.player.getDuration()) * 100));
-            long currentDuration = ApplicationClass.player.getCurrentPosition();
-            binding.elapsedDuration.setText(convertDuration(currentDuration));
-            handler.postDelayed(runnable, 1000);
+        try {
+            if (ApplicationClass.player == null) {
+                Log.e(TAG, "Player is null in updateSeekbar");
+                return;
+            }
+            
+            if (ApplicationClass.player.isPlaying()) {
+                try {
+                    long duration = ApplicationClass.player.getDuration();
+                    long currentPosition = ApplicationClass.player.getCurrentPosition();
+                    
+                    // Check for valid duration to avoid division by zero
+                    if (duration > 0) {
+                        int progress = (int)(((float) currentPosition / duration) * 100);
+                        binding.seekbar.setProgress(progress);
+                        binding.elapsedDuration.setText(convertDuration(currentPosition));
+                    }
+                    
+                    // Schedule the next update
+                    handler.postDelayed(runnable, 1000);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error updating seekbar", e);
+                }
+            } else {
+                // If player is paused, still show correct position but don't schedule updates
+                try {
+                    long duration = ApplicationClass.player.getDuration();
+                    long currentPosition = ApplicationClass.player.getCurrentPosition();
+                    
+                    if (duration > 0) {
+                        int progress = (int)(((float) currentPosition / duration) * 100);
+                        binding.seekbar.setProgress(progress);
+                        binding.elapsedDuration.setText(convertDuration(currentPosition));
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error updating seekbar while paused", e);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Exception in updateSeekbar", e);
         }
     }
 
@@ -535,7 +662,9 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
     public void showNotification(int playPauseButton) {
         ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
-        applicationClass.setMusicDetails(IMAGE_URL, binding.title.getText().toString(), binding.description.getText().toString(), getIntent().getExtras().getString("id", ""));
+        String songId = getIntent().getExtras().getString("id", "");
+        applicationClass.setMusicDetails(IMAGE_URL, binding.title.getText().toString(), binding.description.getText().toString(), songId);
+        Log.i(TAG, "MusicOverviewActivity showNotification for song ID: " + songId);
         applicationClass.showNotification();
     }
 

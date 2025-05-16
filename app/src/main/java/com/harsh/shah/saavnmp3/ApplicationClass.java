@@ -431,32 +431,6 @@ public class ApplicationClass extends Application {
         }
     }
 
-    public void nextTrack() {
-        if (!trackQueue.isEmpty() && track_position < trackQueue.size() - 1) {
-            if (player.getShuffleModeEnabled())
-                track_position = (int) (Math.random() * trackQueue.size());
-            else
-                track_position++;
-            MUSIC_ID = trackQueue.get(track_position);
-            playTrack();
-            //startActivity(new Intent(this, MusicOverviewActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("id", MUSIC_ID));
-        }
-        showNotification();
-    }
-
-    public void prevTrack() {
-        if (track_position > 0) {
-            if (player.getShuffleModeEnabled())
-                track_position = (int) (Math.random() * trackQueue.size());
-            else
-                track_position--;
-            MUSIC_ID = trackQueue.get(track_position);
-            playTrack();
-            //startActivity(new Intent(this, MusicOverviewActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra("id", MUSIC_ID));
-        }
-        showNotification();
-    }
-
     @UnstableApi
     public void prepareMediaPlayer() {
         try {
@@ -554,6 +528,9 @@ public class ApplicationClass extends Application {
             player.setPlayWhenReady(false);
             player.prepare();
             
+            // Enable repeat mode if needed
+            configureRepeatMode();
+            
             // Remove any existing listeners to avoid duplicates
             final Player.Listener playbackListener = new Player.Listener() {
                 @Override
@@ -571,6 +548,10 @@ public class ApplicationClass extends Application {
                         // Try to recover from errors
                         Log.e(TAG, "Player in IDLE state, possible error");
                         handlePlaybackError();
+                    } else if (playbackState == Player.STATE_ENDED) {
+                        // Auto-play next track when current track ends
+                        Log.i(TAG, "Track ended, auto-playing next track");
+                        nextTrack();
                     }
                     
                     showNotification();
@@ -585,8 +566,9 @@ public class ApplicationClass extends Application {
                 @Override
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                     Player.Listener.super.onPlayerStateChanged(playWhenReady, playbackState);
-                    if (playbackState == Player.STATE_ENDED)
+                    if (playbackState == Player.STATE_ENDED) {
                         nextTrack();
+                    }
                 }
             };
             
@@ -614,6 +596,88 @@ public class ApplicationClass extends Application {
         }
     }
     
+    /**
+     * Configures repeat mode based on preferences or queue size
+     */
+    private void configureRepeatMode() {
+        // If there's only one track in the queue, set repeat mode to ONE
+        if (trackQueue.size() <= 1) {
+            player.setRepeatMode(Player.REPEAT_MODE_ONE);
+            Log.i(TAG, "Set repeat mode to REPEAT_ONE (single track in queue)");
+        } else {
+            // Otherwise use ALL so we continue playing the queue
+            player.setRepeatMode(Player.REPEAT_MODE_ALL);
+            Log.i(TAG, "Set repeat mode to REPEAT_ALL (multiple tracks in queue)");
+        }
+    }
+
+    public void nextTrack() {
+        if (trackQueue.isEmpty()) {
+            Log.i(TAG, "Cannot play next track: track queue is empty");
+            return;
+        }
+        
+        if (track_position >= trackQueue.size() - 1) {
+            if (player.getRepeatMode() == Player.REPEAT_MODE_ALL) {
+                // Loop back to the first track
+                track_position = 0;
+                Log.i(TAG, "Looping back to first track in queue (position 0)");
+            } else {
+                Log.i(TAG, "Reached end of queue, not playing next track");
+                return;
+            }
+        } else {
+            if (player.getShuffleModeEnabled()) {
+                track_position = (int) (Math.random() * trackQueue.size());
+                Log.i(TAG, "Shuffle enabled, random next track position: " + track_position);
+            } else {
+                track_position++;
+                Log.i(TAG, "Playing next track at position: " + track_position);
+            }
+        }
+        
+        MUSIC_ID = trackQueue.get(track_position);
+        Log.i(TAG, "Auto-playing next track: " + MUSIC_ID);
+        playTrack();
+        showNotification();
+    }
+    
+    public void prevTrack() {
+        if (trackQueue.isEmpty()) {
+            Log.i(TAG, "Cannot play previous track: track queue is empty");
+            return;
+        }
+        
+        if (track_position <= 0) {
+            if (player.getRepeatMode() == Player.REPEAT_MODE_ALL) {
+                // Loop to the last track
+                track_position = trackQueue.size() - 1;
+                Log.i(TAG, "Looping to last track in queue (position " + track_position + ")");
+            } else {
+                // Just restart current track
+                Log.i(TAG, "At first track, restarting current track");
+                if (player != null) {
+                    player.seekTo(0);
+                    player.play();
+                    return;
+                }
+            }
+        } else {
+            if (player.getShuffleModeEnabled()) {
+                track_position = (int) (Math.random() * trackQueue.size());
+                Log.i(TAG, "Shuffle enabled, random previous track position: " + track_position);
+            } else {
+                track_position--;
+                Log.i(TAG, "Playing previous track at position: " + track_position);
+            }
+        }
+        
+        MUSIC_ID = trackQueue.get(track_position);
+        Log.i(TAG, "Playing previous track: " + MUSIC_ID);
+        playTrack();
+        showNotification();
+    }
+
     private void handlePlaybackError() {
         // Try to recover from playback errors
         try {

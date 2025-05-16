@@ -4,60 +4,105 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.harsh.shah.saavnmp3.ApplicationClass;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity;
 
 public class NotificationReceiver extends BroadcastReceiver {
+    private static final String TAG = "NotificationReceiver";
+    
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent == null || intent.getAction() == null) return;
+        if (intent == null || intent.getAction() == null) {
+            Log.e(TAG, "Received null intent or action");
+            return;
+        }
 
-        Intent intent1 = new Intent(context, MusicService.class);
-
+        String action = intent.getAction();
+        Log.i(TAG, "Received action: " + action);
+        
+        // Create intent for MusicService
+        Intent serviceIntent = new Intent(context, MusicService.class);
+        
+        // Get ApplicationClass instance
         final ApplicationClass applicationClass = (ApplicationClass) context.getApplicationContext();
 
-        switch (intent.getAction()) {
+        switch (action) {
             case ApplicationClass.ACTION_NEXT:
-                // Handle next action
-                //Toast.makeText(context, "next", Toast.LENGTH_SHORT).show();
-                intent1.putExtra("action", intent.getAction());
-                //context.startService(intent1);
-                applicationClass.nextTrack();
+                Log.i(TAG, "Processing NEXT action");
+                try {
+                    // First update via ApplicationClass for immediate effect
+                    applicationClass.nextTrack();
+                    
+                    // Then notify service for UI updates
+                    serviceIntent.putExtra("action", action);
+                    context.startService(serviceIntent);
+                    
+                    // Show visual feedback
+                    Toast.makeText(context, "Playing next track", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error processing next action", e);
+                }
                 break;
+                
             case ApplicationClass.ACTION_PREV:
-                // Handle previous action
-                //Toast.makeText(context, "prev", Toast.LENGTH_SHORT).show();
-                intent1.putExtra("action", intent.getAction());
-                //context.startService(intent1);
-                applicationClass.prevTrack();
+                Log.i(TAG, "Processing PREVIOUS action");
+                try {
+                    // First update via ApplicationClass for immediate effect
+                    applicationClass.prevTrack();
+                    
+                    // Then notify service for UI updates
+                    serviceIntent.putExtra("action", action);
+                    context.startService(serviceIntent);
+                    
+                    // Show visual feedback
+                    Toast.makeText(context, "Playing previous track", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error processing previous action", e);
+                }
                 break;
+                
             case ApplicationClass.ACTION_PLAY:
-                // Handle play/pause action
-                //Toast.makeText(context, "play", Toast.LENGTH_SHORT).show();
-
-//                if (ApplicationClass.mediaPlayerUtil.isPlaying()) {
-//                    ApplicationClass.mediaPlayerUtil.pause();
-//                } else {
-//                    ApplicationClass.mediaPlayerUtil.start();
-//                }
-
-                applicationClass.togglePlayPause();
-
-                intent1.putExtra("action", intent.getAction());
-                intent1.putExtra("fromNotification", true);
-                context.startService(intent1);
-
-                applicationClass.showNotification(ApplicationClass.player.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+                Log.i(TAG, "Processing PLAY/PAUSE action");
+                try {
+                    // Toggle playback
+                    applicationClass.togglePlayPause();
+                    
+                    // Notify service
+                    serviceIntent.putExtra("action", action);
+                    serviceIntent.putExtra("fromNotification", true);
+                    context.startService(serviceIntent);
+                    
+                    // Update notification with current state
+                    boolean isPlaying = ApplicationClass.player.isPlaying();
+                    applicationClass.showNotification(isPlaying ? 
+                        R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+                    
+                    // Show visual feedback
+                    Toast.makeText(context, isPlaying ? "Playing" : "Paused", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error toggling playback", e);
+                }
                 break;
+                
             case "action_click":
-                context.startActivity(new Intent(context, MusicOverviewActivity.class).putExtra("id", intent.getStringExtra("id")).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
+                Log.i(TAG, "Processing CLICK action");
+                try {
+                    // Launch activity for the current track
+                    Intent activityIntent = new Intent(context, MusicOverviewActivity.class)
+                        .putExtra("id", ApplicationClass.MUSIC_ID)
+                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(activityIntent);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error launching activity", e);
+                }
                 break;
+                
             default:
-                Log.i("NotificationReceiver", "onReceive: Unknown action: " + intent.getAction());
+                Log.i(TAG, "Unknown action received: " + action);
                 break;
         }
-        Log.i("NotificationReceiver", "onReceive: Action received - " + intent.getAction());
     }
 }

@@ -144,8 +144,79 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
         final ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
 
-        binding.nextIcon.setOnClickListener(view -> applicationClass.nextTrack());
-        binding.prevIcon.setOnClickListener(view -> applicationClass.prevTrack());
+        binding.nextIcon.setOnClickListener(view -> {
+            try {
+                Log.i(TAG, "Next button clicked");
+                if (ApplicationClass.player == null) {
+                    Log.e(TAG, "Player is null, cannot skip to next track");
+                    Toast.makeText(MusicOverviewActivity.this, "Media player not ready", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                // Add visual feedback
+                binding.nextIcon.setAlpha(0.5f);
+                binding.nextIcon.animate().alpha(1.0f).setDuration(200).start();
+                
+                // Call next track method
+                applicationClass.nextTrack();
+                
+                // Update UI state
+                updateSeekbar();
+                updateTrackInfo();
+                
+                // Make sure play icon reflects current state
+                if (ApplicationClass.player.isPlaying()) {
+                    binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
+                } else {
+                    binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
+                }
+                
+                Toast.makeText(MusicOverviewActivity.this, "Playing next track", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Log.e(TAG, "Error skipping to next track", e);
+                Toast.makeText(MusicOverviewActivity.this, "Error skipping to next track", Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        binding.prevIcon.setOnClickListener(view -> {
+            try {
+                Log.i(TAG, "Previous button clicked");
+                if (ApplicationClass.player == null) {
+                    Log.e(TAG, "Player is null, cannot skip to previous track");
+                    Toast.makeText(MusicOverviewActivity.this, "Media player not ready", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                // Add visual feedback
+                binding.prevIcon.setAlpha(0.5f);
+                binding.prevIcon.animate().alpha(1.0f).setDuration(200).start();
+                
+                // If we're already at the beginning of the track, go to previous track
+                // Otherwise just restart the current track
+                if (ApplicationClass.player.getCurrentPosition() > 3000) {
+                    ApplicationClass.player.seekTo(0);
+                    Toast.makeText(MusicOverviewActivity.this, "Restarting current track", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Call previous track method
+                    applicationClass.prevTrack();
+                    Toast.makeText(MusicOverviewActivity.this, "Playing previous track", Toast.LENGTH_SHORT).show();
+                }
+                
+                // Update UI state
+                updateSeekbar();
+                updateTrackInfo();
+                
+                // Make sure play icon reflects current state
+                if (ApplicationClass.player.isPlaying()) {
+                    binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
+                } else {
+                    binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error going to previous track", e);
+                Toast.makeText(MusicOverviewActivity.this, "Error going to previous track", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         binding.repeatIcon.setOnClickListener(view -> {
             if (ApplicationClass.player.getRepeatMode() == Player.REPEAT_MODE_OFF)
@@ -639,10 +710,73 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
     @Override
     public void nextClicked() {
+        Log.i(TAG, "nextClicked called from service");
+        try {
+            if (ApplicationClass.player == null) {
+                Log.e(TAG, "Player is null in nextClicked");
+                return;
+            }
+            
+            // Update UI to show active button state
+            binding.nextIcon.setAlpha(0.5f);
+            binding.nextIcon.animate().alpha(1.0f).setDuration(200).start();
+            
+            // Get application instance
+            ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
+            applicationClass.nextTrack();
+            
+            // Update UI
+            updateTrackInfo();
+            updateSeekbar();
+            
+            // Ensure play/pause button shows correct state
+            if (ApplicationClass.player.isPlaying()) {
+                binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
+            } else {
+                binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in nextClicked", e);
+        }
     }
 
     @Override
     public void prevClicked() {
+        Log.i(TAG, "prevClicked called from service");
+        try {
+            if (ApplicationClass.player == null) {
+                Log.e(TAG, "Player is null in prevClicked");
+                return;
+            }
+            
+            // Update UI to show active button state
+            binding.prevIcon.setAlpha(0.5f);
+            binding.prevIcon.animate().alpha(1.0f).setDuration(200).start();
+            
+            // Get application instance
+            ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
+            
+            // If we're already at the beginning of the track, go to previous track
+            // Otherwise just restart the current track
+            if (ApplicationClass.player.getCurrentPosition() > 3000) {
+                ApplicationClass.player.seekTo(0);
+            } else {
+                applicationClass.prevTrack();
+            }
+            
+            // Update UI
+            updateTrackInfo();
+            updateSeekbar();
+            
+            // Ensure play/pause button shows correct state
+            if (ApplicationClass.player.isPlaying()) {
+                binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
+            } else {
+                binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in prevClicked", e);
+        }
     }
 
     @Override

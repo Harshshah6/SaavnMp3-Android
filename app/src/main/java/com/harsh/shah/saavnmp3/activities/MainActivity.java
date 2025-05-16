@@ -112,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
                 .withDragDistance(250)
                 .inject();
 
+        // Set version text in the drawer layout
+        updateVersionTextInDrawer();
+
         onDrawerItemsClicked();
 
         binding.profileIcon.setOnClickListener(view -> slidingRootNavBuilder.openMenu(true));
@@ -243,6 +246,24 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, AboutActivity.class));
             slidingRootNavBuilder.closeMenu();
         });
+    }
+
+    /**
+     * Updates the version text in the navigation drawer with the app's current version
+     */
+    private void updateVersionTextInDrawer() {
+        try {
+            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            View drawerLayout = slidingRootNavBuilder.getLayout();
+            if (drawerLayout != null) {
+                View versionTextView = drawerLayout.findViewById(R.id.versionTxt);
+                if (versionTextView instanceof android.widget.TextView) {
+                    ((android.widget.TextView) versionTextView).setText("version " + versionName);
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Error getting app version: " + e.getMessage());
+        }
     }
 
     Handler handler = new Handler();

@@ -600,14 +600,22 @@ public class ApplicationClass extends Application {
      * Configures repeat mode based on preferences or queue size
      */
     private void configureRepeatMode() {
-        // If there's only one track in the queue, set repeat mode to ONE
-        if (trackQueue.size() <= 1) {
+        // Get current repeat mode
+        int currentRepeatMode = player.getRepeatMode();
+        
+        // If there's only one track in the queue and no specific repeat mode is set,
+        // default to repeat one to prevent playback from stopping
+        if (trackQueue.size() <= 1 && currentRepeatMode == Player.REPEAT_MODE_OFF) {
             player.setRepeatMode(Player.REPEAT_MODE_ONE);
             Log.i(TAG, "Set repeat mode to REPEAT_ONE (single track in queue)");
-        } else {
-            // Otherwise use ALL so we continue playing the queue
+        } else if (trackQueue.size() > 1 && currentRepeatMode == Player.REPEAT_MODE_OFF) {
+            // For multiple tracks in queue, we can keep the existing repeat mode
+            // But ensure we don't get stuck at the end of the queue
             player.setRepeatMode(Player.REPEAT_MODE_ALL);
             Log.i(TAG, "Set repeat mode to REPEAT_ALL (multiple tracks in queue)");
+        } else {
+            // Keep the user's chosen repeat mode
+            Log.i(TAG, "Keeping user-selected repeat mode: " + player.getRepeatMode());
         }
     }
 
@@ -617,18 +625,51 @@ public class ApplicationClass extends Application {
             return;
         }
         
+        int repeatMode = player.getRepeatMode();
+        boolean shuffleEnabled = player.getShuffleModeEnabled();
+        
         if (track_position >= trackQueue.size() - 1) {
-            if (player.getRepeatMode() == Player.REPEAT_MODE_ALL) {
-                // Loop back to the first track
-                track_position = 0;
-                Log.i(TAG, "Looping back to first track in queue (position 0)");
-            } else {
-                Log.i(TAG, "Reached end of queue, not playing next track");
-                return;
+            // End of queue behavior depends on repeat mode
+            switch (repeatMode) {
+                case Player.REPEAT_MODE_ONE:
+                    // When repeat one is enabled, we should stay on the current track
+                    // Just restart the current track
+                    if (player != null) {
+                        player.seekTo(0);
+                        player.play();
+                        Log.i(TAG, "Repeat ONE mode - restarting current track");
+                        return;
+                    }
+                    break;
+                    
+                case Player.REPEAT_MODE_ALL:
+                    // Loop back to the first track in queue
+                    track_position = 0;
+                    Log.i(TAG, "Repeat ALL mode - looping back to first track in queue");
+                    break;
+                    
+                case Player.REPEAT_MODE_OFF:
+                default:
+                    // In no-repeat mode, we've reached the end of the queue
+                    // Just restart the current track instead of stopping completely
+                    if (player != null) {
+                        player.seekTo(0);
+                        player.play();
+                        Log.i(TAG, "Repeat OFF mode, but reached end of queue - restarting current track");
+                        return;
+                    }
+                    break;
             }
         } else {
-            if (player.getShuffleModeEnabled()) {
-                track_position = (int) (Math.random() * trackQueue.size());
+            // Normal next track behavior when not at end of queue
+            if (shuffleEnabled) {
+                // For shuffle, pick any random track except the current one
+                int newPosition;
+                do {
+                    newPosition = (int) (Math.random() * trackQueue.size());
+                } while (newPosition == track_position && trackQueue.size() > 1);
+                
+                track_position = newPosition;
                 Log.i(TAG, "Shuffle enabled, random next track position: " + track_position);
             } else {
                 track_position++;
@@ -636,10 +677,21 @@ public class ApplicationClass extends Application {
             }
         }
         
-        MUSIC_ID = trackQueue.get(track_position);
-        Log.i(TAG, "Auto-playing next track: " + MUSIC_ID);
-        playTrack();
-        showNotification();
+        // Get the track ID and play it
+        try {
+            MUSIC_ID = trackQueue.get(track_position);
+            Log.i(TAG, "Playing next track: " + MUSIC_ID + " at position " + track_position);
+            playTrack();
+            showNotification();
+        } catch (Exception e) {
+            Log.e(TAG, "Error playing next track", e);
+            // Try to recover by resetting track position
+            if (!trackQueue.isEmpty()) {
+                track_position = 0;
+                MUSIC_ID = trackQueue.get(0);
+                playTrack();
+            }
+        }
     }
     
     public void prevTrack() {

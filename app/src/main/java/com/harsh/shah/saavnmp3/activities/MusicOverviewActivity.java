@@ -219,17 +219,40 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         });
 
         binding.repeatIcon.setOnClickListener(view -> {
-            if (ApplicationClass.player.getRepeatMode() == Player.REPEAT_MODE_OFF)
-                ApplicationClass.player.setRepeatMode(Player.REPEAT_MODE_ONE);
-            else
-                ApplicationClass.player.setRepeatMode(Player.REPEAT_MODE_OFF);
-
-            if (ApplicationClass.player.getRepeatMode() == Player.REPEAT_MODE_OFF)
-                binding.repeatIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.textSec)));
-            else
-                binding.repeatIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)));
-
-            Toast.makeText(MusicOverviewActivity.this, "Repeat Mode Changed.", Toast.LENGTH_SHORT).show();
+            try {
+                // Cycle through all three repeat modes
+                int currentMode = ApplicationClass.player.getRepeatMode();
+                int newMode;
+                String modeMessage;
+                
+                switch (currentMode) {
+                    case Player.REPEAT_MODE_OFF:
+                        newMode = Player.REPEAT_MODE_ONE;
+                        modeMessage = "Repeat One";
+                        break;
+                    case Player.REPEAT_MODE_ONE:
+                        newMode = Player.REPEAT_MODE_ALL;
+                        modeMessage = "Repeat All";
+                        break;
+                    case Player.REPEAT_MODE_ALL:
+                    default:
+                        newMode = Player.REPEAT_MODE_OFF;
+                        modeMessage = "Repeat Off";
+                        break;
+                }
+                
+                ApplicationClass.player.setRepeatMode(newMode);
+                
+                // Update UI to reflect the current mode
+                updateRepeatButtonUI();
+                
+                Toast.makeText(MusicOverviewActivity.this, modeMessage, Toast.LENGTH_SHORT).show();
+                
+                Log.i(TAG, "Repeat mode changed to: " + newMode);
+            } catch (Exception e) {
+                Log.e(TAG, "Error changing repeat mode", e);
+                Toast.makeText(MusicOverviewActivity.this, "Error changing repeat mode", Toast.LENGTH_SHORT).show();
+            }
         });
 
         binding.shuffleIcon.setOnClickListener(view -> {
@@ -694,10 +717,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
         //((ApplicationClass)getApplicationContext()).showNotification();
 
-        if (ApplicationClass.player.getRepeatMode() == Player.REPEAT_MODE_OFF)
-            binding.repeatIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.textSec)));
-        else
-            binding.repeatIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)));
+        // Update repeat and shuffle button UI
+        updateRepeatButtonUI();
 
         if (ApplicationClass.player.getShuffleModeEnabled())
             binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)));
@@ -707,6 +728,34 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         mHandler.postDelayed(mUpdateTimeTask, 1000);
     }
 
+    private void updateRepeatButtonUI() {
+        int tintColor;
+        int repeatMode = ApplicationClass.player.getRepeatMode();
+        
+        switch (repeatMode) {
+            case Player.REPEAT_MODE_ONE:
+                tintColor = getResources().getColor(R.color.spotify_green);
+                try {
+                    binding.repeatIcon.setImageResource(R.drawable.repeat_one_24px);
+                } catch (Exception e) {
+                    // Fallback to regular repeat icon if repeat_one_24px isn't available
+                    Log.e(TAG, "Error setting repeat_one icon: " + e.getMessage());
+                    binding.repeatIcon.setImageResource(R.drawable.repeat_24px);
+                }
+                break;
+            case Player.REPEAT_MODE_ALL:
+                tintColor = getResources().getColor(R.color.spotify_green);
+                binding.repeatIcon.setImageResource(R.drawable.repeat_24px);
+                break;
+            case Player.REPEAT_MODE_OFF:
+            default:
+                tintColor = getResources().getColor(R.color.textSec);
+                binding.repeatIcon.setImageResource(R.drawable.repeat_24px);
+                break;
+        }
+        
+        binding.repeatIcon.setImageTintList(ColorStateList.valueOf(tintColor));
+    }
 
     @Override
     public void nextClicked() {

@@ -33,34 +33,53 @@ public class NotificationReceiver extends BroadcastReceiver {
             case ApplicationClass.ACTION_NEXT:
                 Log.i(TAG, "Processing NEXT action");
                 try {
-                    // First update via ApplicationClass for immediate effect
+                    // First check if player exists
+                    if (ApplicationClass.player == null) {
+                        Log.e(TAG, "Player is null in notification receiver - cannot process NEXT action");
+                        return;
+                    }
+                    
+                    // Call nextTrack through ApplicationClass for immediate effect
                     applicationClass.nextTrack();
                     
-                    // Then notify service for UI updates
+                    // Then notify the service for UI updates
                     serviceIntent.putExtra("action", action);
                     context.startService(serviceIntent);
                     
-                    // Show visual feedback
-                    Toast.makeText(context, "Playing next track", Toast.LENGTH_SHORT).show();
+                    // Visual feedback is already handled in the activity when it receives the service update
                 } catch (Exception e) {
-                    Log.e(TAG, "Error processing next action", e);
+                    Log.e(TAG, "Error processing next action: " + e.getMessage(), e);
+                    Toast.makeText(context, "Error playing next track", Toast.LENGTH_SHORT).show();
                 }
                 break;
                 
             case ApplicationClass.ACTION_PREV:
                 Log.i(TAG, "Processing PREVIOUS action");
                 try {
-                    // First update via ApplicationClass for immediate effect
-                    applicationClass.prevTrack();
+                    // First check if player exists
+                    if (ApplicationClass.player == null) {
+                        Log.e(TAG, "Player is null in notification receiver - cannot process PREV action");
+                        return;
+                    }
+                    
+                    // If we're already at the beginning of the track, go to previous track
+                    // Otherwise just restart the current track (standard music player behavior)
+                    if (ApplicationClass.player.getCurrentPosition() > 3000) {
+                        ApplicationClass.player.seekTo(0);
+                        ApplicationClass.player.play();
+                    } else {
+                        // Call prevTrack for track change
+                        applicationClass.prevTrack();
+                    }
                     
                     // Then notify service for UI updates
                     serviceIntent.putExtra("action", action);
                     context.startService(serviceIntent);
                     
-                    // Show visual feedback
-                    Toast.makeText(context, "Playing previous track", Toast.LENGTH_SHORT).show();
+                    // Visual feedback is already handled in the activity when it receives the service update
                 } catch (Exception e) {
-                    Log.e(TAG, "Error processing previous action", e);
+                    Log.e(TAG, "Error processing previous action: " + e.getMessage(), e);
+                    Toast.makeText(context, "Error playing previous track", Toast.LENGTH_SHORT).show();
                 }
                 break;
                 

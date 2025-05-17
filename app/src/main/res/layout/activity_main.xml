@@ -50,8 +50,8 @@
             android:layout_weight="1" />
 
         <ImageView
-            android:layout_width="@dimen/_25sdp"
-            android:layout_height="@dimen/_25sdp"
+            android:layout_width="@dimen/_20ssp"
+            android:layout_height="@dimen/_20sdp"
             android:src="@drawable/search_24px"
             android:contentDescription="@android:string/search_go"
             android:onClick="openSearch"

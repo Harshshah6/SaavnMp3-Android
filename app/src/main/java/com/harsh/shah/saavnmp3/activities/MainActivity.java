@@ -112,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
                 .withDragDistance(250)
                 .inject();
 
+        // Set version text in the drawer layout
+        updateVersionTextInDrawer();
+
         onDrawerItemsClicked();
 
         binding.profileIcon.setOnClickListener(view -> slidingRootNavBuilder.openMenu(true));
@@ -148,9 +151,49 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, MusicOverviewActivity.class).putExtra("id", ApplicationClass.MUSIC_ID));
         });
 
-        binding.playBarPrevIcon.setOnClickListener(view -> applicationClass.prevTrack());
+        binding.playBarPrevIcon.setOnClickListener(view -> {
+            try {
+                Log.i(TAG, "Play bar previous button clicked");
+                if (applicationClass == null) {
+                    Log.e(TAG, "Application class is null");
+                    return;
+                }
+                
+                // Add visual feedback
+                binding.playBarPrevIcon.setAlpha(0.5f);
+                binding.playBarPrevIcon.animate().alpha(1.0f).setDuration(200).start();
+                
+                // Call the previous track method
+                applicationClass.prevTrack();
+                
+                // Update play/pause icon
+                updatePlaybarUi();
+            } catch (Exception e) {
+                Log.e(TAG, "Error handling previous button click", e);
+            }
+        });
 
-        binding.playBarNextIcon.setOnClickListener(view -> applicationClass.nextTrack());
+        binding.playBarNextIcon.setOnClickListener(view -> {
+            try {
+                Log.i(TAG, "Play bar next button clicked");
+                if (applicationClass == null) {
+                    Log.e(TAG, "Application class is null");
+                    return;
+                }
+                
+                // Add visual feedback
+                binding.playBarNextIcon.setAlpha(0.5f);
+                binding.playBarNextIcon.animate().alpha(1.0f).setDuration(200).start();
+                
+                // Call the next track method
+                applicationClass.nextTrack();
+                
+                // Update play/pause icon
+                updatePlaybarUi();
+            } catch (Exception e) {
+                Log.e(TAG, "Error handling next button click", e);
+            }
+        });
 
         showShimmerData();
         showOfflineData();
@@ -245,6 +288,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Updates the version text in the navigation drawer with the app's current version
+     */
+    private void updateVersionTextInDrawer() {
+        try {
+            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            View drawerLayout = slidingRootNavBuilder.getLayout();
+            if (drawerLayout != null) {
+                View versionTextView = drawerLayout.findViewById(R.id.versionTxt);
+                if (versionTextView instanceof android.widget.TextView) {
+                    ((android.widget.TextView) versionTextView).setText("version " + versionName);
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Error getting app version: " + e.getMessage());
+        }
+    }
+
     Handler handler = new Handler();
     Runnable runnable = this::showPlayBarData;
 
@@ -252,11 +313,7 @@ public class MainActivity extends AppCompatActivity {
         binding.playBarMusicTitle.setText(ApplicationClass.MUSIC_TITLE);
         binding.playBarMusicDesc.setText(ApplicationClass.MUSIC_DESCRIPTION);
         Picasso.get().load(Uri.parse(ApplicationClass.IMAGE_URL)).into(binding.playBarCoverImage);
-        if (ApplicationClass.player.isPlaying()) {
-            binding.playBarPlayPauseIcon.setImageResource(R.drawable.baseline_pause_24);
-        } else {
-            binding.playBarPlayPauseIcon.setImageResource(R.drawable.play_arrow_24px);
-        }
+        updatePlaybarUi();
 
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setColor(ApplicationClass.IMAGE_BG_COLOR);
@@ -276,6 +333,18 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(runnable, 1000);
     }
 
+    /**
+     * Updates the play/pause icon based on current playback state
+     */
+    private void updatePlaybarUi() {
+        if (ApplicationClass.player != null) {
+            binding.playBarPlayPauseIcon.setImageResource(
+                ApplicationClass.player.isPlaying() ? 
+                R.drawable.baseline_pause_24 : 
+                R.drawable.play_arrow_24px
+            );
+        }
+    }
 
     @Override
     protected void onResume() {

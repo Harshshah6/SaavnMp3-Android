@@ -1,6 +1,6 @@
    # SaavnMp3 / Melotune
 
-A simple music player inspired by spotify and developed using the unofficial JioSaavn API. Has a lot of features like Search for an Artist, Song, Playlist, Albums. Not just search this app also provides you functionality to play the songs and view the artist info and much more.
+A simple music player inspired by Spotify and developed using the unofficial JioSaavn API. It has many features like searching for Artists, Songs, Playlists, Albums, and more. The app also provides functionality to play songs, view artist info, and much more.
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/Harshshah6/SaavnMp3-Android)
 ![GitHub watchers](https://img.shields.io/github/watchers/Harshshah6/SaavnMp3-Android)
@@ -19,8 +19,12 @@ A simple music player inspired by spotify and developed using the unofficial Jio
 * Search for Albums
 * Search for Playlists
 * Doesn't collect any user data
-* UI inspired by spotify
-* much more...
+* UI inspired by Spotify
+* Auto-updating version display
+* Auto-next play functionality
+* HTTP/HTTPS support for music CDN domains
+* Robust error handling
+* Much more...
 
 ## Screenshots
 
@@ -47,7 +51,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 * Android Studio (latest version recommended)
 * Java 17+
-* An android device or emulator
+* An Android device or emulator
 
 ### Installation
 
@@ -57,33 +61,40 @@ These instructions will get you a copy of the project up and running on your loc
     git clone https://github.com/harshshah6/SaavnMp3-Android.git
     ```
 
-2. Open the project in android studio
+2. Open the project in Android Studio
 3. Build and run the app on your device or emulator
+
+## Recent Updates
+
+* **Auto-updating version display**: The app now automatically displays the current version in the main drawer layout
+* **Improved player controls**: Better handling of next/previous track functionality
+* **Enhanced error handling**: Robust error recovery mechanisms for network operations
+* **HTTP/HTTPS support**: Proper handling for music CDN domains 
 
 ## Built with
 
-* [Java 17](https://openjdk.org/projects/jdk/17/) - The programming language used.
-* [Saavn.dev](https://github.com/sumitkolhe/jiosaavn-api) - The unofficial JioSaav API used.
-* [Glide](https://github.com/bumptech/glide) - Image library used to load the images from URL.
-* [Picasso](https://github.com/square/picasso) - Image library used to load the images from URL.
-* [Gson](https://github.com/google/gson) - Gson library to parse the json response from API.
-* [OkHttp](https://github.com/square/okhttp) - Library to send requests to the APIs and receive the data.
-* [SwiperefreshLayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) - Library to add feature of pull to refresh list.
-* [Shimmer](https://github.com/facebookarchive/shimmer-android) - Library to add an animated loading effect to the layout.
-* [OverscrollDecor](https://github.com/EverythingMe/overscroll-decor) - IOS style (bouncy) overscroll effect in scrollable layouts.
-* [SSP](https://github.com/intuit/ssp) & [SDP](https://github.com/intuit/sdp) - Dimension Values library to make UI responsive.
+* [Java 17](https://openjdk.org/projects/jdk/17/) - The programming language used
+* [Saavn.dev](https://github.com/sumitkolhe/jiosaavn-api) - The unofficial JioSaavn API
+* [Glide](https://github.com/bumptech/glide) - Image library used to load images from URL
+* [Picasso](https://github.com/square/picasso) - Image library used to load images from URL
+* [Gson](https://github.com/google/gson) - Gson library to parse JSON responses from API
+* [OkHttp](https://github.com/square/okhttp) - Library to send requests to APIs and receive data
+* [SwiperefreshLayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) - Library for pull-to-refresh functionality
+* [Shimmer](https://github.com/facebookarchive/shimmer-android) - Library for animated loading effects
+* [OverscrollDecor](https://github.com/EverythingMe/overscroll-decor) - iOS style (bouncy) overscroll effect
+* [SSP](https://github.com/intuit/ssp) & [SDP](https://github.com/intuit/sdp) - Dimension libraries for responsive UI
 
 ## Contributing
 
 If you'd like to contribute to SaavnMp3-Android, here are some guidelines:
 
-1. Fork the repository.
-2. Create a new branch for your changes.
-3. Make your changes.
-4. Run the project to ensure it works.
-5. Commit your changes.
-6. Push your changes to your forked repository.
-7. Submit a pull request.
+1. Fork the repository
+2. Create a new branch for your changes
+3. Make your changes
+4. Run the project to ensure it works
+5. Commit your changes
+6. Push your changes to your forked repository
+7. Submit a pull request
 
 ## License
 
@@ -113,8 +124,8 @@ SOFTWARE.
 
 ## Acknowledgements
 
-* Inspired by spotify.
-* Thanks to Saavn.dev for amazing unofficial JioSaavn API
+* Inspired by Spotify
+* Thanks to Saavn.dev for the amazing unofficial JioSaavn API
 
 ## Contributors ✨
 

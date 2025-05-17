@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.1"
+agp = "8.10.0"
 compiler = "4.16.0"
 core = "1.15.0"
 exoplayer = "2.19.1"

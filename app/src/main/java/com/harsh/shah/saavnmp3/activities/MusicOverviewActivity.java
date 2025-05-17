@@ -18,15 +18,18 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.media3.common.Player;
+import androidx.media3.common.util.UnstableApi;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.harsh.shah.saavnmp3.ApplicationClass;
+import com.harsh.shah.saavnmp3.BuildConfig;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.databinding.ActivityMusicOverviewBinding;
 import com.harsh.shah.saavnmp3.databinding.MusicOverviewMoreInfoBottomSheetBinding;
@@ -61,6 +64,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     private String IMAGE_URL = "";
     MusicService musicService;
     private List<SongResponse.Artist> artsitsList = new ArrayList<>();
+    private final boolean isDebugMode = BuildConfig.DEBUG;
 
     //@SuppressLint("ClickableViewAccessibility")
     @Override
@@ -171,7 +175,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                     binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
                 }
                 
-                Toast.makeText(MusicOverviewActivity.this, "Playing next track", Toast.LENGTH_SHORT).show();
+                 if(!isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Playing next track", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 Log.e(TAG, "Error skipping to next track", e);
                 Toast.makeText(MusicOverviewActivity.this, "Error skipping to next track", Toast.LENGTH_SHORT).show();
@@ -195,11 +199,11 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 // Otherwise just restart the current track
                 if (ApplicationClass.player.getCurrentPosition() > 3000) {
                     ApplicationClass.player.seekTo(0);
-                    Toast.makeText(MusicOverviewActivity.this, "Restarting current track", Toast.LENGTH_SHORT).show();
+                    if(!isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Restarting current track", Toast.LENGTH_SHORT).show();
                 } else {
                     // Call previous track method
                     applicationClass.prevTrack();
-                    Toast.makeText(MusicOverviewActivity.this, "Playing previous track", Toast.LENGTH_SHORT).show();
+                    if(!isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Playing previous track", Toast.LENGTH_SHORT).show();
                 }
                 
                 // Update UI state
@@ -245,8 +249,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 
                 // Update UI to reflect the current mode
                 updateRepeatButtonUI();
-                
-                Toast.makeText(MusicOverviewActivity.this, modeMessage, Toast.LENGTH_SHORT).show();
+
+                if(!isDebugMode) Toast.makeText(MusicOverviewActivity.this, modeMessage, Toast.LENGTH_SHORT).show();
                 
                 Log.i(TAG, "Repeat mode changed to: " + newMode);
             } catch (Exception e) {
@@ -607,6 +611,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         return timeString;
     }
 
+    @OptIn(markerClass = UnstableApi.class)
     void prepareMediaPLayer() {
         try {
             ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();

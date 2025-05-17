@@ -34,16 +34,31 @@ android {
     }
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 
     viewBinding {
         enabled true
     }
 
-    applicationVariants.all { variant ->
+    applicationVariants.configureEach { variant ->
         variant.outputs.each { output ->
             def outputFileName = "Melotune-${variant.versionName}-${variant.name}.apk"
             output.outputFileName = outputFileName
+
+            variant.assembleProvider.get().doLast {
+                def apkDir = output.outputFile.parent
+                def customApk = new File(apkDir, outputFileName)
+                def standardApk = new File(apkDir, "app-release.apk")
+
+                if (customApk.exists()) {
+                    standardApk.bytes = customApk.bytes
+                    println("Copied ${outputFileName} to app-release.apk")
+                } else {
+                    println("Custom APK not found: ${customApk}")
+                }
+            }
+
         }
     }}
 

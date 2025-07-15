@@ -1,6 +1,6 @@
-   # SaavnMp3 / Melotune
+# SaavnMp3 / Melotune
 
-A simple music player inspired by Spotify and developed using the unofficial JioSaavn API. It has many features like searching for Artists, Songs, Playlists, Albums, and more. The app also provides functionality to play songs, view artist info, and much more.
+A clean, ad-free Android music streaming app powered by the unofficial JioSaavn API. Inspired by Spotify’s minimal interface, this app enables users to search, stream, and enjoy music seamlessly — all without login or tracking.
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/Harshshah6/SaavnMp3-Android)
 ![GitHub watchers](https://img.shields.io/github/watchers/Harshshah6/SaavnMp3-Android)

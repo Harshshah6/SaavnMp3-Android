@@ -16,6 +16,8 @@
     <color name="spotify_dark_green">#1DB954</color>
     <color name="spotify_light_green">#1ED760</color>
 
+    <color name="activity_main_cta_button">@color/textSec</color>
+
     <!-- Background colors -->
     <color name="background_dark">#121212</color>
     <color name="background_light">#FAF9F6</color>

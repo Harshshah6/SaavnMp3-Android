@@ -100,10 +100,10 @@
                         android:id="@+id/versionTxt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="Version - 1.0 "
+                        android:layout_marginTop="@dimen/_4sdp"
                         android:src="@drawable/round_info_outline_24"
                         app:srcPadding="@dimen/_4sdp"
-                        android:layout_marginTop="@dimen/_4sdp" />
+                        app:title="Version - 1.0 " />
 
                     <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
                         android:id="@+id/email"

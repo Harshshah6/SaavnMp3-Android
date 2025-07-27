@@ -102,9 +102,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
                     .putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_ALBUMS.name())
                     .putExtra("artist_name", binding.artistName.getText().toString()));
         });
-        binding.topSinglesSeeMore.setOnClickListener(v -> {
-
-        });
+        binding.topSinglesSeeMore.setVisibility(View.GONE);
+        //binding.topSinglesSeeMore.setOnClickListener(v -> startActivity(seeMoreIntent.putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_SINGLES.name())));
 
         showShimmerData();
         //showData();

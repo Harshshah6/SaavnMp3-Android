@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.gson.Gson;
 import com.harsh.shah.saavnmp3.adapters.ActivitySeeMoreAlbumListAdapter;
 import com.harsh.shah.saavnmp3.adapters.ActivitySeeMoreListAdapter;
+import com.harsh.shah.saavnmp3.adapters.ActivitySeeMoreSinglesListAdapter;
 import com.harsh.shah.saavnmp3.databinding.ActivitySeeMoreBinding;
 import com.harsh.shah.saavnmp3.network.ApiManager;
 import com.harsh.shah.saavnmp3.network.utility.RequestNetwork;
@@ -65,9 +66,12 @@ public class SeeMoreActivity extends AppCompatActivity {
         if (getIntent().getExtras() == null) finish();
         binding.toolbarText.setText(getIntent().getExtras().getString("artist_name"));
         artistId = getIntent().getExtras().getString("id");
-        String type = getIntent().getExtras().getString("type", ActivitySeeMoreListAdapter.Mode.TOP_SONGS.name());
+        final String type = getIntent().getExtras().getString("type", ActivitySeeMoreListAdapter.Mode.TOP_SONGS.name());
         mode = ActivitySeeMoreListAdapter.Mode.valueOf(type);
-        binding.recyclerView.setAdapter(mode == ActivitySeeMoreListAdapter.Mode.TOP_SONGS ? activitySeeMoreListAdapter : activitySeeMoreAlbumListAdapter);
+        binding.recyclerView.setAdapter(
+                mode == ActivitySeeMoreListAdapter.Mode.TOP_SONGS ?
+                        activitySeeMoreListAdapter : activitySeeMoreAlbumListAdapter
+        );
         requestDataFirst();
     }
 
@@ -75,6 +79,8 @@ public class SeeMoreActivity extends AppCompatActivity {
     private ActivitySeeMoreListAdapter.Mode mode = ActivitySeeMoreListAdapter.Mode.TOP_SONGS;
     private final ActivitySeeMoreListAdapter activitySeeMoreListAdapter = new ActivitySeeMoreListAdapter();
     private final ActivitySeeMoreAlbumListAdapter activitySeeMoreAlbumListAdapter = new ActivitySeeMoreAlbumListAdapter();
+
+    //private final ActivitySeeMoreSinglesListAdapter activitySeeMoreSinglesListAdapter = new ActivitySeeMoreSinglesListAdapter();
 
     private void requestDataFirst() {
         final ApiManager apiManager = new ApiManager(this);

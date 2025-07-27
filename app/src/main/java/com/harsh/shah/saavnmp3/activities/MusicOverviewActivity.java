@@ -64,7 +64,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     private String IMAGE_URL = "";
     MusicService musicService;
     private List<SongResponse.Artist> artsitsList = new ArrayList<>();
-    private final boolean isDebugMode = BuildConfig.DEBUG;
+    private final boolean isDebugMode = false;
 
     //@SuppressLint("ClickableViewAccessibility")
     @Override
@@ -175,7 +175,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                     binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
                 }
                 
-                 if(!isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Playing next track", Toast.LENGTH_SHORT).show();
+                 if(isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Playing next track", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 Log.e(TAG, "Error skipping to next track", e);
                 Toast.makeText(MusicOverviewActivity.this, "Error skipping to next track", Toast.LENGTH_SHORT).show();
@@ -199,11 +199,11 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 // Otherwise just restart the current track
                 if (ApplicationClass.player.getCurrentPosition() > 3000) {
                     ApplicationClass.player.seekTo(0);
-                    if(!isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Restarting current track", Toast.LENGTH_SHORT).show();
+                    if(isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Restarting current track", Toast.LENGTH_SHORT).show();
                 } else {
                     // Call previous track method
                     applicationClass.prevTrack();
-                    if(!isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Playing previous track", Toast.LENGTH_SHORT).show();
+                    if(isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Playing previous track", Toast.LENGTH_SHORT).show();
                 }
                 
                 // Update UI state
@@ -228,7 +228,6 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 int currentMode = ApplicationClass.player.getRepeatMode();
                 int newMode;
                 String modeMessage;
-                
                 switch (currentMode) {
                     case Player.REPEAT_MODE_OFF:
                         newMode = Player.REPEAT_MODE_ONE;
@@ -244,13 +243,13 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                         modeMessage = "Repeat Off";
                         break;
                 }
-                
+
                 ApplicationClass.player.setRepeatMode(newMode);
                 
                 // Update UI to reflect the current mode
                 updateRepeatButtonUI();
 
-                if(!isDebugMode) Toast.makeText(MusicOverviewActivity.this, modeMessage, Toast.LENGTH_SHORT).show();
+                if(isDebugMode) Toast.makeText(MusicOverviewActivity.this, modeMessage, Toast.LENGTH_SHORT).show();
                 
                 Log.i(TAG, "Repeat mode changed to: " + newMode);
             } catch (Exception e) {
@@ -267,7 +266,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             else
                 binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.textSec)));
 
-            Toast.makeText(MusicOverviewActivity.this, "Shuffle Mode Changed.", Toast.LENGTH_SHORT).show();
+            if(isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Shuffle Mode Changed.", Toast.LENGTH_SHORT).show();
         });
 
         binding.shareIcon.setOnClickListener(view -> {

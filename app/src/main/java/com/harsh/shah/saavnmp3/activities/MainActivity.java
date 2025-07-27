@@ -310,6 +310,10 @@ public class MainActivity extends AppCompatActivity {
     Runnable runnable = this::showPlayBarData;
 
     void showPlayBarData() {
+
+        if(ApplicationClass.MUSIC_ID.isBlank()) binding.playBarBackground.setVisibility(View.GONE);
+        else binding.playBarBackground.setVisibility(View.VISIBLE);
+
         binding.playBarMusicTitle.setText(ApplicationClass.MUSIC_TITLE);
         binding.playBarMusicDesc.setText(ApplicationClass.MUSIC_DESCRIPTION);
         Picasso.get().load(Uri.parse(ApplicationClass.IMAGE_URL)).into(binding.playBarCoverImage);

@@ -27,7 +27,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:strokeWidth="0dp">
+            app:strokeWidth="@dimen/_1sdp"
+            app:strokeColor="@color/activity_main_cta_button">
 
             <ImageView
                 android:id="@+id/coverImage"

@@ -38,6 +38,7 @@ public class AboutActivity extends AppCompatActivity {
         binding.discord.setOnClickListener(view -> Toast.makeText(AboutActivity.this, "Oops, No Discord Server found.", Toast.LENGTH_SHORT).show());
         binding.instagram.setOnClickListener(view -> openUrl("https://www.instagram.com/harsh_.s._shah/"));
         binding.telegram.setOnClickListener(view -> openUrl("https://t.me/legendary_streamer_official"));
+        binding.rate.setOnClickListener(view -> openUrl("https://github.com/harshshah6/SaavnMp3-Android"));
 
         new RequestNetwork(this).startRequestNetwork(RequestNetworkController.GET, "https://androsketchui.vercel.app/api/github/harshshah6/saavnmp3-android/contributors", "", new RequestNetwork.RequestListener() {
             @Override

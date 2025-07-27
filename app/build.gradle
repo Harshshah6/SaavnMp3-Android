@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 36
         versionCode 2
-        versionName "1.0.1"
+        versionName "1.0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //Universal APK Supporting All ABIs
@@ -88,10 +88,9 @@ dependencies {
 
     //FOR APIs REQUEST AND RESPONSE PARSING
     implementation libs.gson
-    implementation libs.okhttp
-    // Add for HTTP connections with cleaner API
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    implementation libs.okhttp.v4120
+
+    implementation libs.logging.interceptor
 
     //FOR SHIMMERING LAYOUT (LOADING LAYOUT)
     implementation libs.shimmer
@@ -122,8 +121,4 @@ dependencies {
 
     // PAGING LIBRARY FOR RECYCLERVIEW
     implementation libs.paginate
-
-    //AudioFile Utility
-    implementation libs.ffmpegandroid
-
 }

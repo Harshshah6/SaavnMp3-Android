@@ -8,4 +8,6 @@
     <color name="dividerBackground">@color/divider_light</color>
     <color name="green">@color/spotify_dark_green</color>
 
+    <color name="activity_main_cta_button">@color/spotify_dark_green</color>
+
 </resources>

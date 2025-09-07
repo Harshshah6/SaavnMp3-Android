@@ -26,9 +26,7 @@
             app:layout_constraintBottom_toTopOf="@+id/albumTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:strokeWidth="@dimen/_1sdp"
-            app:strokeColor="@color/activity_main_cta_button">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/coverImage"

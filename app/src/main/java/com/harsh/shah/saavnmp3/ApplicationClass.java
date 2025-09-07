@@ -144,7 +144,7 @@ public class ApplicationClass extends Application {
             @Override
             public void onPlaybackStateChanged(int playbackState) {
                 Log.i(TAG, "Player state changed to: " + getStateString(playbackState));
-                
+
                 // Auto-handle errors
                 if (playbackState == Player.STATE_IDLE) {
                     Log.e(TAG, "Player idle state detected, might need recovery");
@@ -160,21 +160,30 @@ public class ApplicationClass extends Application {
                             }
                         }, 2000);
                     }
+                }else if (playbackState == Player.STATE_READY) {
+                    // Now it's safe to play
+                    Log.i(TAG, "Player ready, starting playback...");
+                    player.play();
+
+                } else if (playbackState == Player.STATE_ENDED) {
+                    // Auto-play next track when current track ends
+                    Log.i(TAG, "Track ended, auto-playing next track");
+                    nextTrack();
                 }
             }
-            
+
             @Override
             public void onIsPlayingChanged(boolean isPlaying) {
                 Log.i(TAG, "Player isPlaying changed to: " + isPlaying);
-                
+
                 // Update notification when playback state changes
                 showNotification();
             }
-            
+
             @Override
             public void onPlayerError(androidx.media3.common.PlaybackException error) {
                 Log.e(TAG, "Player error: " + error.getMessage());
-                
+
                 // Auto-recovery from common errors
                 if (SONG_URL != null && !SONG_URL.isEmpty()) {
                     Log.i(TAG, "Attempting to recover from error");
@@ -529,7 +538,7 @@ public class ApplicationClass extends Application {
             player.prepare();
             
             // Enable repeat mode if needed
-            configureRepeatMode();
+            //configureRepeatMode();
             
             // Remove any existing listeners to avoid duplicates
             final Player.Listener playbackListener = new Player.Listener() {
@@ -573,7 +582,7 @@ public class ApplicationClass extends Application {
             };
             
             // Add the one-time listener
-            player.addListener(playbackListener);
+            //player.addListener(playbackListener);
             
             // Update notification
             showNotification();

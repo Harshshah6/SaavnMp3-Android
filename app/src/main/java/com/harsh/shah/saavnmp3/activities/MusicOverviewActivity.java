@@ -321,7 +321,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 final TrackCacheHelper trackCacheHelper = new TrackCacheHelper(MusicOverviewActivity.this);
                 final SongResponse.Song song = mSongResponse.data().get(0);
                 if (trackCacheHelper.isTrackInCache(song.id())) {
-                    trackCacheHelper.copyFileToMusicDir(trackCacheHelper.getTrackFromCache(song.id()), song.name());
+                    trackCacheHelper.copyFileToMusicDir(trackCacheHelper.getTrackFromCache(song.id()), song.name(), song);
                     Toast.makeText(MusicOverviewActivity.this, "Downloaded to /Music/Melotune/ ", Toast.LENGTH_SHORT).show();
                 } else {
                     ProgressDialog progressDialog = new ProgressDialog(MusicOverviewActivity.this);
@@ -334,7 +334,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                         public void run() {
                             if (ApplicationClass.isTrackDownloaded) {
                                 progressDialog.dismiss();
-                                trackCacheHelper.copyFileToMusicDir(trackCacheHelper.getTrackFromCache(song.id()), song.name());
+                                trackCacheHelper.copyFileToMusicDir(trackCacheHelper.getTrackFromCache(song.id()), song.name(), song);
                                 Toast.makeText(MusicOverviewActivity.this, "Downloaded to /Music/Melotune/ ", Toast.LENGTH_SHORT).show();
                                 this.cancel();
                             }

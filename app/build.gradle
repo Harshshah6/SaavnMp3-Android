@@ -121,4 +121,7 @@ dependencies {
 
     // PAGING LIBRARY FOR RECYCLERVIEW
     implementation libs.paginate
+
+    // FOR TAGGING METADATA INTO MP3 FILES
+    implementation libs.jaudiotagger
 }

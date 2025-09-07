@@ -1,5 +1,5 @@
 [versions]
-agp = "8.11.1"
+agp = "8.13.0"
 compiler = "4.16.0"
 core = "1.16.0"
 gson = "2.13.1"
@@ -23,6 +23,7 @@ shimmer = "0.5.0"
 slidingrootnav = "v1.1.1"
 sspAndroid = "1.1.1"
 swiperefreshlayout = "1.2.0-beta01"
+jaudiotagger = "3.0.1"
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
@@ -51,6 +52,7 @@ shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 slidingrootnav = { module = "com.github.yarolegovich:SlidingRootNav", version.ref = "slidingrootnav" }
 ssp-android = { module = "com.intuit.ssp:ssp-android", version.ref = "sspAndroid" }
 swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
+jaudiotagger = { module = "net.jthink:jaudiotagger", version.ref = "jaudiotagger" }
 
 # Media3 Exoplayer related dependencies
 [bundles]

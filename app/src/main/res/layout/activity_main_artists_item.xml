@@ -26,8 +26,6 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:strokeColor="@color/activity_main_cta_button"
-            app:strokeWidth="@dimen/_1sdp"
             app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize100Percent" />
 
         <TextView

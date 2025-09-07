@@ -15,8 +15,11 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
@@ -276,16 +279,41 @@ public class ApplicationClass extends Application {
     public void showNotification(int playPauseButton) {
         try {
             Log.i(TAG, "showNotification: " + MUSIC_TITLE + " - ID: " + MUSIC_ID);
-            
+
             if (MUSIC_ID == null || MUSIC_ID.isEmpty()) {
                 Log.e(TAG, "Cannot show notification: Music ID is empty");
                 return;
             }
-            
+
             if (MUSIC_TITLE == null || MUSIC_TITLE.isEmpty() || IMAGE_URL == null || IMAGE_URL.isEmpty()) {
                 Log.e(TAG, "Cannot show notification: Missing title or image");
                 return;
             }
+
+            // 🔹 Update playback state
+            PlaybackStateCompat state = new PlaybackStateCompat.Builder()
+                    .setActions(
+                            PlaybackStateCompat.ACTION_PLAY |
+                                    PlaybackStateCompat.ACTION_PAUSE |
+                                    PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                    )
+                    .setState(
+                            playPauseButton == R.drawable.play_arrow_24px
+                                    ? PlaybackStateCompat.STATE_PAUSED
+                                    : PlaybackStateCompat.STATE_PLAYING,
+                            0, 1.0f
+                    )
+                    .build();
+
+            mediaSession.setPlaybackState(state);
+
+            // 🔹 Update metadata (shows in widget)
+            MediaMetadataCompat metadata = new MediaMetadataCompat.Builder()
+                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, MUSIC_TITLE)
+                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, MUSIC_DESCRIPTION)
+                    .build();
+            mediaSession.setMetadata(metadata);
 
             int reqCode = MUSIC_ID.hashCode();
 
@@ -293,23 +321,23 @@ public class ApplicationClass extends Application {
             intent.putExtra("id", MUSIC_ID);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-            PendingIntent contentIntent = PendingIntent.getActivity(this, reqCode, intent, 
+            PendingIntent contentIntent = PendingIntent.getActivity(this, reqCode, intent,
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
             Intent prevIntent = new Intent(this, NotificationReceiver.class).setAction(ACTION_PREV);
-            PendingIntent prevPendingIntent = PendingIntent.getBroadcast(this, 0, prevIntent, 
+            PendingIntent prevPendingIntent = PendingIntent.getBroadcast(this, 0, prevIntent,
                     PendingIntent.FLAG_IMMUTABLE);
 
             Intent playIntent = new Intent(this, NotificationReceiver.class).setAction(ApplicationClass.ACTION_PLAY);
-            PendingIntent playPendingIntent = PendingIntent.getBroadcast(this, 0, playIntent, 
+            PendingIntent playPendingIntent = PendingIntent.getBroadcast(this, 0, playIntent,
                     PendingIntent.FLAG_IMMUTABLE);
 
             Intent nextIntent = new Intent(this, NotificationReceiver.class).setAction(ApplicationClass.ACTION_NEXT);
-            PendingIntent nextPendingIntent = PendingIntent.getBroadcast(this, 0, nextIntent, 
+            PendingIntent nextPendingIntent = PendingIntent.getBroadcast(this, 0, nextIntent,
                     PendingIntent.FLAG_IMMUTABLE);
-            
+
             // Create and show a simple notification as fallback in case image loading fails
-            androidx.core.app.NotificationCompat.Builder notificationBuilder = 
+            androidx.core.app.NotificationCompat.Builder notificationBuilder =
                     new androidx.core.app.NotificationCompat.Builder(ApplicationClass.this, CHANNEL_ID_1)
                     .setSmallIcon(R.drawable.headphone)
                     .setContentTitle(MUSIC_TITLE)
@@ -324,7 +352,7 @@ public class ApplicationClass extends Application {
                     .setPriority(Notification.PRIORITY_DEFAULT)
                     .setContentIntent(contentIntent)
                     .setOnlyAlertOnce(true);
-            
+
             // Load album art with a timeout to avoid blocking
             try {
                 Glide.with(this)
@@ -337,7 +365,7 @@ public class ApplicationClass extends Application {
                                 try {
                                     //IMAGE_BG_COLOR = calculateDominantColor(resource);
                                     //TEXT_ON_IMAGE_COLOR = invertColor(IMAGE_BG_COLOR);
-                                    
+
                                     // Try to get palette colors
                                     try {
                                         Palette.from(resource)
@@ -354,10 +382,10 @@ public class ApplicationClass extends Application {
                                     } catch (Exception e) {
                                         Log.e(TAG, "Error generating palette", e);
                                     }
-                                    
+
                                     // Add the bitmap to the notification
                                     notificationBuilder.setLargeIcon(resource);
-                                    
+
                                     // Build and show the notification
                                     Notification notification = notificationBuilder.build();
                                     NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -390,7 +418,7 @@ public class ApplicationClass extends Application {
             Log.e("ApplicationClass", "showNotification error: ", e);
         }
     }
-    
+
     private void showBasicNotification(androidx.core.app.NotificationCompat.Builder builder) {
         try {
             Notification notification = builder.build();

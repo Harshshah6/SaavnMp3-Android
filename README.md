@@ -7,6 +7,8 @@ A clean, ad-free Android music streaming app powered by the unofficial JioSaavn 
 ![GitHub Repo stars](https://img.shields.io/github/stars/Harshshah6/SaavnMp3-Android)
 <br/>
 [![Download APK](https://img.shields.io/badge/Download_APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Harshshah6/SaavnMp3-Android/releases/latest)
+[![Get it at IzzyOnDroid](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/com.harsh.shah.saavnmp3&style=for-the-badge)](https://apt.izzysoft.de/packages/com.harsh.shah.saavnmp3)
+[![RB Status](https://shields.rbtlog.dev/simple/com.harsh.shah.saavnmp3?style=for-the-badge)](https://shields.rbtlog.dev/com.harsh.shah.saavnmp3)
 [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.me/HarshShah06)
 
 ## Features

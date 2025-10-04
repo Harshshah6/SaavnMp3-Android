@@ -595,7 +595,7 @@ public class ApplicationClass extends Application {
                 }
 
                 @Override
-                public void onPlayerError(androidx.media3.common.PlaybackException error) {
+                public void onPlayerError(@NonNull androidx.media3.common.PlaybackException error) {
                     Log.e(TAG, "Player error: " + error.getMessage(), error);
                     handlePlaybackError();
                 }
@@ -690,9 +690,7 @@ public class ApplicationClass extends Application {
                     // In no-repeat mode, we've reached the end of the queue
                     // Just restart the current track instead of stopping completely
                     if (player != null) {
-                        player.seekTo(0);
-                        player.play();
-                        Log.i(TAG, "Repeat OFF mode, but reached end of queue - restarting current track");
+                        Log.i(TAG, "Repeat OFF mode");
                         return;
                     }
                     break;
@@ -805,13 +803,13 @@ public class ApplicationClass extends Application {
     }
     
     private String getStateString(int state) {
-        switch (state) {
-            case Player.STATE_IDLE: return "IDLE";
-            case Player.STATE_BUFFERING: return "BUFFERING";
-            case Player.STATE_READY: return "READY";
-            case Player.STATE_ENDED: return "ENDED";
-            default: return "UNKNOWN";
-        }
+        return switch (state) {
+            case Player.STATE_IDLE -> "IDLE";
+            case Player.STATE_BUFFERING -> "BUFFERING";
+            case Player.STATE_READY -> "READY";
+            case Player.STATE_ENDED -> "ENDED";
+            default -> "UNKNOWN";
+        };
     }
 
     private void playTrack() {

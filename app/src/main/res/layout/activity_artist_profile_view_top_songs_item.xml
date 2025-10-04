@@ -31,6 +31,7 @@
         android:layout_height="@dimen/_30sdp"
         android:layout_marginStart="@dimen/_4sdp"
         android:background="@color/textSec"
+        android:contentDescription="Artist-Profile-Image"
         app:layout_constraintBottom_toBottomOf="@id/position"
         app:layout_constraintStart_toEndOf="@id/position"
         app:layout_constraintTop_toTopOf="@id/position" />
@@ -45,7 +46,7 @@
         android:textColor="@color/textMain"
         android:textSize="@dimen/_14ssp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/more"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/coverImage"
         app:layout_constraintTop_toTopOf="@id/coverImage" />
 
@@ -59,15 +60,5 @@
         app:layout_constraintEnd_toEndOf="@+id/coverTitle"
         app:layout_constraintStart_toStartOf="@id/coverTitle"
         app:layout_constraintTop_toBottomOf="@id/coverTitle" />
-
-    <ImageView
-        android:id="@+id/more"
-        android:layout_width="@dimen/_30sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:padding="@dimen/_6sdp"
-        android:src="@drawable/more_vert_24px"
-        app:layout_constraintBottom_toBottomOf="@id/position"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/position" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

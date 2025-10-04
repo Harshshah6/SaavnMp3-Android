@@ -27,6 +27,7 @@
                 android:id="@+id/artist_img"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_250sdp"
+                android:contentDescription="artist-profile-image"
                 android:scaleType="centerCrop"
                 app:layout_collapseMode="parallax" />
 
@@ -46,6 +47,7 @@
                     android:paddingVertical="@dimen/_6sdp"
                     android:text="@string/app_name"
                     android:textSize="@dimen/_30ssp"
+                    android:textColor="#ffffff"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -57,7 +59,8 @@
                 android:layout_marginTop="@dimen/_18sdp"
                 android:fitsSystemWindows="true"
                 app:layout_collapseMode="pin"
-                app:title="" />
+                app:title=""
+                android:theme="@style/ToolbarTheme"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

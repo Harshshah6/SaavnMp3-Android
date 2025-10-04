@@ -10,4 +10,8 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">@color/textMain</item>
+    </style>
+
 </resources>

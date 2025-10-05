@@ -1,6 +1,7 @@
 package com.harsh.shah.saavnmp3.records;
 
 import com.google.gson.annotations.SerializedName;
+import com.harsh.shah.saavnmp3.utils.TextParserUtil;
 
 import java.util.List;
 
@@ -22,5 +23,11 @@ public record AlbumSearch(
             @SerializedName("image") List<GlobalSearch.Image> image,
             @SerializedName("songs") List<SongResponse.Song> songs
     ) {
+        public String name(){
+            return TextParserUtil.parseHtmlText(name);
+        }
+        public String description(){
+            return TextParserUtil.parseHtmlText(description);
+        }
     }
 }

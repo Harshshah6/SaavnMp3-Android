@@ -1,6 +1,7 @@
 package com.harsh.shah.saavnmp3.records;
 
 import com.google.gson.annotations.SerializedName;
+import com.harsh.shah.saavnmp3.utils.TextParserUtil;
 
 import java.util.List;
 
@@ -22,6 +23,10 @@ public record PlaylistsSearch(
                 @SerializedName("songCount") int songCount,
                 @SerializedName("language") String language,
                 @SerializedName("explicitContent") boolean explicitContent
-        ){}
+        ){
+            public String name() {
+                return TextParserUtil.parseHtmlText(name);
+            }
+        }
     }
 }

@@ -33,7 +33,7 @@
             <ImageView
                 android:id="@+id/profile_icon"
                 android:layout_width="@dimen/_25sdp"
-                android:layout_height="@dimen/_25sdp"
+                android:layout_height="28dp"
                 android:padding="@dimen/_2sdp"
                 android:src="@drawable/round_menu_24" />
         </com.google.android.material.card.MaterialCardView>

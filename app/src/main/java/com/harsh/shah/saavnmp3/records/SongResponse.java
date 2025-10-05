@@ -1,6 +1,7 @@
 package com.harsh.shah.saavnmp3.records;
 
 import com.google.gson.annotations.SerializedName;
+import com.harsh.shah.saavnmp3.utils.TextParserUtil;
 
 import java.util.List;
 
@@ -30,7 +31,9 @@ public record SongResponse(
             @SerializedName("downloadUrl") List<DownloadUrl> downloadUrl
 
     ) {
-
+        public String name() {
+            return TextParserUtil.parseHtmlText(name);
+        }
     }
 
     public record Lyrics(
@@ -38,6 +41,9 @@ public record SongResponse(
             @SerializedName("copyright") String copyright,
             @SerializedName("snippet") String snippet
     ) {
+        public String lyrics() {
+            return TextParserUtil.parseHtmlText(lyrics);
+        }
     }
 
     public record Album(
@@ -45,6 +51,9 @@ public record SongResponse(
             @SerializedName("name") String name,
             @SerializedName("url") String url
     ) {
+        public String name() {
+            return TextParserUtil.parseHtmlText(name);
+        }
     }
 
     public record Artists(
@@ -62,6 +71,12 @@ public record SongResponse(
             @SerializedName("image") List<Image> image,
             @SerializedName("url") String url
     ) {
+        public String name() {
+            return TextParserUtil.parseHtmlText(name);
+        }
+        public String role() {
+            return TextParserUtil.parseHtmlText(role);
+        }
     }
 
     public record Image(

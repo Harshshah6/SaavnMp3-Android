@@ -1,6 +1,7 @@
 package com.harsh.shah.saavnmp3.records;
 
 import com.google.gson.annotations.SerializedName;
+import com.harsh.shah.saavnmp3.utils.TextParserUtil;
 
 import java.util.List;
 
@@ -37,16 +38,32 @@ public record ArtistSearch(
             @SerializedName("similarArtists") List<SimilarArtist> similarArtists
 
     ) {
+
+        public String name(){
+            return TextParserUtil.parseHtmlText(name);
+        }
+
         public record Bio(
                 @SerializedName("text") String text,
                 @SerializedName("title") String title,
                 @SerializedName("sequence") int sequence
-        ){}
+        ){
+            public String text(){
+                return TextParserUtil.parseHtmlText(text);
+            }
+            public String title(){
+                return TextParserUtil.parseHtmlText(title);
+            }
+        }
 
         public record SimilarArtist(
                 @SerializedName("id") String id,
                 @SerializedName("name") String name
-        ){}
+        ){
+            public String name() {
+                return TextParserUtil.parseHtmlText(name);
+            }
+        }
 
     }
 }

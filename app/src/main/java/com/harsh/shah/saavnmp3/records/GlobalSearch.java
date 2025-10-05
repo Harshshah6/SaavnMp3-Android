@@ -1,6 +1,7 @@
 package com.harsh.shah.saavnmp3.records;
 
 import com.google.gson.annotations.SerializedName;
+import com.harsh.shah.saavnmp3.utils.TextParserUtil;
 
 import java.util.List;
 
@@ -26,7 +27,14 @@ public record GlobalSearch(
                     @SerializedName("url") String url,
                     @SerializedName("type") String type,
                     @SerializedName("description") String description
-            ){  }
+            ){
+                public String title(){
+                    return TextParserUtil.parseHtmlText(title);
+                }
+                public String description(){
+                    return TextParserUtil.parseHtmlText(description);
+                }
+            }
         }
 
         public record Songs(
@@ -45,7 +53,26 @@ public record GlobalSearch(
                     @SerializedName("singers") String singers,
                     @SerializedName("language") String language
 
-            ){ }
+            ){
+                public String title(){
+                    return TextParserUtil.parseHtmlText(title);
+                }
+                public String description(){
+                    return TextParserUtil.parseHtmlText(description);
+                }
+                public String album(){
+                    return TextParserUtil.parseHtmlText(album);
+                }
+                public String primaryArtists(){
+                    return TextParserUtil.parseHtmlText(primaryArtists);
+                }
+                public String singers(){
+                    return TextParserUtil.parseHtmlText(singers);
+                }
+                public String language() {
+                    return TextParserUtil.parseHtmlText(language);
+                }
+            }
         }
 
         public record Albums(
@@ -63,7 +90,20 @@ public record GlobalSearch(
                     @SerializedName("year") String year,
                     @SerializedName("songIds") String songIds,
                     @SerializedName("language") String language
-            ){ }
+            ){
+                public String title(){
+                    return TextParserUtil.parseHtmlText(title);
+                }
+                public String description(){
+                    return TextParserUtil.parseHtmlText(description);
+                }
+                public String artist(){
+                    return TextParserUtil.parseHtmlText(artist);
+                }
+                public String year() {
+                    return TextParserUtil.parseHtmlText(year);
+                }
+            }
         }
 
         public record Artists(
@@ -78,7 +118,14 @@ public record GlobalSearch(
                     @SerializedName("description") String description,
                     @SerializedName("position") int position
 
-            ){ }
+            ){
+                public String title(){
+                    return TextParserUtil.parseHtmlText(title);
+                }
+                public String description(){
+                    return TextParserUtil.parseHtmlText(description);
+                }
+            }
         }
 
         public record Playlists(
@@ -93,7 +140,14 @@ public record GlobalSearch(
                     @SerializedName("type") String type,
                     @SerializedName("language") String language,
                     @SerializedName("description") String description
-            ){}
+            ){
+                public String title(){
+                    return TextParserUtil.parseHtmlText(title);
+                }
+                public String description(){
+                    return TextParserUtil.parseHtmlText(description);
+                }
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -8,10 +9,10 @@ android {
 
     defaultConfig {
         applicationId "com.harsh.shah.saavnmp3"
-        minSdk 21
+        minSdk 23
         targetSdk 36
-        versionCode 2
-        versionName "1.0.5"
+        versionCode 3
+        versionName "1.0.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //Universal APK Supporting All ABIs
@@ -78,6 +79,8 @@ dependencies {
     implementation libs.material
     implementation libs.activity
     implementation libs.constraintlayout
+    implementation libs.firebase.analytics
+    implementation libs.firebase.messaging
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

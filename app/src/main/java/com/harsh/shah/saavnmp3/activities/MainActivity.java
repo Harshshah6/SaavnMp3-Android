@@ -22,13 +22,17 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.harsh.shah.saavnmp3.ApplicationClass;
 import com.harsh.shah.saavnmp3.R;
@@ -158,14 +162,14 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, "Application class is null");
                     return;
                 }
-                
+
                 // Add visual feedback
                 binding.playBarPrevIcon.setAlpha(0.5f);
                 binding.playBarPrevIcon.animate().alpha(1.0f).setDuration(200).start();
-                
+
                 // Call the previous track method
                 applicationClass.prevTrack();
-                
+
                 // Update play/pause icon
                 updatePlaybarUi();
             } catch (Exception e) {
@@ -180,14 +184,14 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, "Application class is null");
                     return;
                 }
-                
+
                 // Add visual feedback
                 binding.playBarNextIcon.setAlpha(0.5f);
                 binding.playBarNextIcon.animate().alpha(1.0f).setDuration(200).start();
-                
+
                 // Call the next track method
                 applicationClass.nextTrack();
-                
+
                 // Update play/pause icon
                 updatePlaybarUi();
             } catch (Exception e) {
@@ -203,17 +207,7 @@ public class MainActivity extends AppCompatActivity {
 
         showSavedLibrariesData();
 
-        // Permission granted
-        // Permission denied
-        ActivityResultLauncher<Intent> requestManageAllFiles = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == RESULT_OK) {
-                // Permission granted
-                Toast.makeText(this, "Manage All Files Permission Granted", Toast.LENGTH_SHORT).show();
-            } else {
-                // Permission denied
-                Toast.makeText(this, "Manage All Files Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        });
+        askNotificationPermission();
 
         requestStoragePermission = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
             if (result.containsValue(false)) {
@@ -311,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
 
     void showPlayBarData() {
 
-        if(ApplicationClass.MUSIC_ID.isBlank()) binding.playBarBackground.setVisibility(View.GONE);
+        if (ApplicationClass.MUSIC_ID.isBlank()) binding.playBarBackground.setVisibility(View.GONE);
         else binding.playBarBackground.setVisibility(View.VISIBLE);
 
         binding.playBarMusicTitle.setText(ApplicationClass.MUSIC_TITLE);
@@ -343,9 +337,9 @@ public class MainActivity extends AppCompatActivity {
     private void updatePlaybarUi() {
         if (ApplicationClass.player != null) {
             binding.playBarPlayPauseIcon.setImageResource(
-                ApplicationClass.player.isPlaying() ? 
-                R.drawable.baseline_pause_24 : 
-                R.drawable.play_arrow_24px
+                    ApplicationClass.player.isPlaying() ?
+                            R.drawable.baseline_pause_24 :
+                            R.drawable.play_arrow_24px
             );
         }
     }
@@ -654,5 +648,25 @@ public class MainActivity extends AppCompatActivity {
 
     public void openSearch(View view) {
         startActivity(new Intent(this, SearchActivity.class));
+    }
+
+    // Declare the launcher at the top of your Activity/Fragment:
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+//                if (isGranted) {
+//                    // FCM SDK (and your app) can post notifications.
+//                } else {
+//
+//                }
+            });
+
+    private void askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 }

@@ -1,18 +1,18 @@
 [versions]
 agp = "8.13.0"
-compiler = "4.16.0"
-core = "1.16.0"
-gson = "2.13.1"
+compiler = "5.0.5"
+core = "1.17.0"
+gson = "2.13.2"
 junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
 appcompat = "1.7.1"
 loggingInterceptor = "5.1.0"
-material = "1.12.0"
-activity = "1.10.1"
+material = "1.13.0"
+activity = "1.11.0"
 constraintlayout = "2.2.1"
-media = "1.7.0"
-media3Exoplayer = "1.7.1"
+media = "1.7.1"
+media3Exoplayer = "1.8.0"
 okhttpVersion = "5.1.0"
 overscrollDecorAndroid = "1.1.1"
 paginate = "1.0.0"
@@ -24,6 +24,9 @@ slidingrootnav = "v1.1.1"
 sspAndroid = "1.1.1"
 swiperefreshlayout = "1.2.0-beta01"
 jaudiotagger = "3.0.1"
+googleGmsGoogleServices = "4.4.3"
+firebaseAnalytics = "23.0.0"
+firebaseMessaging = "25.0.1"
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
@@ -53,6 +56,8 @@ slidingrootnav = { module = "com.github.yarolegovich:SlidingRootNav", version.re
 ssp-android = { module = "com.intuit.ssp:ssp-android", version.ref = "sspAndroid" }
 swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 jaudiotagger = { module = "net.jthink:jaudiotagger", version.ref = "jaudiotagger" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 
 # Media3 Exoplayer related dependencies
 [bundles]
@@ -60,4 +65,5 @@ media3Exoplayer = ["media3-exoplayer", "media3-ui", "media3-exoplayer-dash"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 

@@ -46,6 +46,7 @@ import androidx.palette.graphics.Palette;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity;
 import com.harsh.shah.saavnmp3.activities.SettingsActivity;
@@ -65,6 +66,7 @@ import java.util.List;
 
 public class ApplicationClass extends Application {
 
+    public static FirebaseAnalytics firebaseAnalytics;
     public static final String CHANNEL_ID_1 = "channel_1";
     public static final String CHANNEL_ID_2 = "channel_2";
     public static final String ACTION_NEXT = "next";
@@ -109,6 +111,8 @@ public class ApplicationClass extends Application {
     public void onCreate() {
         super.onCreate();
 
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         File cacheDir = new File(getCacheDir(), "audio_cache");
 
         // Step 2: Set up SimpleCache
@@ -123,7 +127,7 @@ public class ApplicationClass extends Application {
                 .setConnectTimeoutMs(15000) // 15 seconds timeout
                 .setReadTimeoutMs(15000)
                 .setAllowCrossProtocolRedirects(true);
-                
+
         CacheDataSource.Factory cacheDataSourceFactory = new CacheDataSource.Factory()
                 .setCache(simpleCache)
                 .setUpstreamDataSourceFactory(httpDataSourceFactory)
@@ -134,14 +138,14 @@ public class ApplicationClass extends Application {
                 .setMediaSourceFactory(new DefaultMediaSourceFactory(cacheDataSourceFactory))
                 .setHandleAudioBecomingNoisy(true) // Handle audio focus automatically 
                 .setAudioAttributes(
-                    new androidx.media3.common.AudioAttributes.Builder()
-                        .setUsage(androidx.media3.common.C.USAGE_MEDIA)
-                        .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MUSIC)
-                        .build(), 
-                    true // Handle audio focus automatically
+                        new androidx.media3.common.AudioAttributes.Builder()
+                                .setUsage(androidx.media3.common.C.USAGE_MEDIA)
+                                .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MUSIC)
+                                .build(),
+                        true // Handle audio focus automatically
                 )
                 .build();
-        
+
         // Add a global player listener for logging and reliability
         player.addListener(new Player.Listener() {
             @Override
@@ -163,7 +167,7 @@ public class ApplicationClass extends Application {
                             }
                         }, 2000);
                     }
-                }else if (playbackState == Player.STATE_READY) {
+                } else if (playbackState == Player.STATE_READY) {
                     // Now it's safe to play
                     Log.i(TAG, "Player ready, starting playback...");
                     player.play();
@@ -204,10 +208,10 @@ public class ApplicationClass extends Application {
                 }
             }
         });
-                
+
         // Properly initialize media session with metadata
         mediaSession = new MediaSessionCompat(this, "ApplicationClass");
-        
+
         // Set callback for media session
         mediaSession.setCallback(new MediaSessionCompat.Callback() {
             @Override
@@ -232,7 +236,7 @@ public class ApplicationClass extends Application {
                 prevTrack();
             }
         });
-        
+
         mediaSession.setActive(true);
         createNotificationChannel();
         sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
@@ -339,19 +343,19 @@ public class ApplicationClass extends Application {
             // Create and show a simple notification as fallback in case image loading fails
             androidx.core.app.NotificationCompat.Builder notificationBuilder =
                     new androidx.core.app.NotificationCompat.Builder(ApplicationClass.this, CHANNEL_ID_1)
-                    .setSmallIcon(R.drawable.headphone)
-                    .setContentTitle(MUSIC_TITLE)
-                    .setOngoing(playPauseButton != R.drawable.play_arrow_24px)
-                    .setContentText(MUSIC_DESCRIPTION)
-                    .setStyle(new NotificationCompat.MediaStyle()
-                            .setMediaSession(mediaSession.getSessionToken())
-                            .setShowActionsInCompactView(0, 1, 2))
-                    .addAction(new androidx.core.app.NotificationCompat.Action(R.drawable.skip_previous_24px, "prev", prevPendingIntent))
-                    .addAction(new androidx.core.app.NotificationCompat.Action(playPauseButton, "play", playPendingIntent))
-                    .addAction(new androidx.core.app.NotificationCompat.Action(R.drawable.skip_next_24px, "next", nextPendingIntent))
-                    .setPriority(Notification.PRIORITY_DEFAULT)
-                    .setContentIntent(contentIntent)
-                    .setOnlyAlertOnce(true);
+                            .setSmallIcon(R.drawable.headphone)
+                            .setContentTitle(MUSIC_TITLE)
+                            .setOngoing(playPauseButton != R.drawable.play_arrow_24px)
+                            .setContentText(MUSIC_DESCRIPTION)
+                            .setStyle(new NotificationCompat.MediaStyle()
+                                    .setMediaSession(mediaSession.getSessionToken())
+                                    .setShowActionsInCompactView(0, 1, 2))
+                            .addAction(new androidx.core.app.NotificationCompat.Action(R.drawable.skip_previous_24px, "prev", prevPendingIntent))
+                            .addAction(new androidx.core.app.NotificationCompat.Action(playPauseButton, "play", playPendingIntent))
+                            .addAction(new androidx.core.app.NotificationCompat.Action(R.drawable.skip_next_24px, "next", nextPendingIntent))
+                            .setPriority(Notification.PRIORITY_DEFAULT)
+                            .setContentIntent(contentIntent)
+                            .setOnlyAlertOnce(true);
 
             // Load album art with a timeout to avoid blocking
             try {
@@ -440,10 +444,10 @@ public class ApplicationClass extends Application {
                 Log.e(TAG, "Player is null in togglePlayPause");
                 return;
             }
-            
+
             boolean wasPlaying = player.isPlaying();
             Log.i(TAG, "togglePlayPause: wasPlaying=" + wasPlaying);
-            
+
             if (wasPlaying) {
                 player.pause();
                 Log.i(TAG, "Player paused, isPlaying=" + player.isPlaying());
@@ -457,7 +461,7 @@ public class ApplicationClass extends Application {
                     Log.i(TAG, "Player started, isPlaying=" + player.isPlaying());
                 }
             }
-            
+
             // Wait a moment for player state to update before showing notification
             new Handler().postDelayed(() -> {
                 showNotification();
@@ -475,18 +479,18 @@ public class ApplicationClass extends Application {
             if (player != null && player.isPlaying()) {
                 player.stop();
             }
-            
+
             // Reset player state
             if (player != null) {
                 player.clearMediaItems();
             }
-            
+
             // Check if we actually have a URL to play
             if (SONG_URL == null || SONG_URL.isEmpty()) {
                 Log.e(TAG, "prepareMediaPlayer: No URL available to play");
                 return;
             }
-            
+
             // Try to convert HTTP URLs to HTTPS for better security
             String finalUrl = SONG_URL;
             if (finalUrl.startsWith("http:")) {
@@ -494,15 +498,15 @@ public class ApplicationClass extends Application {
                 Log.i(TAG, "Converting URL from HTTP to HTTPS: " + httpsUrl);
                 finalUrl = httpsUrl;
             }
-            
+
             MediaItem mediaItem = MediaItem.fromUri(finalUrl);
             isTrackDownloaded = false;
-            
+
             if (currentActivity == null) {
                 Log.e(TAG, "prepareMediaPlayer: No current activity set");
                 return;
             }
-            
+
             final TrackCacheHelper trackCacheHelper = new TrackCacheHelper(currentActivity);
             if (trackCacheHelper.isTrackInCache(MUSIC_ID)) {
                 try {
@@ -523,16 +527,16 @@ public class ApplicationClass extends Application {
                             // Invalid cache file, fallback to network
                             Log.i(TAG, "Cached file invalid, using network URL");
                             player.setMediaItem(mediaItem);
-                            
+
                             // Re-cache the file
                             if (new SettingsActivity.SettingsSharedPrefManager(currentActivity).getStoreInCache()) {
                                 new TrackManager(
-                                    currentActivity,
-                                    finalUrl,
-                                    MUSIC_TITLE,
-                                    MUSIC_ID,
-                                    IMAGE_URL,
-                                    true
+                                        currentActivity,
+                                        finalUrl,
+                                        MUSIC_TITLE,
+                                        MUSIC_ID,
+                                        IMAGE_URL,
+                                        true
                                 ).execute();
                             }
                         }
@@ -564,18 +568,18 @@ public class ApplicationClass extends Application {
             // Prepare player but don't auto-play to prevent race conditions
             player.setPlayWhenReady(false);
             player.prepare();
-            
+
             // Enable repeat mode if needed
             //configureRepeatMode();
-            
+
             // Remove any existing listeners to avoid duplicates
             final Player.Listener playbackListener = new Player.Listener() {
                 @Override
                 public void onPlaybackStateChanged(int playbackState) {
                     Player.Listener.super.onPlaybackStateChanged(playbackState);
-                    
+
                     Log.i(TAG, "prepareMediaPlayer listener: state changed to " + getStateString(playbackState));
-                    
+
                     if (playbackState == Player.STATE_READY) {
                         // Now it's safe to play
                         Log.i(TAG, "Player ready, starting playback...");
@@ -590,7 +594,7 @@ public class ApplicationClass extends Application {
                         Log.i(TAG, "Track ended, auto-playing next track");
                         nextTrack();
                     }
-                    
+
                     showNotification();
                 }
 
@@ -608,18 +612,18 @@ public class ApplicationClass extends Application {
                     }
                 }
             };
-            
+
             // Add the one-time listener
             //player.addListener(playbackListener);
-            
+
             // Update notification
             showNotification();
-            
+
             // Start playback after a short delay
             new Handler().postDelayed(() -> {
                 try {
-                    if (player != null && !player.isPlaying() && 
-                        player.getPlaybackState() == Player.STATE_READY) {
+                    if (player != null && !player.isPlaying() &&
+                            player.getPlaybackState() == Player.STATE_READY) {
                         Log.i(TAG, "Starting delayed playback");
                         player.play();
                     }
@@ -627,19 +631,19 @@ public class ApplicationClass extends Application {
                     Log.e(TAG, "Error in delayed play", e);
                 }
             }, 500);
-            
+
         } catch (Exception e) {
             Log.e(TAG, "prepareMediaPlayer: ", e);
         }
     }
-    
+
     /**
      * Configures repeat mode based on preferences or queue size
      */
     private void configureRepeatMode() {
         // Get current repeat mode
         int currentRepeatMode = player.getRepeatMode();
-        
+
         // If there's only one track in the queue and no specific repeat mode is set,
         // default to repeat one to prevent playback from stopping
         if (trackQueue.size() <= 1 && currentRepeatMode == Player.REPEAT_MODE_OFF) {
@@ -661,10 +665,10 @@ public class ApplicationClass extends Application {
             Log.i(TAG, "Cannot play next track: track queue is empty");
             return;
         }
-        
+
         int repeatMode = player.getRepeatMode();
         boolean shuffleEnabled = player.getShuffleModeEnabled();
-        
+
         if (track_position >= trackQueue.size() - 1) {
             // End of queue behavior depends on repeat mode
             switch (repeatMode) {
@@ -678,13 +682,13 @@ public class ApplicationClass extends Application {
                         return;
                     }
                     break;
-                    
+
                 case Player.REPEAT_MODE_ALL:
                     // Loop back to the first track in queue
                     track_position = 0;
                     Log.i(TAG, "Repeat ALL mode - looping back to first track in queue");
                     break;
-                    
+
                 case Player.REPEAT_MODE_OFF:
                 default:
                     // In no-repeat mode, we've reached the end of the queue
@@ -703,7 +707,7 @@ public class ApplicationClass extends Application {
                 do {
                     newPosition = (int) (Math.random() * trackQueue.size());
                 } while (newPosition == track_position && trackQueue.size() > 1);
-                
+
                 track_position = newPosition;
                 Log.i(TAG, "Shuffle enabled, random next track position: " + track_position);
             } else {
@@ -711,7 +715,7 @@ public class ApplicationClass extends Application {
                 Log.i(TAG, "Playing next track at position: " + track_position);
             }
         }
-        
+
         // Get the track ID and play it
         try {
             MUSIC_ID = trackQueue.get(track_position);
@@ -728,13 +732,13 @@ public class ApplicationClass extends Application {
             }
         }
     }
-    
+
     public void prevTrack() {
         if (trackQueue.isEmpty()) {
             Log.i(TAG, "Cannot play previous track: track queue is empty");
             return;
         }
-        
+
         if (track_position <= 0) {
             if (player.getRepeatMode() == Player.REPEAT_MODE_ALL) {
                 // Loop to the last track
@@ -758,7 +762,7 @@ public class ApplicationClass extends Application {
                 Log.i(TAG, "Playing previous track at position: " + track_position);
             }
         }
-        
+
         MUSIC_ID = trackQueue.get(track_position);
         Log.i(TAG, "Playing previous track: " + MUSIC_ID);
         playTrack();
@@ -772,36 +776,36 @@ public class ApplicationClass extends Application {
             if (SONG_URL != null && SONG_URL.startsWith("https:")) {
                 String httpUrl = SONG_URL.replace("https:", "http:");
                 Log.i(TAG, "Trying HTTP URL after error: " + httpUrl);
-                
+
                 // Create a new media item with the HTTP URL
                 MediaItem mediaItem = MediaItem.fromUri(httpUrl);
                 player.setMediaItem(mediaItem);
                 player.prepare();
                 player.play();
-                
+
                 // Update the URL for future use
                 SONG_URL = httpUrl;
                 return;
             }
-            
+
             // If that didn't work or we're not using HTTPS, try to use the TrackManager
             // to download the file and play it from cache
             if (SONG_URL != null && !SONG_URL.isEmpty() && currentActivity != null) {
                 Log.i(TAG, "Trying to download and cache the file after error");
                 new TrackManager(
-                    currentActivity,
-                    SONG_URL,
-                    MUSIC_TITLE,
-                    MUSIC_ID,
-                    IMAGE_URL,
-                    true
+                        currentActivity,
+                        SONG_URL,
+                        MUSIC_TITLE,
+                        MUSIC_ID,
+                        IMAGE_URL,
+                        true
                 ).execute();
             }
         } catch (Exception e) {
             Log.e(TAG, "Error recovering from playback failure", e);
         }
     }
-    
+
     private String getStateString(int state) {
         return switch (state) {
             case Player.STATE_IDLE -> "IDLE";
@@ -848,24 +852,24 @@ public class ApplicationClass extends Application {
 
     public static String getDownloadUrl(List<SongResponse.DownloadUrl> downloadUrlList) {
         if (downloadUrlList.isEmpty()) return "";
-        
+
         // Try to find HTTPS URL first
         String bestUrl = "";
-        
+
         for (SongResponse.DownloadUrl downloadUrl : downloadUrlList) {
             String url = downloadUrl.url();
-            
+
             // Always prefer HTTPS URLs
             if (url.startsWith("https:") && downloadUrl.quality().equals(TRACK_QUALITY)) {
                 return url;
             }
-            
+
             // Keep the best quality HTTP URL as fallback
             if (downloadUrl.quality().equals(TRACK_QUALITY)) {
                 bestUrl = url;
             }
         }
-        
+
         // If we found a matching quality, use it even if HTTP
         if (!bestUrl.isEmpty()) {
             // Try to convert to HTTPS if possible

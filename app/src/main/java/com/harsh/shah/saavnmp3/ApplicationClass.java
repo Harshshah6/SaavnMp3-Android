@@ -19,7 +19,6 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
@@ -177,6 +176,8 @@ public class ApplicationClass extends Application {
                     Log.i(TAG, "Track ended, auto-playing next track");
                     nextTrack();
                 }
+
+
             }
 
             @Override

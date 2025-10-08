@@ -7,8 +7,6 @@ A clean, ad-free Android music streaming app powered by the unofficial JioSaavn 
 ![GitHub Repo stars](https://img.shields.io/github/stars/Harshshah6/SaavnMp3-Android)
 <br/>
 [![Download APK](https://img.shields.io/badge/Download_APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Harshshah6/SaavnMp3-Android/releases/latest)
-[![Get it at IzzyOnDroid](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/com.harsh.shah.saavnmp3&style=for-the-badge)](https://apt.izzysoft.de/packages/com.harsh.shah.saavnmp3)
-[![RB Status](https://shields.rbtlog.dev/simple/com.harsh.shah.saavnmp3?style=for-the-badge)](https://shields.rbtlog.dev/com.harsh.shah.saavnmp3)
 [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.me/HarshShah06)
 
 ## Features
@@ -31,19 +29,19 @@ A clean, ad-free Android music streaming app powered by the unofficial JioSaavn 
 ## Screenshots
 
 <div style="display:flex; gap:80; flex-wrap:wrap;">
-    <img src="docs/home.png" alt="" width="250" style="margin:10px;"/>
-    <img src="docs/artists.png" alt="" width="250" style="margin:10px;" />
-    <img src="docs/playlist.png" alt="" width="250"  style="margin:10px;"/>
+    <img src="docs/home.jpg" alt="" width="250" style="margin:10px;"/>
+    <img src="docs/artist.jpg" alt="" width="250" style="margin:10px;" />
+    <img src="docs/album.jpg" alt="" width="250"  style="margin:10px;"/>
     <img src="docs/search.png" alt="" width="250" style="margin:10px;" />
-    <img src="docs/track.png" alt="" width="250" style="margin:10px;" />
-    <img src="docs/notification.png" alt="" width="250" style="margin:10px;" />
+    <img src="docs/music.jpg" alt="" width="250" style="margin:10px;" />
+    <img src="docs/settings.jpg" alt="" width="250" style="margin:10px;" />
+    <img src="docs/notification.jpg" alt="" width="500" style="margin:10px;" />
+    <img src="docs/widget_light.jpg" alt="" width="250" style="margin:10px;" />
+    <img src="docs/widget_night.jpg" alt="" width="250" style="margin:10px;" />
+    <img src="docs/logo_light.png" alt="" width="250" style="margin:10px;" />
+    <img src="docs/logo_night.png" alt="" width="250" style="margin:10px;" />
+
 </div>
-<!-- ![HOME_SCREEN_PNG](docs/home.png)
-![HOME_SCREEN_PNG](docs/artists.png)
-![HOME_SCREEN_PNG](docs/playlist.png)
-![HOME_SCREEN_PNG](docs/search.png)
-![HOME_SCREEN_PNG](docs/track.png)
-![HOME_SCREEN_PNG](docs/notification.png) -->
 
 ## Getting Started
 

@@ -10,4 +10,6 @@
 
     <color name="activity_main_cta_button">@color/textMain</color>
 
+    <color name="widget_transparent_75">#BF000000</color>
+
 </resources>

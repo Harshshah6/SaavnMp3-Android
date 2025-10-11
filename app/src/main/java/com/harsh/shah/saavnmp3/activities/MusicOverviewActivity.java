@@ -321,7 +321,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
             final SongResponse.Song song = mSongResponse.data().get(0);
 
-            if (TrackDownloader.isAlreadyDownloaded(this, song.name(), song.artists().primary().get(0).name())) {
+            if (TrackDownloader.isAlreadyDownloaded(song.name())) {
 //                _binding.download.getTitleTextView().setText("Already Downloaded");
                 _binding.download.setVisibility(View.GONE);
             }
@@ -348,7 +348,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                             @Override
                             public void onFinished() {
                                 progressDialog.dismiss();
-                                if(TrackDownloader.isAlreadyDownloaded(MusicOverviewActivity.this, song.name(), song.artists().primary().get(0).name())){
+                                if (TrackDownloader.isAlreadyDownloaded(song.name())) {
                                     Toast.makeText(MusicOverviewActivity.this, "Successfully Downloaded.", Toast.LENGTH_SHORT).show();
                                     _binding.download.setVisibility(View.GONE);
                                 }

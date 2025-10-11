@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -37,65 +36,17 @@ public class TrackDownloader {
         void onError(String errorMessage);
     }
 
-    public static boolean isAlreadyDownloaded(Context context, String title, String artist) {
-        ContentResolver resolver = context.getContentResolver();
+    public static boolean isAlreadyDownloaded(String title) {
+        File musicDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "Melotune");
 
-        Uri collection = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                ? MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-                : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-        String[] projection = {
-                MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.RELATIVE_PATH,
-                MediaStore.Audio.Media.DISPLAY_NAME
-        };
-
-        String selection = MediaStore.Audio.Media.TITLE + "=? AND " + MediaStore.Audio.Media.ARTIST + "=?";
-        String[] selectionArgs = new String[]{ title, artist };
-
-        try (Cursor cursor = resolver.query(collection, projection, selection, selectionArgs, null)) {
-            if (cursor != null && cursor.moveToFirst()) {
-                do {
-                    String filePath = null;
-
-                    // 1️⃣ Try DATA column first (works on Android 9 and below)
-                    int dataIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-                    if (dataIndex != -1) {
-                        filePath = cursor.getString(dataIndex);
-                        if (filePath != null) {
-                            File file = new File(filePath);
-                            if (file.exists()) {
-                                return true;
-                            }
-                        }
-                    }
-
-                    // 2️⃣ Try RELATIVE_PATH + DISPLAY_NAME for Android 10+
-                    int relIndex = cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH);
-                    int nameIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
-                    if (relIndex != -1 && nameIndex != -1) {
-                        String relativePath = cursor.getString(relIndex);
-                        String displayName = cursor.getString(nameIndex);
-                        if (relativePath != null && displayName != null) {
-                            File musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
-                            filePath = new File(musicDir, relativePath + "/" + displayName).getAbsolutePath();
-                            File file = new File(filePath);
-                            if (file.exists()) {
-                                return true;
-                            }
-                        }
-                    }
-                } while (cursor.moveToNext());
-            }
-        } catch (Exception e) {
-            Log.e("TrackDownloader", "Error checking track existence: " + e.getMessage());
+        if (!musicDir.exists()) {
+            return false;
         }
-
-        return false;
+        File songFile = new File(musicDir, title + ".m4a");
+        File songFile1 = new File(musicDir, title + ".mp4");
+        File songFile2 = new File(musicDir, title + ".mp3");
+        return songFile.exists() || songFile1.exists() || songFile2.exists();
     }
-
-
 
     public static void downloadAndEmbedMetadata(Context context, String audioUrl, String imageUrl, String title, String artist, String album, TrackDownloadListener listener) {
 

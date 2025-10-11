@@ -29,7 +29,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.harsh.shah.saavnmp3.ApplicationClass;
-import com.harsh.shah.saavnmp3.BuildConfig;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.databinding.ActivityMusicOverviewBinding;
 import com.harsh.shah.saavnmp3.databinding.MusicOverviewMoreInfoBottomSheetBinding;
@@ -42,7 +41,7 @@ import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries;
 import com.harsh.shah.saavnmp3.services.ActionPlaying;
 import com.harsh.shah.saavnmp3.services.MusicService;
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager;
-import com.harsh.shah.saavnmp3.utils.TrackCacheHelper;
+import com.harsh.shah.saavnmp3.utils.TrackDownloader;
 import com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView;
 import com.squareup.picasso.Picasso;
 
@@ -50,8 +49,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MusicOverviewActivity extends AppCompatActivity implements ActionPlaying, ServiceConnection {
 
@@ -86,10 +83,10 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                     Toast.makeText(this, "Media player not ready. Try again.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                
+
                 // Get application instance to control playback
                 ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
-                
+
                 if (ApplicationClass.player.isPlaying()) {
                     // Handle pause action
                     Log.i(TAG, "Pausing playback");
@@ -103,7 +100,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                     binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
                     updateSeekbar();
                 }
-                
+
                 // Update notification with correct playback state
                 boolean isPlaying = ApplicationClass.player.isPlaying();
                 Log.i(TAG, "Player state after click: isPlaying=" + isPlaying);
@@ -156,32 +153,33 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                     Toast.makeText(MusicOverviewActivity.this, "Media player not ready", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                
+
                 // Add visual feedback
                 binding.nextIcon.setAlpha(0.5f);
                 binding.nextIcon.animate().alpha(1.0f).setDuration(200).start();
-                
+
                 // Call next track method
                 applicationClass.nextTrack();
-                
+
                 // Update UI state
                 updateSeekbar();
                 updateTrackInfo();
-                
+
                 // Make sure play icon reflects current state
                 if (ApplicationClass.player.isPlaying()) {
                     binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
                 } else {
                     binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
                 }
-                
-                 if(isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Playing next track", Toast.LENGTH_SHORT).show();
+
+                if (isDebugMode)
+                    Toast.makeText(MusicOverviewActivity.this, "Playing next track", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 Log.e(TAG, "Error skipping to next track", e);
                 Toast.makeText(MusicOverviewActivity.this, "Error skipping to next track", Toast.LENGTH_SHORT).show();
             }
         });
-        
+
         binding.prevIcon.setOnClickListener(view -> {
             try {
                 Log.i(TAG, "Previous button clicked");
@@ -190,26 +188,28 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                     Toast.makeText(MusicOverviewActivity.this, "Media player not ready", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                
+
                 // Add visual feedback
                 binding.prevIcon.setAlpha(0.5f);
                 binding.prevIcon.animate().alpha(1.0f).setDuration(200).start();
-                
+
                 // If we're already at the beginning of the track, go to previous track
                 // Otherwise just restart the current track
                 if (ApplicationClass.player.getCurrentPosition() > 3000) {
                     ApplicationClass.player.seekTo(0);
-                    if(isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Restarting current track", Toast.LENGTH_SHORT).show();
+                    if (isDebugMode)
+                        Toast.makeText(MusicOverviewActivity.this, "Restarting current track", Toast.LENGTH_SHORT).show();
                 } else {
                     // Call previous track method
                     applicationClass.prevTrack();
-                    if(isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Playing previous track", Toast.LENGTH_SHORT).show();
+                    if (isDebugMode)
+                        Toast.makeText(MusicOverviewActivity.this, "Playing previous track", Toast.LENGTH_SHORT).show();
                 }
-                
+
                 // Update UI state
                 updateSeekbar();
                 updateTrackInfo();
-                
+
                 // Make sure play icon reflects current state
                 if (ApplicationClass.player.isPlaying()) {
                     binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
@@ -245,12 +245,13 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 }
 
                 ApplicationClass.player.setRepeatMode(newMode);
-                
+
                 // Update UI to reflect the current mode
                 updateRepeatButtonUI();
 
-                if(isDebugMode) Toast.makeText(MusicOverviewActivity.this, modeMessage, Toast.LENGTH_SHORT).show();
-                
+                if (isDebugMode)
+                    Toast.makeText(MusicOverviewActivity.this, modeMessage, Toast.LENGTH_SHORT).show();
+
                 Log.i(TAG, "Repeat mode changed to: " + newMode);
             } catch (Exception e) {
                 Log.e(TAG, "Error changing repeat mode", e);
@@ -266,7 +267,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             else
                 binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.textSec)));
 
-            if(isDebugMode) Toast.makeText(MusicOverviewActivity.this, "Shuffle Mode Changed.", Toast.LENGTH_SHORT).show();
+            if (isDebugMode)
+                Toast.makeText(MusicOverviewActivity.this, "Shuffle Mode Changed.", Toast.LENGTH_SHORT).show();
         });
 
         binding.shareIcon.setOnClickListener(view -> {
@@ -317,30 +319,53 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
             });
 
+            final SongResponse.Song song = mSongResponse.data().get(0);
+
+            if (TrackDownloader.isAlreadyDownloaded(this, song.name(), song.artists().primary().get(0).name())) {
+//                _binding.download.getTitleTextView().setText("Already Downloaded");
+                _binding.download.setVisibility(View.GONE);
+            }
+
             _binding.download.setOnClickListener(v -> {
-                final TrackCacheHelper trackCacheHelper = new TrackCacheHelper(MusicOverviewActivity.this);
-                final SongResponse.Song song = mSongResponse.data().get(0);
-                if (trackCacheHelper.isTrackInCache(song.id())) {
-                    trackCacheHelper.copyFileToMusicDir(trackCacheHelper.getTrackFromCache(song.id()), song.name(), song);
-                    Toast.makeText(MusicOverviewActivity.this, "Downloaded to /Music/Melotune/ ", Toast.LENGTH_SHORT).show();
-                } else {
-                    ProgressDialog progressDialog = new ProgressDialog(MusicOverviewActivity.this);
-                    progressDialog.setMessage("Downloading...");
-                    progressDialog.setCancelable(false);
-                    progressDialog.setCanceledOnTouchOutside(false);
-                    progressDialog.show();
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            if (ApplicationClass.isTrackDownloaded) {
+
+                ProgressDialog progressDialog = new ProgressDialog(MusicOverviewActivity.this);
+                progressDialog.setMessage("Downloading...");
+                progressDialog.setCancelable(false);
+                progressDialog.setCanceledOnTouchOutside(false);
+                TrackDownloader.downloadAndEmbedMetadata(
+                        MusicOverviewActivity.this,
+                        song.downloadUrl().get(song.downloadUrl().size() - 1).url(),
+                        !IMAGE_URL.isEmpty() ? IMAGE_URL : song.image().get(song.image().size() - 1).url(),
+                        song.name(),
+                        song.artists().primary().get(0).name(),
+                        song.album().name(),
+                        new TrackDownloader.TrackDownloadListener() {
+                            @Override
+                            public void onStarted() {
+                                progressDialog.show();
+                            }
+
+                            @Override
+                            public void onFinished() {
                                 progressDialog.dismiss();
-                                trackCacheHelper.copyFileToMusicDir(trackCacheHelper.getTrackFromCache(song.id()), song.name(), song);
-                                Toast.makeText(MusicOverviewActivity.this, "Downloaded to /Music/Melotune/ ", Toast.LENGTH_SHORT).show();
-                                this.cancel();
+                                if(TrackDownloader.isAlreadyDownloaded(MusicOverviewActivity.this, song.name(), song.artists().primary().get(0).name())){
+                                    Toast.makeText(MusicOverviewActivity.this, "Successfully Downloaded.", Toast.LENGTH_SHORT).show();
+                                    _binding.download.setVisibility(View.GONE);
+                                }
+                            }
+
+                            @Override
+                            public void onError(String errorMessage) {
+                                Toast.makeText(MusicOverviewActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(MusicOverviewActivity.this);
+                                alertDialogBuilder.setTitle("Error");
+                                alertDialogBuilder.setMessage(errorMessage);
+                                alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
+                                alertDialogBuilder.show();
                             }
                         }
-                    }, 1, 1000);
-                }
+                );
+
             });
 
             for (SongResponse.Artist artist : artsitsList) {
@@ -420,14 +445,14 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     @Override
     protected void onResume() {
         super.onResume();
-        
+
         // Set as current activity in ApplicationClass
         ApplicationClass.setCurrentActivity(this);
-        
+
         // Bind to the service
         Intent intent = new Intent(this, MusicService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
-        
+
         // Update UI with current playback state
         if (ApplicationClass.player != null) {
             updateTrackInfo();
@@ -440,11 +465,11 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     @Override
     protected void onPause() {
         super.onPause();
-        
+
         // Remove callbacks to prevent leaks
         handler.removeCallbacks(runnable);
         mHandler.removeCallbacks(mUpdateTimeTask);
-        
+
         // Unbind from service
         try {
             unbindService(this);
@@ -452,7 +477,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             Log.e(TAG, "Error unbinding service", e);
         }
     }
-    
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -460,7 +485,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         handler.removeCallbacks(runnable);
         mHandler.removeCallbacks(mUpdateTimeTask);
     }
-    
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -476,7 +501,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         musicService.setCallback(MusicOverviewActivity.this);
         Log.e(TAG, "onServiceConnected: ");
     }
-    
+
     @Override
     public void onServiceDisconnected(ComponentName name) {
         Log.e(TAG, "onServiceDisconnected: ");
@@ -615,7 +640,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         try {
             ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
             applicationClass.prepareMediaPlayer();
-            
+
             // Wait until player is actually ready
             if (ApplicationClass.player != null && ApplicationClass.player.getDuration() > 0) {
                 binding.totalDuration.setText(convertDuration(ApplicationClass.player.getDuration()));
@@ -629,7 +654,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                     }
                 }, 500);
             }
-            
+
             // Set play state
             if (ApplicationClass.player.isPlaying()) {
                 binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
@@ -637,10 +662,10 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             } else {
                 binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
             }
-            
+
             // Update notification
-            showNotification(ApplicationClass.player.isPlaying() ? 
-                R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+            showNotification(ApplicationClass.player.isPlaying() ?
+                    R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
         } catch (Exception e) {
             Log.e(TAG, "Error preparing media player", e);
             // Try to recover
@@ -657,19 +682,19 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 Log.e(TAG, "Player is null in updateSeekbar");
                 return;
             }
-            
+
             if (ApplicationClass.player.isPlaying()) {
                 try {
                     long duration = ApplicationClass.player.getDuration();
                     long currentPosition = ApplicationClass.player.getCurrentPosition();
-                    
+
                     // Check for valid duration to avoid division by zero
                     if (duration > 0) {
-                        int progress = (int)(((float) currentPosition / duration) * 100);
+                        int progress = (int) (((float) currentPosition / duration) * 100);
                         binding.seekbar.setProgress(progress);
                         binding.elapsedDuration.setText(convertDuration(currentPosition));
                     }
-                    
+
                     // Schedule the next update
                     handler.postDelayed(runnable, 1000);
                 } catch (Exception e) {
@@ -680,9 +705,9 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 try {
                     long duration = ApplicationClass.player.getDuration();
                     long currentPosition = ApplicationClass.player.getCurrentPosition();
-                    
+
                     if (duration > 0) {
-                        int progress = (int)(((float) currentPosition / duration) * 100);
+                        int progress = (int) (((float) currentPosition / duration) * 100);
                         binding.seekbar.setProgress(progress);
                         binding.elapsedDuration.setText(convertDuration(currentPosition));
                     }
@@ -735,7 +760,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     private void updateRepeatButtonUI() {
         int tintColor;
         int repeatMode = ApplicationClass.player.getRepeatMode();
-        
+
         switch (repeatMode) {
             case Player.REPEAT_MODE_ONE:
                 tintColor = getResources().getColor(R.color.spotify_green);
@@ -757,7 +782,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 binding.repeatIcon.setImageResource(R.drawable.repeat_24px);
                 break;
         }
-        
+
         binding.repeatIcon.setImageTintList(ColorStateList.valueOf(tintColor));
     }
 
@@ -769,19 +794,19 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 Log.e(TAG, "Player is null in nextClicked");
                 return;
             }
-            
+
             // Update UI to show active button state
             binding.nextIcon.setAlpha(0.5f);
             binding.nextIcon.animate().alpha(1.0f).setDuration(200).start();
-            
+
             // Get application instance
             ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
             applicationClass.nextTrack();
-            
+
             // Update UI
             updateTrackInfo();
             updateSeekbar();
-            
+
             // Ensure play/pause button shows correct state
             if (ApplicationClass.player.isPlaying()) {
                 binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
@@ -801,14 +826,14 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 Log.e(TAG, "Player is null in prevClicked");
                 return;
             }
-            
+
             // Update UI to show active button state
             binding.prevIcon.setAlpha(0.5f);
             binding.prevIcon.animate().alpha(1.0f).setDuration(200).start();
-            
+
             // Get application instance
             ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
-            
+
             // If we're already at the beginning of the track, go to previous track
             // Otherwise just restart the current track
             if (ApplicationClass.player.getCurrentPosition() > 3000) {
@@ -816,11 +841,11 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             } else {
                 applicationClass.prevTrack();
             }
-            
+
             // Update UI
             updateTrackInfo();
             updateSeekbar();
-            
+
             // Ensure play/pause button shows correct state
             if (ApplicationClass.player.isPlaying()) {
                 binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);

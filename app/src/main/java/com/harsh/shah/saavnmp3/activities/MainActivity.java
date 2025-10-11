@@ -53,6 +53,7 @@ import com.harsh.shah.saavnmp3.records.SongSearch;
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries;
 import com.harsh.shah.saavnmp3.utils.NetworkUtil;
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager;
+import com.harsh.shah.saavnmp3.utils.TrackDownloader;
 import com.squareup.picasso.Picasso;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
@@ -221,23 +222,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                requestAllFilesAccessPermission();
-            } else {
-            }
-        } else {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             requestStoragePermission();
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.R)
-    private void requestAllFilesAccessPermission() {
-        if (!Environment.isExternalStorageManager()) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            startActivity(intent);
         }
     }
 
@@ -249,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean checkIfStorageAccessAvailable() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            return Environment.isExternalStorageManager();
+            return true;
         } else {
             return (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                     && (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);

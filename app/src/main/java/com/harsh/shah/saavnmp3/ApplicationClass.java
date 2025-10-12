@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v4.media.MediaMetadataCompat;
@@ -20,7 +19,6 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.media.app.NotificationCompat;
@@ -32,31 +30,26 @@ import androidx.media3.database.DatabaseProvider;
 import androidx.media3.database.ExoDatabaseProvider;
 import androidx.media3.datasource.DataSource;
 import androidx.media3.datasource.DefaultHttpDataSource;
-import androidx.media3.datasource.FileDataSource;
 import androidx.media3.datasource.cache.CacheDataSource;
 import androidx.media3.datasource.cache.CacheEvictor;
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor;
 import androidx.media3.datasource.cache.SimpleCache;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
-import androidx.media3.exoplayer.source.ProgressiveMediaSource;
 import androidx.palette.graphics.Palette;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity;
 import com.harsh.shah.saavnmp3.activities.SettingsActivity;
 import com.harsh.shah.saavnmp3.network.ApiManager;
-import com.harsh.shah.saavnmp3.network.TrackManager;
 import com.harsh.shah.saavnmp3.network.utility.RequestNetwork;
 import com.harsh.shah.saavnmp3.records.SongResponse;
 import com.harsh.shah.saavnmp3.services.NotificationReceiver;
 import com.harsh.shah.saavnmp3.utils.MediaPlayerUtil;
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager;
-import com.harsh.shah.saavnmp3.utils.TrackCacheHelper;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -359,65 +352,124 @@ public class ApplicationClass extends Application {
                             .setOnlyAlertOnce(true);
 
             // Load album art with a timeout to avoid blocking
-            try {
-                Glide.with(this)
-                        .asBitmap()
-                        .load(IMAGE_URL)
-                        .timeout(3000) // 3 second timeout
-                        .into(new CustomTarget<Bitmap>() {
-                            @Override
-                            public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
-                                try {
-                                    //IMAGE_BG_COLOR = calculateDominantColor(resource);
-                                    //TEXT_ON_IMAGE_COLOR = invertColor(IMAGE_BG_COLOR);
+//            try {
+//                Glide.with(this)
+//                        .asBitmap()
+//                        .load(IMAGE_URL)
+//                        .timeout(3000) // 3 second timeout
+//                        .into(new CustomTarget<Bitmap>() {
+//                            @Override
+//                            public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+//                                try {
+//                                    //IMAGE_BG_COLOR = calculateDominantColor(resource);
+//                                    //TEXT_ON_IMAGE_COLOR = invertColor(IMAGE_BG_COLOR);
+//
+//                                    // Try to get palette colors
+//                                    try {
+//                                        Palette.from(resource)
+//                                                .generate(palette -> {
+//                                                    Palette.Swatch textSwatch = palette.getDominantSwatch();
+//                                                    if (textSwatch == null) {
+//                                                        Log.i("ApplicationClass", "Null swatch :(");
+//                                                        return;
+//                                                    }
+//                                                    IMAGE_BG_COLOR = (textSwatch.getRgb());
+//                                                    TEXT_ON_IMAGE_COLOR = (textSwatch.getTitleTextColor());
+//                                                    TEXT_ON_IMAGE_COLOR1 = (textSwatch.getBodyTextColor());
+//                                                });
+//                                    } catch (Exception e) {
+//                                        Log.e(TAG, "Error generating palette", e);
+//                                    }
+//
+//                                    // Add the bitmap to the notification
+//                                    notificationBuilder.setLargeIcon(resource);
+//
+//                                    // Build and show the notification
+//                                    Notification notification = notificationBuilder.build();
+//                                    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//                                    notificationManager.notify(0, notification);
+//                                } catch (Exception e) {
+//                                    Log.e(TAG, "Error displaying notification with bitmap", e);
+//                                    // Show basic notification without image if there's an error
+//                                    showBasicNotification(notificationBuilder);
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onLoadFailed(Drawable errorDrawable) {
+//                                // Show notification without image if loading fails
+//                                showBasicNotification(notificationBuilder);
+//                            }
+//
+//                            @Override
+//                            public void onLoadCleared(Drawable placeholder) {
+//                                // Handle placeholder if needed
+//                            }
+//                        });
+//            } catch (Exception e) {
+//                Log.e(TAG, "Error loading image for notification", e);
+//                // Show basic notification without image if there's an error
+//                showBasicNotification(notificationBuilder);
+//            }
 
-                                    // Try to get palette colors
+            try {
+                Picasso.get()
+                        .load(IMAGE_URL)
+                        .into(new Target() {
+                            @Override
+                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                try {
                                     try {
-                                        Palette.from(resource)
-                                                .generate(palette -> {
-                                                    Palette.Swatch textSwatch = palette.getDominantSwatch();
-                                                    if (textSwatch == null) {
-                                                        Log.i("ApplicationClass", "Null swatch :(");
-                                                        return;
-                                                    }
-                                                    IMAGE_BG_COLOR = (textSwatch.getRgb());
-                                                    TEXT_ON_IMAGE_COLOR = (textSwatch.getTitleTextColor());
-                                                    TEXT_ON_IMAGE_COLOR1 = (textSwatch.getBodyTextColor());
-                                                });
+                                        // Generate color palette from the bitmap
+                                        Palette.from(bitmap).generate(palette -> {
+                                            if (palette == null) {
+                                                Log.i("ApplicationClass", "palette is null :(");
+                                                return;
+                                            }
+                                            Palette.Swatch textSwatch = palette.getDominantSwatch();
+                                            if (textSwatch == null) {
+                                                Log.i("ApplicationClass", "Null swatch :(");
+                                                return;
+                                            }
+                                            IMAGE_BG_COLOR = textSwatch.getRgb();
+                                            TEXT_ON_IMAGE_COLOR = textSwatch.getTitleTextColor();
+                                            TEXT_ON_IMAGE_COLOR1 = textSwatch.getBodyTextColor();
+                                        });
                                     } catch (Exception e) {
                                         Log.e(TAG, "Error generating palette", e);
                                     }
 
-                                    // Add the bitmap to the notification
-                                    notificationBuilder.setLargeIcon(resource);
+                                    // Add bitmap to the notification
+                                    notificationBuilder.setLargeIcon(bitmap);
 
                                     // Build and show the notification
                                     Notification notification = notificationBuilder.build();
-                                    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                                    NotificationManager notificationManager =
+                                            (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                                     notificationManager.notify(0, notification);
+
                                 } catch (Exception e) {
                                     Log.e(TAG, "Error displaying notification with bitmap", e);
-                                    // Show basic notification without image if there's an error
                                     showBasicNotification(notificationBuilder);
                                 }
                             }
 
                             @Override
-                            public void onLoadFailed(Drawable errorDrawable) {
-                                // Show notification without image if loading fails
+                            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                Log.e(TAG, "Error loading image for notification", e);
                                 showBasicNotification(notificationBuilder);
                             }
 
                             @Override
-                            public void onLoadCleared(Drawable placeholder) {
-                                // Handle placeholder if needed
+                            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
                             }
                         });
             } catch (Exception e) {
                 Log.e(TAG, "Error loading image for notification", e);
-                // Show basic notification without image if there's an error
                 showBasicNotification(notificationBuilder);
             }
+
 
         } catch (Exception e) {
             Log.e("ApplicationClass", "showNotification error: ", e);
@@ -508,114 +560,11 @@ public class ApplicationClass extends Application {
                 return;
             }
 
-            final TrackCacheHelper trackCacheHelper = new TrackCacheHelper(currentActivity);
-            if (trackCacheHelper.isTrackInCache(MUSIC_ID)) {
-                try {
-                    isTrackDownloaded = true;
-                    String cachedFilePath = trackCacheHelper.getTrackFromCache(MUSIC_ID);
-                    if (cachedFilePath != null && !cachedFilePath.isEmpty()) {
-                        File cachedFile = new File(cachedFilePath);
-                        if (cachedFile.exists() && cachedFile.length() > 0) {
-                            mediaItem = MediaItem.fromUri(Uri.parse("file://" + cachedFilePath));
-                            Log.i(TAG, "Using cached file: " + cachedFilePath);
-
-                            ProgressiveMediaSource.Factory mediaSourceFactory = new ProgressiveMediaSource.Factory(FileDataSource::new);
-                            ProgressiveMediaSource mediaSource = mediaSourceFactory.createMediaSource(mediaItem);
-
-                            // Prepare and play the media
-                            player.setMediaSource(mediaSource);
-                        } else {
-                            // Invalid cache file, fallback to network
-                            Log.i(TAG, "Cached file invalid, using network URL");
-                            player.setMediaItem(mediaItem);
-
-                            // Re-cache the file
-                            if (new SettingsActivity.SettingsSharedPrefManager(currentActivity).getStoreInCache()) {
-                                new TrackManager(
-                                        currentActivity,
-                                        finalUrl,
-                                        MUSIC_TITLE,
-                                        MUSIC_ID,
-                                        IMAGE_URL,
-                                        true
-                                ).execute();
-                            }
-                        }
-                    } else {
-                        // Fallback to network source if cache path is invalid
-                        player.setMediaItem(mediaItem);
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Error loading cached file", e);
-                    // Fallback to network source
-                    player.setMediaItem(mediaItem);
-                }
-            } else {
-                if (!trackCacheHelper.isTrackInCache(MUSIC_ID)) {
-                    if (new SettingsActivity.SettingsSharedPrefManager(currentActivity).getStoreInCache()) {
-                        new TrackManager(
-                                currentActivity,
-                                finalUrl,
-                                MUSIC_TITLE,
-                                MUSIC_ID,
-                                IMAGE_URL,
-                                true
-                        ).execute();
-                    }
-                }
-                player.setMediaItem(mediaItem);
-            }
+            player.setMediaItem(mediaItem);
 
             // Prepare player but don't auto-play to prevent race conditions
             player.setPlayWhenReady(false);
             player.prepare();
-
-            // Enable repeat mode if needed
-            //configureRepeatMode();
-
-            // Remove any existing listeners to avoid duplicates
-            final Player.Listener playbackListener = new Player.Listener() {
-                @Override
-                public void onPlaybackStateChanged(int playbackState) {
-                    Player.Listener.super.onPlaybackStateChanged(playbackState);
-
-                    Log.i(TAG, "prepareMediaPlayer listener: state changed to " + getStateString(playbackState));
-
-                    if (playbackState == Player.STATE_READY) {
-                        // Now it's safe to play
-                        Log.i(TAG, "Player ready, starting playback...");
-                        player.play();
-                        player.removeListener(this); // One-time operation
-                    } else if (playbackState == Player.STATE_IDLE) {
-                        // Try to recover from errors
-                        Log.e(TAG, "Player in IDLE state, possible error");
-                        handlePlaybackError();
-                    } else if (playbackState == Player.STATE_ENDED) {
-                        // Auto-play next track when current track ends
-                        Log.i(TAG, "Track ended, auto-playing next track");
-                        nextTrack();
-                    }
-
-                    showNotification();
-                }
-
-                @Override
-                public void onPlayerError(@NonNull androidx.media3.common.PlaybackException error) {
-                    Log.e(TAG, "Player error: " + error.getMessage(), error);
-                    handlePlaybackError();
-                }
-
-                @Override
-                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                    Player.Listener.super.onPlayerStateChanged(playWhenReady, playbackState);
-                    if (playbackState == Player.STATE_ENDED) {
-                        nextTrack();
-                    }
-                }
-            };
-
-            // Add the one-time listener
-            //player.addListener(playbackListener);
 
             // Update notification
             showNotification();
@@ -635,29 +584,6 @@ public class ApplicationClass extends Application {
 
         } catch (Exception e) {
             Log.e(TAG, "prepareMediaPlayer: ", e);
-        }
-    }
-
-    /**
-     * Configures repeat mode based on preferences or queue size
-     */
-    private void configureRepeatMode() {
-        // Get current repeat mode
-        int currentRepeatMode = player.getRepeatMode();
-
-        // If there's only one track in the queue and no specific repeat mode is set,
-        // default to repeat one to prevent playback from stopping
-        if (trackQueue.size() <= 1 && currentRepeatMode == Player.REPEAT_MODE_OFF) {
-            player.setRepeatMode(Player.REPEAT_MODE_ONE);
-            Log.i(TAG, "Set repeat mode to REPEAT_ONE (single track in queue)");
-        } else if (trackQueue.size() > 1 && currentRepeatMode == Player.REPEAT_MODE_OFF) {
-            // For multiple tracks in queue, we can keep the existing repeat mode
-            // But ensure we don't get stuck at the end of the queue
-            player.setRepeatMode(Player.REPEAT_MODE_ALL);
-            Log.i(TAG, "Set repeat mode to REPEAT_ALL (multiple tracks in queue)");
-        } else {
-            // Keep the user's chosen repeat mode
-            Log.i(TAG, "Keeping user-selected repeat mode: " + player.getRepeatMode());
         }
     }
 
@@ -770,43 +696,6 @@ public class ApplicationClass extends Application {
         showNotification();
     }
 
-    private void handlePlaybackError() {
-        // Try to recover from playback errors
-        try {
-            // First, try switching from HTTPS to HTTP if we're using HTTPS
-            if (SONG_URL != null && SONG_URL.startsWith("https:")) {
-                String httpUrl = SONG_URL.replace("https:", "http:");
-                Log.i(TAG, "Trying HTTP URL after error: " + httpUrl);
-
-                // Create a new media item with the HTTP URL
-                MediaItem mediaItem = MediaItem.fromUri(httpUrl);
-                player.setMediaItem(mediaItem);
-                player.prepare();
-                player.play();
-
-                // Update the URL for future use
-                SONG_URL = httpUrl;
-                return;
-            }
-
-            // If that didn't work or we're not using HTTPS, try to use the TrackManager
-            // to download the file and play it from cache
-            if (SONG_URL != null && !SONG_URL.isEmpty() && currentActivity != null) {
-                Log.i(TAG, "Trying to download and cache the file after error");
-                new TrackManager(
-                        currentActivity,
-                        SONG_URL,
-                        MUSIC_TITLE,
-                        MUSIC_ID,
-                        IMAGE_URL,
-                        true
-                ).execute();
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error recovering from playback failure", e);
-        }
-    }
-
     private String getStateString(int state) {
         return switch (state) {
             case Player.STATE_IDLE -> "IDLE";
@@ -896,35 +785,6 @@ public class ApplicationClass extends Application {
     public void showNotification() {
         //showNotification(mediaPlayerUtil.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
         showNotification(player.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
-    }
-
-    private int invertColor(int color) {
-        return (color ^ 0x00FFFFFF);
-    }
-
-    int calculateDominantColor(Bitmap bitmap) {
-        int[] pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
-        bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-        int redSum = 0;
-        int greenSum = 0;
-        int blueSum = 0;
-
-        for (int pixel : pixels) {
-            int red = Color.red(pixel);
-            int green = Color.green(pixel);
-            int blue = Color.blue(pixel);
-
-            redSum += red;
-            greenSum += green;
-            blueSum += blue;
-        }
-
-        int dominantRed = redSum / pixels.length;
-        int dominantGreen = greenSum / pixels.length;
-        int dominantBlue = blueSum / pixels.length;
-
-        return Color.argb(255, dominantRed, dominantGreen, dominantBlue);
     }
 
 }

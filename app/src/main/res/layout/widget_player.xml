@@ -11,7 +11,7 @@
     <ImageView
         android:layout_width="@dimen/_32sdp"
         android:layout_height="@dimen/_32sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_4sdp"
         android:src="@mipmap/ic_launcher" />
 
     <LinearLayout

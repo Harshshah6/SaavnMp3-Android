@@ -132,17 +132,6 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             }
         });
 
-//        ApplicationClass.player.setOnCompletionListener(mediaPlayer -> {
-//            binding.seekbar.setProgress(0);
-//            binding.elapsedDuration.setText("00:00");
-//            binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
-//            handler.removeCallbacks(runnable);
-//            mediaPlayer.seekTo(0);
-//            mediaPlayer.reset();
-//            ((ApplicationClass)getApplication()).nextTrack();
-//        });
-        //((ApplicationClass)getApplication()).setMusicDetails("","","","");
-
         final ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
 
         binding.nextIcon.setOnClickListener(view -> {
@@ -578,16 +567,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
         artsitsList = songResponse.data().get(0).artists().primary();
 
-        //Log.i(TAG, "onResponse: " + downloadUrls.get(downloadUrls.size() - 1).url());
         SONG_URL = ApplicationClass.getDownloadUrl(downloadUrls);
-//                    if (ApplicationClass.MUSIC_ID.equals(ID)) {
-//                        updateSeekbar();
-//                        if (ApplicationClass.player.isPlaying())
-//                            binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
-//                        else
-//                            binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
-//                    } else
-//                        prepareMediaPLayer();
 
         if ((!ApplicationClass.MUSIC_ID.equals(ID_FROM_EXTRA) || forced)) {
             ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
@@ -596,14 +576,6 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             prepareMediaPLayer();
         }
 
-        //prepareMediaPLayer();
-
-//        if(!ApplicationClass.player.isPlaying()){
-//            playClicked();
-//            binding.playPauseImage.performClick();
-//        }
-
-        //binding.main.setBackgroundColor(ApplicationClass.IMAGE_BG_COLOR);
     }
 
     public void backPress(View view) {

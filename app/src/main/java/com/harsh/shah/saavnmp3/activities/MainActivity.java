@@ -120,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
         // Set version text in the drawer layout
         updateVersionTextInDrawer();
 
+        for (TrackDownloader.DownloadedTrack downloadedTrack : TrackDownloader.getDownloadedTracks()) System.out.println(downloadedTrack);
+
         onDrawerItemsClicked();
 
         binding.profileIcon.setOnClickListener(view -> slidingRootNavBuilder.openMenu(true));

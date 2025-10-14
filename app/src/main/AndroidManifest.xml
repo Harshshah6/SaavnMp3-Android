@@ -4,12 +4,12 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!--    To Save the track/songs to the external storage for offline use -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- To Save the track/songs to the external storage for offline use -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" />
 
@@ -27,6 +27,9 @@
         android:theme="@style/Theme.Melotune"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".activities.DownloadManagerActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.AboutActivity"
             android:exported="false" />
@@ -103,12 +106,9 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_player_info" />
         </receiver>
-
         <receiver
             android:name=".widgets.WidgetControlReceiver"
             android:exported="true" />
-
-
     </application>
 
 </manifest>

@@ -13,8 +13,11 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.harsh.shah.saavnmp3.records.SongResponse;
+
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.images.Artwork;
@@ -25,6 +28,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TrackDownloader {
 
@@ -32,7 +37,9 @@ public class TrackDownloader {
 
     public interface TrackDownloadListener {
         void onStarted();
+
         void onFinished();
+
         void onError(String errorMessage);
     }
 
@@ -48,13 +55,47 @@ public class TrackDownloader {
         return songFile.exists() || songFile1.exists() || songFile2.exists();
     }
 
-    public static void downloadAndEmbedMetadata(Context context, String audioUrl, String imageUrl, String title, String artist, String album, TrackDownloadListener listener) {
+    public record DownloadedTrack(File file, String title, String artist, String album, String year,
+                                  String bitrate, String trackLength) {
+    }
 
-        Log.i(TAG, audioUrl);
-        Log.i(TAG, imageUrl);
-        Log.i(TAG, title);
-        Log.i(TAG, artist);
-        Log.i(TAG, album);
+    public static List<DownloadedTrack> getDownloadedTracks() {
+        final List<DownloadedTrack> data = new ArrayList<>();
+        File musicDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "Melotune");
+        if (!musicDir.exists()) {
+            return data;
+        }
+        File[] files = musicDir.listFiles();
+        if (files == null) {
+            return data;
+        }
+        for (File file : files) {
+            Log.d(TAG, "Downloaded track: " + file.getName());
+            try {
+                AudioFile f = AudioFileIO.read(file);
+                Tag tag = f.getTag();
+                AudioHeader audioHeader = f.getAudioHeader();
+                String title, artist, album, year, bitrate, trackLength;
+                title = tag != null ? tag.getFirst(FieldKey.TITLE) : file.getName();
+                artist = tag != null ? tag.getFirst(FieldKey.ARTIST) : "";
+                album = tag != null ? tag.getFirst(FieldKey.ALBUM) : "";
+                year = tag != null ? tag.getFirst(FieldKey.YEAR) : "";
+                bitrate = audioHeader != null ? String.valueOf(audioHeader.getBitRate()) : "344";
+                trackLength = audioHeader != null ? String.valueOf(audioHeader.getTrackLength()) : "0";
+                data.add(new DownloadedTrack(file, title, artist, album, year, bitrate, trackLength));
+            } catch (Exception e) {
+                Log.e(TAG, "Error reading file: " + e.getMessage());
+            }
+        }
+        return data;
+    }
+
+    public static void downloadAndEmbedMetadata(Context context, SongResponse.Song song, TrackDownloadListener listener) {
+        String audioUrl = song.downloadUrl().get(song.downloadUrl().size() - 1).url();
+        String imageUrl = song.image().get(song.image().size() - 1).url();
+        String title = song.name();
+        String artist = song.artists().primary().get(0).name();
+        String album = song.album().name();
 
         new Thread(() -> {
             new android.os.Handler(Looper.getMainLooper()).post(listener::onStarted);
@@ -76,6 +117,8 @@ public class TrackDownloader {
                 tag.setField(FieldKey.TITLE, title);
                 tag.setField(FieldKey.ARTIST, artist);
                 tag.setField(FieldKey.ALBUM, album);
+                tag.setField(FieldKey.YEAR, song.year());
+                tag.setField(FieldKey.ARTIST, artist);
 
                 File artworkFile = new File(context.getCacheDir(), "artwork.jpg");
                 try (InputStream in = new URL(imageUrl).openStream();
@@ -103,7 +146,7 @@ public class TrackDownloader {
                 Uri newUri = resolver.insert(audioCollection, values);
                 if (newUri == null) {
                     Log.e(TAG, "Failed to insert into MediaStore");
-                    new android.os.Handler(Looper.getMainLooper()).post(()-> listener.onError("Failed to insert into MediaStore"));
+                    new android.os.Handler(Looper.getMainLooper()).post(() -> listener.onError("Failed to insert into MediaStore"));
                     return;
                 }
 
@@ -129,8 +172,8 @@ public class TrackDownloader {
 
             } catch (Exception e) {
                 Log.e(TAG, "Error: " + e.getMessage());
-                new android.os.Handler(Looper.getMainLooper()).post(()-> listener.onError(e.getMessage()));
-            }finally {
+                new android.os.Handler(Looper.getMainLooper()).post(() -> listener.onError(e.getMessage()));
+            } finally {
                 new android.os.Handler(Looper.getMainLooper()).post(listener::onFinished);
             }
         }).start();

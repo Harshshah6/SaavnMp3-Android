@@ -323,11 +323,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 progressDialog.setCanceledOnTouchOutside(false);
                 TrackDownloader.downloadAndEmbedMetadata(
                         MusicOverviewActivity.this,
-                        song.downloadUrl().get(song.downloadUrl().size() - 1).url(),
-                        !IMAGE_URL.isEmpty() ? IMAGE_URL : song.image().get(song.image().size() - 1).url(),
-                        song.name(),
-                        song.artists().primary().get(0).name(),
-                        song.album().name(),
+                        song,
                         new TrackDownloader.TrackDownloadListener() {
                             @Override
                             public void onStarted() {

@@ -120,8 +120,6 @@ public class MainActivity extends AppCompatActivity {
         // Set version text in the drawer layout
         updateVersionTextInDrawer();
 
-        for (TrackDownloader.DownloadedTrack downloadedTrack : TrackDownloader.getDownloadedTracks()) System.out.println(downloadedTrack);
-
         onDrawerItemsClicked();
 
         binding.profileIcon.setOnClickListener(view -> slidingRootNavBuilder.openMenu(true));
@@ -266,6 +264,11 @@ public class MainActivity extends AppCompatActivity {
 
         slidingRootNavBuilder.getLayout().findViewById(R.id.about).setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this, AboutActivity.class));
+            slidingRootNavBuilder.closeMenu();
+        });
+
+        slidingRootNavBuilder.getLayout().findViewById(R.id.download_manager).setOnClickListener(v->{
+            startActivity(new Intent(MainActivity.this, DownloadManagerActivity.class));
             slidingRootNavBuilder.closeMenu();
         });
     }

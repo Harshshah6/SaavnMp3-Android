@@ -311,11 +311,15 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             final SongResponse.Song song = mSongResponse.data().get(0);
 
             if (TrackDownloader.isAlreadyDownloaded(song.name())) {
-//                _binding.download.getTitleTextView().setText("Already Downloaded");
-                _binding.download.setVisibility(View.GONE);
+                _binding.download.getTitleTextView().setText("Download Manager");
             }
 
             _binding.download.setOnClickListener(v -> {
+
+                if (TrackDownloader.isAlreadyDownloaded(song.name())) {
+                    startActivity(new Intent(MusicOverviewActivity.this, DownloadManagerActivity.class));
+                    return;
+                }
 
                 ProgressDialog progressDialog = new ProgressDialog(MusicOverviewActivity.this);
                 progressDialog.setMessage("Downloading...");

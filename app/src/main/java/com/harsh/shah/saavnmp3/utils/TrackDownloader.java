@@ -4,9 +4,12 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -56,7 +59,7 @@ public class TrackDownloader {
     }
 
     public record DownloadedTrack(File file, String title, String artist, String album, String year,
-                                  String bitrate, String trackLength) {
+                                  String bitrate, String trackLength, Bitmap coverImage) {
     }
 
     public static List<DownloadedTrack> getDownloadedTracks() {
@@ -82,7 +85,9 @@ public class TrackDownloader {
                 year = tag != null ? tag.getFirst(FieldKey.YEAR) : "";
                 bitrate = audioHeader != null ? String.valueOf(audioHeader.getBitRate()) : "344";
                 trackLength = audioHeader != null ? String.valueOf(audioHeader.getTrackLength()) : "0";
-                data.add(new DownloadedTrack(file, title, artist, album, year, bitrate, trackLength));
+                final var coverImage = tag != null ? tag.getFirstArtwork().getBinaryData() : null;
+                final Bitmap bitmap = coverImage != null ? BitmapFactory.decodeByteArray(coverImage, 0, coverImage.length) : null;
+                data.add(new DownloadedTrack(file, title, artist, album, year, bitrate, trackLength, bitmap));
             } catch (Exception e) {
                 Log.e(TAG, "Error reading file: " + e.getMessage());
             }
@@ -98,12 +103,11 @@ public class TrackDownloader {
         String album = song.album().name();
 
         new Thread(() -> {
-            new android.os.Handler(Looper.getMainLooper()).post(listener::onStarted);
+            new Handler(Looper.getMainLooper()).post(listener::onStarted);
             Log.d(TAG, "⬇️ Downloading and embedding metadata...");
             try {
                 File tempFile = new File(context.getCacheDir(), title + ".mp4");
-                try (InputStream in = new URL(audioUrl).openStream();
-                     FileOutputStream out = new FileOutputStream(tempFile)) {
+                try (InputStream in = new URL(audioUrl).openStream(); FileOutputStream out = new FileOutputStream(tempFile)) {
                     byte[] buffer = new byte[4096];
                     int bytesRead;
                     while ((bytesRead = in.read(buffer)) != -1) {
@@ -121,8 +125,7 @@ public class TrackDownloader {
                 tag.setField(FieldKey.ARTIST, artist);
 
                 File artworkFile = new File(context.getCacheDir(), "artwork.jpg");
-                try (InputStream in = new URL(imageUrl).openStream();
-                     FileOutputStream out = new FileOutputStream(artworkFile)) {
+                try (InputStream in = new URL(imageUrl).openStream(); FileOutputStream out = new FileOutputStream(artworkFile)) {
                     byte[] buffer = new byte[4096];
                     int bytesRead;
                     while ((bytesRead = in.read(buffer)) != -1) {
@@ -139,19 +142,16 @@ public class TrackDownloader {
                 ContentValues values = getContentValues(title, artist, album);
 
                 ContentResolver resolver = context.getContentResolver();
-                Uri audioCollection = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                        ? MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-                        : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                Uri audioCollection = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ? MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY) : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
                 Uri newUri = resolver.insert(audioCollection, values);
                 if (newUri == null) {
                     Log.e(TAG, "Failed to insert into MediaStore");
-                    new android.os.Handler(Looper.getMainLooper()).post(() -> listener.onError("Failed to insert into MediaStore"));
+                    new Handler(Looper.getMainLooper()).post(() -> listener.onError("Failed to insert into MediaStore"));
                     return;
                 }
 
-                try (InputStream in = new URL("file://" + tempFile.getAbsolutePath()).openStream();
-                     OutputStream out = resolver.openOutputStream(newUri)) {
+                try (InputStream in = new URL("file://" + tempFile.getAbsolutePath()).openStream(); OutputStream out = resolver.openOutputStream(newUri)) {
                     byte[] buffer = new byte[4096];
                     int bytesRead;
                     while ((bytesRead = in.read(buffer)) != -1) {
@@ -172,9 +172,9 @@ public class TrackDownloader {
 
             } catch (Exception e) {
                 Log.e(TAG, "Error: " + e.getMessage());
-                new android.os.Handler(Looper.getMainLooper()).post(() -> listener.onError(e.getMessage()));
+                new Handler(Looper.getMainLooper()).post(() -> listener.onError(e.getMessage()));
             } finally {
-                new android.os.Handler(Looper.getMainLooper()).post(listener::onFinished);
+                new Handler(Looper.getMainLooper()).post(listener::onFinished);
             }
         }).start();
     }

@@ -339,7 +339,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                                 progressDialog.dismiss();
                                 if (TrackDownloader.isAlreadyDownloaded(song.name())) {
                                     Toast.makeText(MusicOverviewActivity.this, "Successfully Downloaded.", Toast.LENGTH_SHORT).show();
-                                    _binding.download.setVisibility(View.GONE);
+                                    _binding.download.getTitleTextView().setText("Download Manager");
                                 }
                             }
 

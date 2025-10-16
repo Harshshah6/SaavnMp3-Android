@@ -21,7 +21,7 @@ public class DownloadManagerActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        binding.recyclerView.setAdapter(new ActivityDownloadManagerListAdapter(TrackDownloader.getDownloadedTracks()));
+        binding.recyclerView.setAdapter(new ActivityDownloadManagerListAdapter(TrackDownloader.getDownloadedTracks(this)));
     }
 
     public void backPress(View view) {

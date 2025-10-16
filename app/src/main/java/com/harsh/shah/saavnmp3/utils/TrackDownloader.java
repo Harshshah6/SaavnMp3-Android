@@ -23,8 +23,10 @@ import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagField;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
+import org.jaudiotagger.tag.mp4.field.Mp4TagReverseDnsField;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,6 +34,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class TrackDownloader {
@@ -59,10 +62,11 @@ public class TrackDownloader {
     }
 
     public record DownloadedTrack(File file, String title, String artist, String album, String year,
-                                  String bitrate, String trackLength, Bitmap coverImage) {
+                                  String bitrate, String trackLength, Bitmap coverImage,
+                                  String trackUID) {
     }
 
-    public static List<DownloadedTrack> getDownloadedTracks() {
+    public static List<DownloadedTrack> getDownloadedTracks(final Context context) {
         final List<DownloadedTrack> data = new ArrayList<>();
         File musicDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "Melotune");
         if (!musicDir.exists()) {
@@ -73,21 +77,51 @@ public class TrackDownloader {
             return data;
         }
         for (File file : files) {
-            Log.d(TAG, "Downloaded track: " + file.getName());
             try {
                 AudioFile f = AudioFileIO.read(file);
                 Tag tag = f.getTag();
                 AudioHeader audioHeader = f.getAudioHeader();
-                String title, artist, album, year, bitrate, trackLength;
+                String title, artist, album, year, bitrate, trackLength, trackUID;
+                final String uidFieldIdPrefix = "----:" + context.getPackageName() + ":"; // prefix for safety
+                final String uidFieldId = uidFieldIdPrefix + "TrackUID";
                 title = tag != null ? tag.getFirst(FieldKey.TITLE) : file.getName();
                 artist = tag != null ? tag.getFirst(FieldKey.ARTIST) : "";
                 album = tag != null ? tag.getFirst(FieldKey.ALBUM) : "";
                 year = tag != null ? tag.getFirst(FieldKey.YEAR) : "";
                 bitrate = audioHeader != null ? String.valueOf(audioHeader.getBitRate()) : "344";
                 trackLength = audioHeader != null ? String.valueOf(audioHeader.getTrackLength()) : "0";
+
+                trackUID = null;
+                if (tag != null) {
+                    var field = tag.getFirstField(uidFieldId);
+                    if (field != null) {
+                        try {
+                            trackUID = field.toString();
+                            try {
+                                java.lang.reflect.Method m = field.getClass().getMethod("getContent");
+                                Object val = m.invoke(field);
+                                if (val != null) trackUID = val.toString();
+                            } catch (NoSuchMethodException ignored) {}
+                        } catch (Exception ignored) {}
+                    } else {
+                        for (Iterator<TagField> it = tag.getFields(); it.hasNext(); ) {
+                            var fField = it.next();
+                            String id = fField.getId();
+                            if (id != null && id.equalsIgnoreCase(uidFieldId)) {
+                                try {
+                                    trackUID = fField.toString();
+                                    break;
+                                } catch (Exception ignored) {}
+                            }
+                        }
+                    }
+                }
+
                 final var coverImage = tag != null ? tag.getFirstArtwork().getBinaryData() : null;
                 final Bitmap bitmap = coverImage != null ? BitmapFactory.decodeByteArray(coverImage, 0, coverImage.length) : null;
-                data.add(new DownloadedTrack(file, title, artist, album, year, bitrate, trackLength, bitmap));
+                final DownloadedTrack downloadedTrack = new DownloadedTrack(file, title, artist, album, year, bitrate, trackLength, bitmap, trackUID);
+                data.add(downloadedTrack);
+                System.out.println(downloadedTrack);
             } catch (Exception e) {
                 Log.e(TAG, "Error reading file: " + e.getMessage());
             }
@@ -124,6 +158,15 @@ public class TrackDownloader {
                 tag.setField(FieldKey.YEAR, song.year());
                 tag.setField(FieldKey.ARTIST, artist);
 
+                Mp4TagReverseDnsField uidField = new Mp4TagReverseDnsField(
+                        "----",
+                        context.getPackageName(),
+                        "TrackUID",
+                        song.id()
+                );
+
+                tag.setField(uidField);
+
                 File artworkFile = new File(context.getCacheDir(), "artwork.jpg");
                 try (InputStream in = new URL(imageUrl).openStream(); FileOutputStream out = new FileOutputStream(artworkFile)) {
                     byte[] buffer = new byte[4096];
@@ -139,7 +182,7 @@ public class TrackDownloader {
                 audioFile.setTag(tag);
                 audioFile.commit();
 
-                ContentValues values = getContentValues(title, artist, album);
+                ContentValues values = getContentValues(title, artist, album, song.id());
 
                 ContentResolver resolver = context.getContentResolver();
                 Uri audioCollection = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ? MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY) : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -180,7 +223,7 @@ public class TrackDownloader {
     }
 
     @NonNull
-    private static ContentValues getContentValues(String title, String artist, String album) {
+    private static ContentValues getContentValues(String title, String artist, String album, String id) {
         ContentValues values = new ContentValues();
         values.put(MediaStore.Audio.Media.DISPLAY_NAME, title);
         values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp4");
@@ -189,6 +232,7 @@ public class TrackDownloader {
         values.put(MediaStore.Audio.Media.ARTIST, artist);
         values.put(MediaStore.Audio.Media.ALBUM, album);
         values.put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_MUSIC + "/Melotune");
+        values.put(MediaStore.Audio.Media._ID, id);
         return values;
     }
 

@@ -41,9 +41,18 @@ jobs:
             -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }} \
             --no-daemon --warning-mode none -x lint -x test
 
+      - name: Get release notes from commit message
+        id: get_notes
+        run: |
+          RELEASE_NOTES=$(git log -1 --pretty=%B)
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Upload APK to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:
           files: app/build/outputs/apk/release/*.apk
+          body: ${{ steps.get_notes.outputs.notes }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TK }}

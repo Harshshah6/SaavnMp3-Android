@@ -1,5 +1,7 @@
 package com.harsh.shah.saavnmp3.adapters;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -9,7 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.harsh.shah.saavnmp3.R;
+import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity;
+import com.harsh.shah.saavnmp3.databinding.DownloadManagerMoreViewBinding;
 import com.harsh.shah.saavnmp3.utils.TrackDownloader;
 
 import java.util.List;
@@ -51,8 +56,27 @@ public class ActivityDownloadManagerListAdapter extends RecyclerView.Adapter<Act
         }
 
         holder.itemView.setOnClickListener(view -> {
-
+            showDialog(item, view);
         });
+    }
+
+    private void showDialog(TrackDownloader.DownloadedTrack track, View view){
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(view.getContext(), R.style.MyBottomSheetDialogTheme);
+        final DownloadManagerMoreViewBinding _binding = DownloadManagerMoreViewBinding.inflate(((Activity)view.getContext()).getLayoutInflater());
+        _binding.songTitle.setText(track.title());
+        _binding.songSubTitle.setText(track.artist());
+        _binding.coverImage.setImageBitmap(track.coverImage());
+        _binding.albumTitle.setText(track.album());
+        _binding.songYear.setText(track.year());
+        _binding.bitrate.setText(track.bitrate() + " kbps");
+        _binding.duration.setText(track.trackLength() + " Seconds");
+        if(track.trackUID() == null || track.trackUID().isEmpty()) _binding.button.setVisibility(View.GONE);
+        _binding.button.setOnClickListener(v->{
+            v.getContext().startActivity(new Intent(v.getContext(), MusicOverviewActivity.class).putExtra("type", "clear").putExtra("id", track.trackUID()));
+            bottomSheetDialog.dismiss();
+        });
+        bottomSheetDialog.setContentView(_binding.getRoot());
+        bottomSheetDialog.show();
     }
 
     @Override

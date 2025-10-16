@@ -14,6 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -28,6 +29,13 @@
             android:onClick="backPress"
             android:padding="@dimen/_12sdp"
             android:src="@drawable/round_arrow_back_24" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Downloads"
+            android:textColor="@color/textMain"
+            android:textSize="@dimen/_18ssp" />
 
     </LinearLayout>
 
@@ -56,13 +64,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Downloads"
-                android:textSize="@dimen/_18ssp"
-                android:textColor="@color/green"
-                android:paddingHorizontal="@dimen/_8sdp"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
@@ -74,7 +75,7 @@
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                 app:spanCount="1"
                 tools:itemCount="5"
-                tools:listitem="@layout/activity_list_song_item" />
+                tools:listitem="@layout/download_manager_list_item" />
 
 
         </LinearLayout>

@@ -64,12 +64,6 @@
 
             </LinearLayout>
 
-            <ImageView
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:src="@drawable/more_vert_24px"
-                android:padding="@dimen/_10sdp" />
-
         </LinearLayout>
 
     </LinearLayout>

@@ -27,6 +27,34 @@
         android:theme="@style/Theme.Melotune"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <activity
+            android:name=".activities.DeepLinkingActivity"
+            android:exported="true">
+            <tools:validation testUrl="https://www.jiosaavn.com/album/kantara-a-legend-chapter-1-hindi/ETr7Yvr8Oog_" />
+            <tools:validation testUrl="https://www.jiosaavn.com/song/rebel-song-from-kantara-a-legend-chapter-1-hindi/NCoDVxp1fGs" />
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="www.jiosaavn.com" />
+                <data android:pathPattern="/song/.*" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="www.jiosaavn.com" />
+                <data android:pathPattern="/album/.*" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.DownloadManagerActivity"
             android:exported="false" />

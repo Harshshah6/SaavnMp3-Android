@@ -488,7 +488,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         MusicService.MyBinder binder = (MusicService.MyBinder) service;
         musicService = binder.getService();
         musicService.setCallback(MusicOverviewActivity.this);
-        Log.e(TAG, "onServiceConnected: ");
+        Log.i(TAG, "onServiceConnected: ");
     }
 
     @Override
@@ -513,34 +513,41 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
         }
 
+        final RequestNetwork.RequestListener requestListener = new RequestNetwork.RequestListener() {
+            @Override
+            public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
+                SongResponse songResponse = new Gson().fromJson(response, SongResponse.class);
+                if (songResponse.success()) {
+                    onSongFetched(songResponse);
+                    SharedPreferenceManager.getInstance(MusicOverviewActivity.this).setSongResponseById(ID, songResponse);
+                } else if (SharedPreferenceManager.getInstance(MusicOverviewActivity.this).isSongResponseById(ID))
+                    onSongFetched(SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
+                else
+                    finish();
+            }
+
+            @Override
+            public void onErrorResponse(String tag, String message) {
+                if (SharedPreferenceManager.getInstance(MusicOverviewActivity.this).isSongResponseById(ID))
+                    onSongFetched(SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
+                else
+                    Toast.makeText(MusicOverviewActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        };
+
         if (getIntent().getExtras().getString("type", "").equals("clear")) {
             ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
             applicationClass.setTrackQueue(new ArrayList<>(Collections.singletonList(ID)));
         }
-        if (SharedPreferenceManager.getInstance(MusicOverviewActivity.this).isSongResponseById(ID))
-            onSongFetched(SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
-        else
-            apiManager.retrieveSongById(ID, null, new RequestNetwork.RequestListener() {
-                @Override
-                public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
-                    SongResponse songResponse = new Gson().fromJson(response, SongResponse.class);
-                    if (songResponse.success()) {
-                        onSongFetched(songResponse);
-                        SharedPreferenceManager.getInstance(MusicOverviewActivity.this).setSongResponseById(ID, songResponse);
-                    } else if (SharedPreferenceManager.getInstance(MusicOverviewActivity.this).isSongResponseById(ID))
-                        onSongFetched(SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
-                    else
-                        finish();
-                }
-
-                @Override
-                public void onErrorResponse(String tag, String message) {
-                    if (SharedPreferenceManager.getInstance(MusicOverviewActivity.this).isSongResponseById(ID))
-                        onSongFetched(SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
-                    else
-                        Toast.makeText(MusicOverviewActivity.this, message, Toast.LENGTH_SHORT).show();
-                }
-            });
+        if((ID.startsWith("http") || ID.startsWith("www")) && ID.contains("jiosaavn.com")){
+            apiManager.retrieveSongByLink(ID, requestListener);
+        }else{
+            if (SharedPreferenceManager.getInstance(MusicOverviewActivity.this).isSongResponseById(ID)) {
+                onSongFetched(SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
+            }else {
+                apiManager.retrieveSongById(ID, null, requestListener);
+            }
+        }
     }
 
     private SongResponse mSongResponse;

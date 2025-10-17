@@ -60,11 +60,9 @@ public class ApplicationClass extends Application {
 
     public static FirebaseAnalytics firebaseAnalytics;
     public static final String CHANNEL_ID_1 = "channel_1";
-    public static final String CHANNEL_ID_2 = "channel_2";
     public static final String ACTION_NEXT = "next";
     public static final String ACTION_PREV = "prev";
     public static final String ACTION_PLAY = "play";
-    public static final MediaPlayerUtil mediaPlayerUtil = MediaPlayerUtil.getInstance();
     public static SongResponse CURRENT_TRACK = null;
 
     public static ExoPlayer player;
@@ -351,67 +349,6 @@ public class ApplicationClass extends Application {
                             .setContentIntent(contentIntent)
                             .setOnlyAlertOnce(true);
 
-            // Load album art with a timeout to avoid blocking
-//            try {
-//                Glide.with(this)
-//                        .asBitmap()
-//                        .load(IMAGE_URL)
-//                        .timeout(3000) // 3 second timeout
-//                        .into(new CustomTarget<Bitmap>() {
-//                            @Override
-//                            public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
-//                                try {
-//                                    //IMAGE_BG_COLOR = calculateDominantColor(resource);
-//                                    //TEXT_ON_IMAGE_COLOR = invertColor(IMAGE_BG_COLOR);
-//
-//                                    // Try to get palette colors
-//                                    try {
-//                                        Palette.from(resource)
-//                                                .generate(palette -> {
-//                                                    Palette.Swatch textSwatch = palette.getDominantSwatch();
-//                                                    if (textSwatch == null) {
-//                                                        Log.i("ApplicationClass", "Null swatch :(");
-//                                                        return;
-//                                                    }
-//                                                    IMAGE_BG_COLOR = (textSwatch.getRgb());
-//                                                    TEXT_ON_IMAGE_COLOR = (textSwatch.getTitleTextColor());
-//                                                    TEXT_ON_IMAGE_COLOR1 = (textSwatch.getBodyTextColor());
-//                                                });
-//                                    } catch (Exception e) {
-//                                        Log.e(TAG, "Error generating palette", e);
-//                                    }
-//
-//                                    // Add the bitmap to the notification
-//                                    notificationBuilder.setLargeIcon(resource);
-//
-//                                    // Build and show the notification
-//                                    Notification notification = notificationBuilder.build();
-//                                    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//                                    notificationManager.notify(0, notification);
-//                                } catch (Exception e) {
-//                                    Log.e(TAG, "Error displaying notification with bitmap", e);
-//                                    // Show basic notification without image if there's an error
-//                                    showBasicNotification(notificationBuilder);
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onLoadFailed(Drawable errorDrawable) {
-//                                // Show notification without image if loading fails
-//                                showBasicNotification(notificationBuilder);
-//                            }
-//
-//                            @Override
-//                            public void onLoadCleared(Drawable placeholder) {
-//                                // Handle placeholder if needed
-//                            }
-//                        });
-//            } catch (Exception e) {
-//                Log.e(TAG, "Error loading image for notification", e);
-//                // Show basic notification without image if there's an error
-//                showBasicNotification(notificationBuilder);
-//            }
-
             try {
                 Picasso.get()
                         .load(IMAGE_URL)
@@ -563,7 +500,7 @@ public class ApplicationClass extends Application {
             player.setMediaItem(mediaItem);
 
             // Prepare player but don't auto-play to prevent race conditions
-            player.setPlayWhenReady(false);
+            player.setPlayWhenReady(true);
             player.prepare();
 
             // Update notification
@@ -707,7 +644,7 @@ public class ApplicationClass extends Application {
     }
 
     private void playTrack() {
-        ApiManager apiManager = new ApiManager(currentActivity);
+        ApiManager apiManager = new ApiManager(getCurrentActivity());
         apiManager.retrieveSongById(MUSIC_ID, null, new RequestNetwork.RequestListener() {
             @OptIn(markerClass = UnstableApi.class)
             @Override

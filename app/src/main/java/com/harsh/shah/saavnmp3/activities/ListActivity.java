@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,6 +44,8 @@ public class ListActivity extends AppCompatActivity {
 
     private final List<String> trackQueue = new ArrayList<>();
 
+    private static final String TAG = "ListActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +63,8 @@ public class ListActivity extends AppCompatActivity {
             if (!trackQueue.isEmpty()) {
                 ((ApplicationClass) getApplicationContext()).setTrackQueue(trackQueue);
                 ((ApplicationClass) getApplicationContext()).nextTrack();
-                startActivity(new Intent(ListActivity.this, MusicOverviewActivity.class).putExtra("id", ApplicationClass.MUSIC_ID));
+                Log.i(TAG, "trackQueueSet: " + ApplicationClass.trackQueue + " With POS " + ApplicationClass.track_position);
+                startActivity(new Intent(ListActivity.this, MusicOverviewActivity.class).putExtra("id", trackQueue.get(0)));
             }
         });
         final SharedPreferenceManager sharedPreferenceManager = SharedPreferenceManager.getInstance(ListActivity.this);
@@ -266,10 +270,12 @@ public class ListActivity extends AppCompatActivity {
         if (getIntent().getExtras() == null) return;
         albumItem = new Gson().fromJson(getIntent().getExtras().getString("data"), AlbumItem.class);
         updateAlbumInLibraryStatus();
-        binding.albumTitle.setText(albumItem.albumTitle());
-        binding.albumSubTitle.setText(albumItem.albumSubTitle());
-        if (!albumItem.albumCover().isBlank())
-            Picasso.get().load(Uri.parse(albumItem.albumCover())).into(binding.albumCover);
+        if (albumItem != null) {
+            binding.albumTitle.setText(albumItem.albumTitle());
+            binding.albumSubTitle.setText(albumItem.albumSubTitle());
+            if (!albumItem.albumCover().isBlank())
+                Picasso.get().load(Uri.parse(albumItem.albumCover())).into(binding.albumCover);
+        }
 
         final ApiManager apiManager = new ApiManager(this);
         final SharedPreferenceManager sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
@@ -281,25 +287,36 @@ public class ListActivity extends AppCompatActivity {
 
         if (getIntent().getExtras().getString("type", "").equals("album")) {
             isAlbum = true;
-            if (sharedPreferenceManager.getAlbumResponseById(albumItem.id()) != null) {
-                onAlbumFetched(sharedPreferenceManager.getAlbumResponseById(albumItem.id()));
-                return;
+            if (albumItem != null) {
+                if (sharedPreferenceManager.getAlbumResponseById(albumItem.id()) != null) {
+                    onAlbumFetched(sharedPreferenceManager.getAlbumResponseById(albumItem.id()));
+                    return;
+                }
             }
-            apiManager.retrieveAlbumById(albumItem.id(), new RequestNetwork.RequestListener() {
+            final String intentId = getIntent().getExtras().getString("id", "");
+            final var requestListener = new RequestNetwork.RequestListener() {
                 @Override
                 public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
                     AlbumSearch albumSearch = new Gson().fromJson(response, AlbumSearch.class);
+                    Log.i("ListActivity", "onResponse: " + albumSearch);
                     if (albumSearch.success()) {
-                        sharedPreferenceManager.setAlbumResponseById(albumItem.id(), albumSearch);
+                        sharedPreferenceManager.setAlbumResponseById(albumSearch.data().id(), albumSearch);
                         onAlbumFetched(albumSearch);
                     }
                 }
 
                 @Override
                 public void onErrorResponse(String tag, String message) {
-
+                    Log.e("ListActivity", "onErrorResponse: " + message);
+                    Toast.makeText(ListActivity.this, "Failed to fetch Album", Toast.LENGTH_SHORT).show();
                 }
-            });
+            };
+
+            if ((intentId.startsWith("http") || intentId.startsWith("www")) && intentId.contains("jiosaavn.com")) {
+                apiManager.retrieveAlbumByLink(intentId, requestListener);
+            } else {
+                apiManager.retrieveAlbumById(albumItem.id(), requestListener);
+            }
             return;
         }
 

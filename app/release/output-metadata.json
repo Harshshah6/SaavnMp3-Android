@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 3,
-      "versionName": "1.0.9",
-      "outputFile": "Melotune-1.0.9-release.apk"
+      "versionCode": 4,
+      "versionName": "1.0.10",
+      "outputFile": "Melotune-1.0.10-release.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +22,14 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/Melotune-1.0.9-release.dm"
+        "baselineProfiles/1/Melotune-1.0.10-release.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/Melotune-1.0.9-release.dm"
+        "baselineProfiles/0/Melotune-1.0.10-release.dm"
       ]
     }
   ],

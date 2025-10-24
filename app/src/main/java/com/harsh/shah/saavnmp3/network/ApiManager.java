@@ -10,7 +10,7 @@ import com.harsh.shah.saavnmp3.network.utility.RequestNetworkController;
 import java.util.HashMap;
 
 public class ApiManager {
-    private static final String BASE_URL = "https://saavn.dev/api/";
+    private static final String BASE_URL = "https://saavn.sumit.co/api/";
     private static final String SEARCH_URL = BASE_URL + "search";
     private static final String SONGS = "/songs";
     private static final String ALBUMS = "/albums";
@@ -213,29 +213,29 @@ public class ApiManager {
 
     public void retrieveArtistSongs(String artistId, int page, SortBy sortBy, SortOrder sortOrder, RequestNetwork.RequestListener requestListener) {
         HashMap<String, Object> queryMap = new HashMap<>();
-        queryMap.put("page", page==-1?0:page);
+        queryMap.put("page", page == -1 ? 0 : page);
         if (sortBy != null) queryMap.put("sortBy", sortBy.name());
         if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name());
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM);
-        requestNetwork.startRequestNetwork(RequestNetworkController.GET, "https://saavn.dev/api/artists/"+Integer.valueOf(artistId)+"/songs", "", requestListener);
+        requestNetwork.startRequestNetwork(RequestNetworkController.GET, ARTISTS_URL + Integer.valueOf(artistId) + "/songs", "", requestListener);
     }
 
     public void retrieveArtistSongs(String artistId, RequestNetwork.RequestListener requestListener) {
         retrieveArtistSongs(artistId, 0, null, null, requestListener);
     }
 
-    public void retrieveArtistAlbums(String artistId, int page, SortBy sortBy, SortOrder sortOrder, RequestNetwork.RequestListener requestListener){
+    public void retrieveArtistAlbums(String artistId, int page, SortBy sortBy, SortOrder sortOrder, RequestNetwork.RequestListener requestListener) {
         HashMap<String, Object> queryMap = new HashMap<>();
-        queryMap.put("page", page==-1?0:page);
+        queryMap.put("page", page == -1 ? 0 : page);
         if (sortBy != null) queryMap.put("sortBy", sortBy.name());
         if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name());
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM);
-        requestNetwork.startRequestNetwork(RequestNetworkController.GET, "https://saavn.dev/api/artists/"+Integer.valueOf(artistId)+"/albums", "", requestListener);
+        requestNetwork.startRequestNetwork(RequestNetworkController.GET, ARTISTS_URL + Integer.valueOf(artistId) + "/albums", "", requestListener);
     }
 
-    public void retrieveArtistAlbums(String artistId, int page, RequestNetwork.RequestListener requestListener){
+    public void retrieveArtistAlbums(String artistId, int page, RequestNetwork.RequestListener requestListener) {
         retrieveArtistAlbums(artistId, page, null, null, requestListener);
     }
 

@@ -116,6 +116,18 @@
                 app:textOn="Will store data to cache. Less Data Consumption. Helps when API Server is down."
                 app:checked="true" />
 
+            <TextView
+                android:id="@+id/clear_cache"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Clear All Cached data"
+                android:paddingHorizontal="@dimen/_12sdp"
+                android:paddingVertical="@dimen/_8sdp"
+                android:textColor="@color/textMain"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.2dp"

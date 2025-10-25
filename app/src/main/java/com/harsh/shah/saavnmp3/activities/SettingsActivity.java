@@ -5,11 +5,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.harsh.shah.saavnmp3.ApplicationClass;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.databinding.ActivitySettingsBinding;
+import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -21,6 +23,7 @@ public class SettingsActivity extends AppCompatActivity {
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         final SettingsSharedPrefManager settingsSharedPrefManager = new SettingsSharedPrefManager(this);
+        final SharedPreferenceManager sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
 
         binding.downloadOverCellular.setOnCheckChangeListener(settingsSharedPrefManager::setDownloadOverCellular);
         binding.highQualityTrack.setOnCheckChangeListener(settingsSharedPrefManager::setHighQualityTrack);
@@ -35,6 +38,15 @@ public class SettingsActivity extends AppCompatActivity {
         binding.themeChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
             settingsSharedPrefManager.setTheme(checkedId == R.id.dark ? "dark" : checkedId == R.id.light ? "light" : "system");
             ApplicationClass.updateTheme();
+        });
+
+        binding.clearCache.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Clear Cache")
+                    .setMessage("Are you sure you want to clear the cache?")
+                    .setPositiveButton("Yes", (dialog, which) -> sharedPreferenceManager.getSharedPreferences().edit().clear().apply())
+                    .setNegativeButton("No", null)
+                    .show();
         });
 
         binding.themeChipGroup.check(settingsSharedPrefManager.getTheme().equals("dark") ? R.id.dark : settingsSharedPrefManager.getTheme().equals("light") ? R.id.light : R.id.system);

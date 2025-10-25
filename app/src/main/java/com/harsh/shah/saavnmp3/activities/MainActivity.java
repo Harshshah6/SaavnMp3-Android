@@ -1,7 +1,6 @@
 package com.harsh.shah.saavnmp3.activities;
 
 import android.Manifest;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,9 +9,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -22,17 +19,12 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.harsh.shah.saavnmp3.ApplicationClass;
 import com.harsh.shah.saavnmp3.R;
@@ -53,7 +45,6 @@ import com.harsh.shah.saavnmp3.records.SongSearch;
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries;
 import com.harsh.shah.saavnmp3.utils.NetworkUtil;
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager;
-import com.harsh.shah.saavnmp3.utils.TrackDownloader;
 import com.squareup.picasso.Picasso;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
@@ -62,6 +53,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -267,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
             slidingRootNavBuilder.closeMenu();
         });
 
-        slidingRootNavBuilder.getLayout().findViewById(R.id.download_manager).setOnClickListener(v->{
+        slidingRootNavBuilder.getLayout().findViewById(R.id.download_manager).setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, DownloadManagerActivity.class));
             slidingRootNavBuilder.closeMenu();
         });
@@ -459,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // String.valueOf(Calendar.getInstance().get(Calendar.YEAR))
-        apiManager.searchPlaylists("2024", 0, 15, new RequestNetwork.RequestListener() {
+        apiManager.searchPlaylists(String.valueOf(Calendar.getInstance().get(Calendar.YEAR)), null,null, new RequestNetwork.RequestListener() {
             @Override
             public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
                 PlaylistsSearch playlistsSearch = new Gson().fromJson(response, PlaylistsSearch.class);

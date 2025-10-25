@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.harsh.shah.saavnmp3.adapters.ActivityArtistProfileTopAlbumsAdapter;
 import com.harsh.shah.saavnmp3.adapters.ActivityArtistProfileTopSongsAdapter;
@@ -20,7 +19,6 @@ import com.harsh.shah.saavnmp3.adapters.ActivitySeeMoreListAdapter;
 import com.harsh.shah.saavnmp3.databinding.ActivityArtistProfileBinding;
 import com.harsh.shah.saavnmp3.model.BasicDataRecord;
 import com.harsh.shah.saavnmp3.network.ApiManager;
-import com.harsh.shah.saavnmp3.network.NetworkChangeReceiver;
 import com.harsh.shah.saavnmp3.network.utility.RequestNetwork;
 import com.harsh.shah.saavnmp3.records.AlbumsSearch;
 import com.harsh.shah.saavnmp3.records.ArtistSearch;
@@ -47,19 +45,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private final String TAG = "ArtistProfileActivity";
     ActivityArtistProfileBinding binding;
-
-    NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver(new NetworkChangeReceiver.NetworkStatusListener() {
-        @Override
-        public void onNetworkConnected() {
-            showData();
-        }
-
-        @Override
-        public void onNetworkDisconnected() {
-            Snackbar.make(binding.getRoot(), "No Internet Connection", Snackbar.LENGTH_LONG).show();
-            //showData();
-        }
-    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,19 +91,17 @@ public class ArtistProfileActivity extends AppCompatActivity {
         //binding.topSinglesSeeMore.setOnClickListener(v -> startActivity(seeMoreIntent.putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_SINGLES.name())));
 
         showShimmerData();
-        //showData();
+        showData();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        NetworkChangeReceiver.registerReceiver(this, networkChangeReceiver);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        NetworkChangeReceiver.unregisterReceiver(this, networkChangeReceiver);
     }
 
     private String artistId = "9999";
@@ -128,47 +111,53 @@ public class ArtistProfileActivity extends AppCompatActivity {
         if (getIntent().getExtras() == null) return;
         Log.i(TAG, "showData: " + getIntent().getExtras());
         final String artist = getIntent().getExtras().getString("data", "null");
+        final ApiManager apiManager = new ApiManager(this);
+        final RequestNetwork.RequestListener responseListener = new RequestNetwork.RequestListener() {
+            final SharedPreferenceManager sharedPreferenceManager = SharedPreferenceManager.getInstance(ArtistProfileActivity.this);
+
+            @Override
+            public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
+                try {
+                    artistSearch = new Gson().fromJson(response, ArtistSearch.class);
+                    Log.i(TAG, "onResponse: " + response);
+                    sharedPreferenceManager.setArtistData(artistSearch.data().id(), artistSearch);
+                    Log.i(TAG, "onResponse: " + sharedPreferenceManager.getArtistData(artistSearch.data().id()));
+                    display();
+                } catch (Exception e) {
+                    Log.e(TAG, "onResponse: ", e);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onErrorResponse(String tag, String message) {
+                Log.i(TAG, "onErrorResponse: " + message);
+                if (!artistId.equals("9999")) {
+                    ArtistSearch offlineData = sharedPreferenceManager.getArtistData(artistId);
+                    if (offlineData != null) {
+                        artistSearch = offlineData;
+                        display();
+                    }
+                }
+            }
+        };
+
+        if ((artist.startsWith("http") || artist.startsWith("www")) && artist.contains("jiosaavn.com")) {
+            apiManager.retrieveArtistsByLink(artist, null, null, null, null, null, responseListener);
+            return;
+        }
+
         final BasicDataRecord artistItem = new Gson().fromJson(artist, BasicDataRecord.class);
-        if (artistItem == null) return;
+        if (artistItem == null) {
+            return;
+        }
         artistId = artistItem.id();
 
         Picasso.get().load(Uri.parse(artistItem.image())).into(binding.artistImg);
         binding.artistName.setText(artistItem.title());
         binding.collapsingToolbarLayout.setTitle(artistItem.title());
 
-        final ApiManager apiManager = new ApiManager(this);
-        apiManager.retrieveArtistById(artistId, new RequestNetwork.RequestListener() {
-            final SharedPreferenceManager sharedPreferenceManager = SharedPreferenceManager.getInstance(ArtistProfileActivity.this);
-
-            @Override
-            public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
-                artistSearch = new Gson().fromJson(response, ArtistSearch.class);
-                Log.i(TAG, "onResponse: " + response);
-                sharedPreferenceManager.setArtistData(artistId, artistSearch);
-                Log.i(TAG, "onResponse: " + sharedPreferenceManager.getArtistData(artistId));
-                display();
-            }
-
-            @Override
-            public void onErrorResponse(String tag, String message) {
-                Log.i(TAG, "onErrorResponse: " + message);
-                ArtistSearch offlineData = sharedPreferenceManager.getArtistData(artistId);
-                if (offlineData != null) {
-                    artistSearch = offlineData;
-                    display();
-                }
-//                if (!NetworkUtil.isNetworkAvailable(ArtistProfileActivity.this)) {
-//                    try {
-//                        Thread.sleep(2000);
-//                        showData();
-//                    } catch (InterruptedException e) {
-//                        Log.e(TAG, "onErrorResponse: ", e);
-//                    }
-//                }
-            }
-
-
-        });
+        apiManager.retrieveArtistById(artistId, responseListener);
     }
 
     private void display() {

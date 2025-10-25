@@ -1,6 +1,7 @@
 package com.harsh.shah.saavnmp3.network;
 
 import android.app.Activity;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
@@ -10,7 +11,7 @@ import com.harsh.shah.saavnmp3.network.utility.RequestNetworkController;
 import java.util.HashMap;
 
 public class ApiManager {
-    private static final String BASE_URL = "https://saavn.sumit.co/api/";
+    private static final String BASE_URL = "https://meloapi.vercel.app/api/";
     private static final String SEARCH_URL = BASE_URL + "search";
     private static final String SONGS = "/songs";
     private static final String ALBUMS = "/albums";
@@ -29,14 +30,14 @@ public class ApiManager {
 
     public void globalSearch(String text, RequestNetwork.RequestListener listener) {
         HashMap<String, Object> queryMap = new HashMap<>();
-        queryMap.put("query", text);
+        queryMap.put("query", Uri.encode(text));
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM);
         requestNetwork.startRequestNetwork(RequestNetworkController.GET, SEARCH_URL, "", listener);
     }
 
     public void searchSongs(@NonNull String query, Integer page, Integer limit, @NonNull RequestNetwork.RequestListener listener) {
         HashMap<String, Object> queryMap = new HashMap<>();
-        queryMap.put("query", query);
+        queryMap.put("query", Uri.encode(query));
         if (page != null) queryMap.put("page", page);
         if (limit != null) queryMap.put("limit", limit);
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM);
@@ -45,7 +46,7 @@ public class ApiManager {
 
     public void searchAlbums(@NonNull String query, Integer page, Integer limit, @NonNull RequestNetwork.RequestListener listener) {
         HashMap<String, Object> queryMap = new HashMap<>();
-        queryMap.put("query", query);
+        queryMap.put("query", Uri.encode(query));
         if (page != null) queryMap.put("page", page);
         if (limit != null) queryMap.put("limit", limit);
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM);
@@ -54,7 +55,7 @@ public class ApiManager {
 
     public void searchArtists(@NonNull String query, Integer page, Integer limit, @NonNull RequestNetwork.RequestListener listener) {
         HashMap<String, Object> queryMap = new HashMap<>();
-        queryMap.put("query", query);
+        queryMap.put("query", Uri.encode(query));
         if (page != null) queryMap.put("page", page);
         if (limit != null) queryMap.put("limit", limit);
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM);
@@ -63,7 +64,7 @@ public class ApiManager {
 
     public void searchPlaylists(@NonNull String query, Integer page, Integer limit, @NonNull RequestNetwork.RequestListener listener) {
         HashMap<String, Object> queryMap = new HashMap<>();
-        queryMap.put("query", query);
+        queryMap.put("query", Uri.encode(query));
         if (page != null) queryMap.put("page", page);
         if (limit != null) queryMap.put("limit", limit);
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM);

@@ -279,12 +279,14 @@ public class ListActivity extends AppCompatActivity {
 
         final ApiManager apiManager = new ApiManager(this);
         final SharedPreferenceManager sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
+        final String intentId = getIntent().getExtras().getString("id", "");
 
         if (getIntent().getExtras().getBoolean("createdByUser", false)) {
             onUserCreatedFetch();
             return;
         }
 
+        boolean checkIfUrlData = (intentId.startsWith("http") || intentId.startsWith("www")) && intentId.contains("jiosaavn.com");
         if (getIntent().getExtras().getString("type", "").equals("album")) {
             isAlbum = true;
             if (albumItem != null) {
@@ -293,7 +295,6 @@ public class ListActivity extends AppCompatActivity {
                     return;
                 }
             }
-            final String intentId = getIntent().getExtras().getString("id", "");
             final var requestListener = new RequestNetwork.RequestListener() {
                 @Override
                 public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
@@ -312,7 +313,7 @@ public class ListActivity extends AppCompatActivity {
                 }
             };
 
-            if ((intentId.startsWith("http") || intentId.startsWith("www")) && intentId.contains("jiosaavn.com")) {
+            if (checkIfUrlData) {
                 apiManager.retrieveAlbumByLink(intentId, requestListener);
             } else {
                 apiManager.retrieveAlbumById(albumItem.id(), requestListener);
@@ -320,17 +321,13 @@ public class ListActivity extends AppCompatActivity {
             return;
         }
 
-        if (sharedPreferenceManager.getPlaylistResponseById(albumItem.id()) != null) {
-            onPlaylistFetched(sharedPreferenceManager.getPlaylistResponseById(albumItem.id()));
-            return;
-        }
-        apiManager.retrievePlaylistById(albumItem.id(), 0, 50, new RequestNetwork.RequestListener() {
+        final RequestNetwork.RequestListener responseListener = new RequestNetwork.RequestListener() {
             @Override
             public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
                 Log.i("API_RESPONSE", "onResponse: " + response);
                 PlaylistSearch playlistSearch = new Gson().fromJson(response, PlaylistSearch.class);
                 if (playlistSearch.success()) {
-                    sharedPreferenceManager.setPlaylistResponseById(albumItem.id(), playlistSearch);
+                    sharedPreferenceManager.setPlaylistResponseById(playlistSearch.data().id(), playlistSearch);
                     onPlaylistFetched(playlistSearch);
                 }
             }
@@ -339,7 +336,15 @@ public class ListActivity extends AppCompatActivity {
             public void onErrorResponse(String tag, String message) {
 
             }
-        });
+        };
+        if (checkIfUrlData) {
+            apiManager.retrievePlaylistByLink(intentId, null, null, responseListener);
+        } else {
+            if (sharedPreferenceManager.getPlaylistResponseById(albumItem.id()) != null) {
+                onPlaylistFetched(sharedPreferenceManager.getPlaylistResponseById(albumItem.id()));
+            }
+            apiManager.retrievePlaylistById(albumItem.id(), null, null, responseListener);
+        }
     }
 
     private boolean isUserCreated = false;

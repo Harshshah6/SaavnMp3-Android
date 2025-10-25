@@ -5,20 +5,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.google.gson.Gson;
 import com.harsh.shah.saavnmp3.R;
-import com.harsh.shah.saavnmp3.network.ApiManager;
-import com.harsh.shah.saavnmp3.network.utility.RequestNetwork;
-import com.harsh.shah.saavnmp3.records.AlbumSearch;
-
-import java.util.HashMap;
 
 public class DeepLinkingActivity extends AppCompatActivity {
 
@@ -41,26 +31,29 @@ public class DeepLinkingActivity extends AppCompatActivity {
 
     private void handleIntent(Intent intent) {
         if (intent == null) return;
-        Uri data = intent.getData();
+        final Uri data = intent.getData();
         if (data == null) {
             Log.w(TAG, "No data in intent");
             return;
         }
 
-        // Example incoming: https://www.jiosaavn.com/song/rebel-song-from-kantara-a-legend-chapter-1-hindi/NCoDVxp1fGs
-        String host = data.getHost();                   // "www.jiosaavn.com"
-        String path = data.getPath();                   // "/song/slug/ID"
+        String host = data.getHost();
+        String path = data.getPath();
         Log.d(TAG, "Deep link host: " + host + " path: " + path);
 
-        if(path == null){
+        if (path == null) {
             openMainScreen();
             return;
         }
 
-        if(path.startsWith("/song")){
+        if (path.startsWith("/song")) {
             openPlayerForSongUrl(data.toString());
-        }else if(path.startsWith("/album")) {
+        } else if (path.startsWith("/album")) {
             openAlbumFromUrl(data.toString());
+        } else if (path.startsWith("/featured")) {
+            openPlaylistFromUrl(data.toString());
+        } else if (path.startsWith("/artist")) {
+            openArtistFromUrl(data.toString());
         }
 
     }
@@ -71,10 +64,23 @@ public class DeepLinkingActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    private void openAlbumFromUrl(String albumUrl){
+    private void openAlbumFromUrl(String albumUrl) {
         startActivity(new Intent(DeepLinkingActivity.this, ListActivity.class)
                 .putExtra("type", "album")
                 .putExtra("id", albumUrl)
+        );
+    }
+
+    private void openPlaylistFromUrl(String albumUrl) {
+        startActivity(new Intent(DeepLinkingActivity.this, ListActivity.class)
+                .putExtra("type", "playlist")
+                .putExtra("id", albumUrl)
+        );
+    }
+
+    private void openArtistFromUrl(String albumUrl) {
+        startActivity(new Intent(DeepLinkingActivity.this, ArtistProfileActivity.class)
+                .putExtra("data", albumUrl)
         );
     }
 

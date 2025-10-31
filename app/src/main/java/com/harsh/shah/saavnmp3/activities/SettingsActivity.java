@@ -8,7 +8,7 @@ import android.view.View;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.harsh.shah.saavnmp3.ApplicationClass;
+import com.harsh.shah.saavnmp3.BaseApplicationClass;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.databinding.ActivitySettingsBinding;
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager;
@@ -37,7 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         binding.themeChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
             settingsSharedPrefManager.setTheme(checkedId == R.id.dark ? "dark" : checkedId == R.id.light ? "light" : "system");
-            ApplicationClass.updateTheme();
+            BaseApplicationClass.updateTheme();
         });
 
         binding.clearCache.setOnClickListener(v -> {

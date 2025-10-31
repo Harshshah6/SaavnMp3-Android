@@ -1,6 +1,8 @@
 package com.harsh.shah.saavnmp3.activities;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -101,6 +103,14 @@ public class SearchActivity extends AppCompatActivity {
 
     private void showData(String query) {
         showShimmerData();
+
+        if((query.startsWith("http") || query.startsWith("www")) && query.contains("jiosaavn.com")){
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(query));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setData(Uri.parse(query));
+            startActivity(intent);
+            return;
+        }
 
         final ApiManager apiManager = new ApiManager(this);
         apiManager.globalSearch(query, new RequestNetwork.RequestListener() {

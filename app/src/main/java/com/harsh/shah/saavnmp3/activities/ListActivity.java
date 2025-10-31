@@ -15,7 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
-import com.harsh.shah.saavnmp3.ApplicationClass;
+import com.harsh.shah.saavnmp3.BaseApplicationClass;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.adapters.ActivityListSongsItemAdapter;
 import com.harsh.shah.saavnmp3.adapters.UserCreatedSongsListAdapter;
@@ -61,9 +61,9 @@ public class ListActivity extends AppCompatActivity {
 
         binding.playAllBtn.setOnClickListener(view -> {
             if (!trackQueue.isEmpty()) {
-                ((ApplicationClass) getApplicationContext()).setTrackQueue(trackQueue);
-                ((ApplicationClass) getApplicationContext()).nextTrack();
-                Log.i(TAG, "trackQueueSet: " + ApplicationClass.trackQueue + " With POS " + ApplicationClass.track_position);
+                ((BaseApplicationClass) getApplicationContext()).setTrackQueue(trackQueue);
+                ((BaseApplicationClass) getApplicationContext()).nextTrack();
+                Log.i(TAG, "trackQueueSet: " + BaseApplicationClass.trackQueue + " With POS " + BaseApplicationClass.track_position);
                 startActivity(new Intent(ListActivity.this, MusicOverviewActivity.class).putExtra("id", trackQueue.get(0)));
             }
         });

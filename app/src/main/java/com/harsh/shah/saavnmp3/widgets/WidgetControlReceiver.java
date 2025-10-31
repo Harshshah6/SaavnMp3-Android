@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.harsh.shah.saavnmp3.ApplicationClass;
+import com.harsh.shah.saavnmp3.BaseApplicationClass;
 
 public class WidgetControlReceiver extends BroadcastReceiver {
 
@@ -15,7 +15,7 @@ public class WidgetControlReceiver extends BroadcastReceiver {
 
         if (action == null) return;
 
-        ApplicationClass a = new ApplicationClass();
+        BaseApplicationClass a = new BaseApplicationClass();
 
         switch (action) {
             case "ACTION_TOGGLE_PLAY":

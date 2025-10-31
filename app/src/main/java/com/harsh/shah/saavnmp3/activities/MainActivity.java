@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
-import com.harsh.shah.saavnmp3.ApplicationClass;
+import com.harsh.shah.saavnmp3.BaseApplicationClass;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.adapters.ActivityMainAlbumItemAdapter;
 import com.harsh.shah.saavnmp3.adapters.ActivityMainArtistsItemAdapter;
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityResultLauncher<String[]> requestStoragePermission;
     private final String TAG = "MainActivity";
     private ActivityMainBinding binding;
-    private ApplicationClass applicationClass;
+    private BaseApplicationClass baseApplicationClass;
     final List<AlbumItem> songs = new ArrayList<>();
     final List<ArtistsSearch.Data.Results> artists = new ArrayList<>();
     final List<AlbumItem> albums = new ArrayList<>();
@@ -99,9 +99,9 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        applicationClass = (ApplicationClass) getApplicationContext();
-        ApplicationClass.setCurrentActivity(this);
-        ApplicationClass.updateTheme();
+        baseApplicationClass = (BaseApplicationClass) getApplicationContext();
+        BaseApplicationClass.setCurrentActivity(this);
+        BaseApplicationClass.updateTheme();
 
         slidingRootNavBuilder = new SlidingRootNavBuilder(this)
                 .withMenuLayout(R.layout.main_drawer_layout)
@@ -137,21 +137,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding.playBarPlayPauseIcon.setOnClickListener(view -> {
-            ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
-            applicationClass.togglePlayPause();
-            applicationClass.showNotification(ApplicationClass.player.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
-            binding.playBarPlayPauseIcon.setImageResource(ApplicationClass.player.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+            BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
+            baseApplicationClass.togglePlayPause();
+            baseApplicationClass.showNotification(BaseApplicationClass.player.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+            binding.playBarPlayPauseIcon.setImageResource(BaseApplicationClass.player.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
         });
 
         binding.playBarBackground.setOnClickListener(view -> {
-            if (!ApplicationClass.MUSIC_ID.isBlank())
-                startActivity(new Intent(this, MusicOverviewActivity.class).putExtra("id", ApplicationClass.MUSIC_ID));
+            if (!BaseApplicationClass.MUSIC_ID.isBlank())
+                startActivity(new Intent(this, MusicOverviewActivity.class).putExtra("id", BaseApplicationClass.MUSIC_ID));
         });
 
         binding.playBarPrevIcon.setOnClickListener(view -> {
             try {
                 Log.i(TAG, "Play bar previous button clicked");
-                if (applicationClass == null) {
+                if (baseApplicationClass == null) {
                     Log.e(TAG, "Application class is null");
                     return;
                 }
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                 binding.playBarPrevIcon.animate().alpha(1.0f).setDuration(200).start();
 
                 // Call the previous track method
-                applicationClass.prevTrack();
+                baseApplicationClass.prevTrack();
 
                 // Update play/pause icon
                 updatePlaybarUi();
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         binding.playBarNextIcon.setOnClickListener(view -> {
             try {
                 Log.i(TAG, "Play bar next button clicked");
-                if (applicationClass == null) {
+                if (baseApplicationClass == null) {
                     Log.e(TAG, "Application class is null");
                     return;
                 }
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                 binding.playBarNextIcon.animate().alpha(1.0f).setDuration(200).start();
 
                 // Call the next track method
-                applicationClass.nextTrack();
+                baseApplicationClass.nextTrack();
 
                 // Update play/pause icon
                 updatePlaybarUi();
@@ -288,26 +288,26 @@ public class MainActivity extends AppCompatActivity {
 
     void showPlayBarData() {
 
-        if (ApplicationClass.MUSIC_ID.isBlank()) binding.playBarBackground.setVisibility(View.GONE);
+        if (BaseApplicationClass.MUSIC_ID.isBlank()) binding.playBarBackground.setVisibility(View.GONE);
         else binding.playBarBackground.setVisibility(View.VISIBLE);
 
-        binding.playBarMusicTitle.setText(ApplicationClass.MUSIC_TITLE);
-        binding.playBarMusicDesc.setText(ApplicationClass.MUSIC_DESCRIPTION);
-        Picasso.get().load(Uri.parse(ApplicationClass.IMAGE_URL)).into(binding.playBarCoverImage);
+        binding.playBarMusicTitle.setText(BaseApplicationClass.MUSIC_TITLE);
+        binding.playBarMusicDesc.setText(BaseApplicationClass.MUSIC_DESCRIPTION);
+        Picasso.get().load(Uri.parse(BaseApplicationClass.IMAGE_URL)).into(binding.playBarCoverImage);
         updatePlaybarUi();
 
         GradientDrawable gradientDrawable = new GradientDrawable();
-        gradientDrawable.setColor(ApplicationClass.IMAGE_BG_COLOR);
+        gradientDrawable.setColor(BaseApplicationClass.IMAGE_BG_COLOR);
         gradientDrawable.setCornerRadius(18);
 
         binding.playBarBackground.setBackground(gradientDrawable);
 
-        binding.playBarMusicTitle.setTextColor(ApplicationClass.TEXT_ON_IMAGE_COLOR1);
-        binding.playBarMusicDesc.setTextColor(ApplicationClass.TEXT_ON_IMAGE_COLOR1);
+        binding.playBarMusicTitle.setTextColor(BaseApplicationClass.TEXT_ON_IMAGE_COLOR1);
+        binding.playBarMusicDesc.setTextColor(BaseApplicationClass.TEXT_ON_IMAGE_COLOR1);
 
-        binding.playBarPlayPauseIcon.setImageTintList(ColorStateList.valueOf(ApplicationClass.TEXT_ON_IMAGE_COLOR));
-        binding.playBarPrevIcon.setImageTintList(ColorStateList.valueOf(ApplicationClass.TEXT_ON_IMAGE_COLOR));
-        binding.playBarNextIcon.setImageTintList(ColorStateList.valueOf(ApplicationClass.TEXT_ON_IMAGE_COLOR));
+        binding.playBarPlayPauseIcon.setImageTintList(ColorStateList.valueOf(BaseApplicationClass.TEXT_ON_IMAGE_COLOR));
+        binding.playBarPrevIcon.setImageTintList(ColorStateList.valueOf(BaseApplicationClass.TEXT_ON_IMAGE_COLOR));
+        binding.playBarNextIcon.setImageTintList(ColorStateList.valueOf(BaseApplicationClass.TEXT_ON_IMAGE_COLOR));
 
         OverScrollDecoratorHelper.setUpStaticOverScroll(binding.getRoot(), OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
@@ -318,9 +318,9 @@ public class MainActivity extends AppCompatActivity {
      * Updates the play/pause icon based on current playback state
      */
     private void updatePlaybarUi() {
-        if (ApplicationClass.player != null) {
+        if (BaseApplicationClass.player != null) {
             binding.playBarPlayPauseIcon.setImageResource(
-                    ApplicationClass.player.isPlaying() ?
+                    BaseApplicationClass.player.isPlaying() ?
                             R.drawable.baseline_pause_24 :
                             R.drawable.play_arrow_24px
             );
@@ -350,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        ApplicationClass.cancelNotification();
+        BaseApplicationClass.cancelNotification();
         super.onDestroy();
     }
 
@@ -375,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
                         binding.popularSongsRecyclerView.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
                     });
-                    ApplicationClass.sharedPreferenceManager.setHomeSongsRecommended(songSearch);
+                    BaseApplicationClass.sharedPreferenceManager.setHomeSongsRecommended(songSearch);
                 } else {
                     try {
                         showOfflineData();
@@ -404,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
                         binding.popularArtistsRecyclerView.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
                     });
-                    ApplicationClass.sharedPreferenceManager.setHomeArtistsRecommended(artistSearch);
+                    BaseApplicationClass.sharedPreferenceManager.setHomeArtistsRecommended(artistSearch);
                 } else {
                     try {
                         showOfflineData();
@@ -433,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
                         binding.popularAlbumsRecyclerView.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
                     });
-                    ApplicationClass.sharedPreferenceManager.setHomeAlbumsRecommended(albumsSearch);
+                    BaseApplicationClass.sharedPreferenceManager.setHomeAlbumsRecommended(albumsSearch);
                 } else {
                     try {
                         Toast.makeText(MainActivity.this, new JSONObject(response).getString("message"), Toast.LENGTH_SHORT).show();
@@ -465,7 +465,7 @@ public class MainActivity extends AppCompatActivity {
                         binding.playlistRecyclerView.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
                     });
-                    ApplicationClass.sharedPreferenceManager.setHomePlaylistRecommended(playlistsSearch);
+                    BaseApplicationClass.sharedPreferenceManager.setHomePlaylistRecommended(playlistsSearch);
                 } else {
                     try {
                         Toast.makeText(MainActivity.this, new JSONObject(response).getString("message"), Toast.LENGTH_SHORT).show();
@@ -516,8 +516,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showOfflineData() {
-        if (ApplicationClass.sharedPreferenceManager.getHomeSongsRecommended() != null) {
-            SongSearch songSearch = ApplicationClass.sharedPreferenceManager.getHomeSongsRecommended();
+        if (BaseApplicationClass.sharedPreferenceManager.getHomeSongsRecommended() != null) {
+            SongSearch songSearch = BaseApplicationClass.sharedPreferenceManager.getHomeSongsRecommended();
             songSearch.data().results().forEach(results -> {
                 songs.add(new AlbumItem(results.name(), results.language() + " " + results.year(), results.image().get(results.image().size() - 1).url(), results.id()));
                 ActivityMainPopularSongs adapter = new ActivityMainPopularSongs(songs);
@@ -526,8 +526,8 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        if (ApplicationClass.sharedPreferenceManager.getHomeArtistsRecommended() != null) {
-            ArtistsSearch artistsSearch = ApplicationClass.sharedPreferenceManager.getHomeArtistsRecommended();
+        if (BaseApplicationClass.sharedPreferenceManager.getHomeArtistsRecommended() != null) {
+            ArtistsSearch artistsSearch = BaseApplicationClass.sharedPreferenceManager.getHomeArtistsRecommended();
             artistsSearch.data().results().forEach(results -> {
                 artists.add(results);
                 ActivityMainArtistsItemAdapter adapter = new ActivityMainArtistsItemAdapter(artists);
@@ -536,8 +536,8 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        if (ApplicationClass.sharedPreferenceManager.getHomeAlbumsRecommended() != null) {
-            AlbumsSearch albumsSearch = ApplicationClass.sharedPreferenceManager.getHomeAlbumsRecommended();
+        if (BaseApplicationClass.sharedPreferenceManager.getHomeAlbumsRecommended() != null) {
+            AlbumsSearch albumsSearch = BaseApplicationClass.sharedPreferenceManager.getHomeAlbumsRecommended();
             albumsSearch.data().results().forEach(results -> {
                 albums.add(new AlbumItem(results.name(), results.language() + " " + results.year(), results.image().get(results.image().size() - 1).url(), results.id()));
                 ActivityMainAlbumItemAdapter adapter = new ActivityMainAlbumItemAdapter(albums);
@@ -546,8 +546,8 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        if (ApplicationClass.sharedPreferenceManager.getHomePlaylistRecommended() != null) {
-            PlaylistsSearch playlistsSearch = ApplicationClass.sharedPreferenceManager.getHomePlaylistRecommended();
+        if (BaseApplicationClass.sharedPreferenceManager.getHomePlaylistRecommended() != null) {
+            PlaylistsSearch playlistsSearch = BaseApplicationClass.sharedPreferenceManager.getHomePlaylistRecommended();
             playlistsSearch.data().results().forEach(results -> {
                 playlists.add(new AlbumItem(results.name(), "", results.image().get(results.image().size() - 1).url(), results.id()));
                 //binding.playlistRecyclerView.setAdapter(new ActivityMainPlaylistAdapter(playlists));

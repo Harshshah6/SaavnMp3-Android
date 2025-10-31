@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.harsh.shah.saavnmp3.ApplicationClass;
+import com.harsh.shah.saavnmp3.BaseApplicationClass;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity;
 import com.harsh.shah.saavnmp3.databinding.ActivityListSongItemBinding;
@@ -47,9 +47,9 @@ public class UserCreatedSongsListAdapter extends RecyclerView.Adapter<UserCreate
             Picasso.get().load(Uri.parse(data.get(position).image())).into(holder.binding.coverImage);
 
         holder.itemView.setOnClickListener(view -> {
-            if(ApplicationClass.trackQueue != null)
-                if(ApplicationClass.trackQueue.contains(data.get(position).id()))
-                    ApplicationClass.track_position = holder.getBindingAdapterPosition();
+            if(BaseApplicationClass.trackQueue != null)
+                if(BaseApplicationClass.trackQueue.contains(data.get(position).id()))
+                    BaseApplicationClass.track_position = holder.getBindingAdapterPosition();
             holder.itemView.getContext().startActivity(new Intent(view.getContext(), MusicOverviewActivity.class).putExtra("id", data.get(position).id()));
         });
     }

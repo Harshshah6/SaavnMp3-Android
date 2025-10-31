@@ -7,7 +7,7 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import com.harsh.shah.saavnmp3.ApplicationClass;
+import com.harsh.shah.saavnmp3.BaseApplicationClass;
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity;
 
 public class MusicService extends Service {
@@ -36,19 +36,19 @@ public class MusicService extends Service {
         String actionName = intent.getExtras().getString("action","");
         if (actionName != null) {
             switch (actionName) {
-                case ApplicationClass.ACTION_NEXT:
+                case BaseApplicationClass.ACTION_NEXT:
                     // Handle next action
                     if (actionPlaying != null) {
                         actionPlaying.nextClicked();
                     }
                     break;
-                case ApplicationClass.ACTION_PREV:
+                case BaseApplicationClass.ACTION_PREV:
                     // Handle previous action
                     if (actionPlaying != null) {
                         actionPlaying.prevClicked();
                     }
                     break;
-                case ApplicationClass.ACTION_PLAY:
+                case BaseApplicationClass.ACTION_PLAY:
                     // Handle play/pause action
                     if (actionPlaying != null) {
                         actionPlaying.playClicked();

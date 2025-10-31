@@ -28,7 +28,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
-import com.harsh.shah.saavnmp3.ApplicationClass;
+import com.harsh.shah.saavnmp3.BaseApplicationClass;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.databinding.ActivityMusicOverviewBinding;
 import com.harsh.shah.saavnmp3.databinding.MusicOverviewMoreInfoBottomSheetBinding;
@@ -73,36 +73,36 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         binding.title.setSelected(true);
         binding.description.setSelected(true);
 
-        if (!(((ApplicationClass) getApplicationContext()).getTrackQueue().size() > 1))
+        if (!(((BaseApplicationClass) getApplicationContext()).getTrackQueue().size() > 1))
             binding.shuffleIcon.setVisibility(View.INVISIBLE);
 
         binding.playPauseImage.setOnClickListener(view -> {
             try {
-                if (ApplicationClass.player == null) {
+                if (BaseApplicationClass.player == null) {
                     Log.e(TAG, "Player is null, cannot toggle playback");
                     Toast.makeText(this, "Media player not ready. Try again.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 // Get application instance to control playback
-                ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
+                BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
 
-                if (ApplicationClass.player.isPlaying()) {
+                if (BaseApplicationClass.player.isPlaying()) {
                     // Handle pause action
                     Log.i(TAG, "Pausing playback");
                     handler.removeCallbacks(runnable);
-                    ApplicationClass.player.pause();
+                    BaseApplicationClass.player.pause();
                     binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
                 } else {
                     // Handle play action
                     Log.i(TAG, "Starting playback");
-                    ApplicationClass.player.play();
+                    BaseApplicationClass.player.play();
                     binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
                     updateSeekbar();
                 }
 
                 // Update notification with correct playback state
-                boolean isPlaying = ApplicationClass.player.isPlaying();
+                boolean isPlaying = BaseApplicationClass.player.isPlaying();
                 Log.i(TAG, "Player state after click: isPlaying=" + isPlaying);
                 showNotification(isPlaying ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
             } catch (Exception e) {
@@ -126,18 +126,18 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                int playPosition = (int) ((ApplicationClass.player.getDuration() / 100) * binding.seekbar.getProgress());
-                ApplicationClass.player.seekTo(playPosition);
-                binding.elapsedDuration.setText(convertDuration(ApplicationClass.player.getCurrentPosition()));
+                int playPosition = (int) ((BaseApplicationClass.player.getDuration() / 100) * binding.seekbar.getProgress());
+                BaseApplicationClass.player.seekTo(playPosition);
+                binding.elapsedDuration.setText(convertDuration(BaseApplicationClass.player.getCurrentPosition()));
             }
         });
 
-        final ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
+        final BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
 
         binding.nextIcon.setOnClickListener(view -> {
             try {
                 Log.i(TAG, "Next button clicked");
-                if (ApplicationClass.player == null) {
+                if (BaseApplicationClass.player == null) {
                     Log.e(TAG, "Player is null, cannot skip to next track");
                     Toast.makeText(MusicOverviewActivity.this, "Media player not ready", Toast.LENGTH_SHORT).show();
                     return;
@@ -148,14 +148,14 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 binding.nextIcon.animate().alpha(1.0f).setDuration(200).start();
 
                 // Call next track method
-                applicationClass.nextTrack();
+                baseApplicationClass.nextTrack();
 
                 // Update UI state
                 updateSeekbar();
                 updateTrackInfo();
 
                 // Make sure play icon reflects current state
-                if (ApplicationClass.player.isPlaying()) {
+                if (BaseApplicationClass.player.isPlaying()) {
                     binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
                 } else {
                     binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
@@ -172,7 +172,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         binding.prevIcon.setOnClickListener(view -> {
             try {
                 Log.i(TAG, "Previous button clicked");
-                if (ApplicationClass.player == null) {
+                if (BaseApplicationClass.player == null) {
                     Log.e(TAG, "Player is null, cannot skip to previous track");
                     Toast.makeText(MusicOverviewActivity.this, "Media player not ready", Toast.LENGTH_SHORT).show();
                     return;
@@ -184,13 +184,13 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
                 // If we're already at the beginning of the track, go to previous track
                 // Otherwise just restart the current track
-                if (ApplicationClass.player.getCurrentPosition() > 3000) {
-                    ApplicationClass.player.seekTo(0);
+                if (BaseApplicationClass.player.getCurrentPosition() > 3000) {
+                    BaseApplicationClass.player.seekTo(0);
                     if (isDebugMode)
                         Toast.makeText(MusicOverviewActivity.this, "Restarting current track", Toast.LENGTH_SHORT).show();
                 } else {
                     // Call previous track method
-                    applicationClass.prevTrack();
+                    baseApplicationClass.prevTrack();
                     if (isDebugMode)
                         Toast.makeText(MusicOverviewActivity.this, "Playing previous track", Toast.LENGTH_SHORT).show();
                 }
@@ -200,7 +200,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 updateTrackInfo();
 
                 // Make sure play icon reflects current state
-                if (ApplicationClass.player.isPlaying()) {
+                if (BaseApplicationClass.player.isPlaying()) {
                     binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
                 } else {
                     binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
@@ -214,7 +214,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         binding.repeatIcon.setOnClickListener(view -> {
             try {
                 // Cycle through all three repeat modes
-                int currentMode = ApplicationClass.player.getRepeatMode();
+                int currentMode = BaseApplicationClass.player.getRepeatMode();
                 int newMode;
                 String modeMessage;
                 switch (currentMode) {
@@ -233,7 +233,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                         break;
                 }
 
-                ApplicationClass.player.setRepeatMode(newMode);
+                BaseApplicationClass.player.setRepeatMode(newMode);
 
                 // Update UI to reflect the current mode
                 updateRepeatButtonUI();
@@ -249,9 +249,9 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         });
 
         binding.shuffleIcon.setOnClickListener(view -> {
-            ApplicationClass.player.setShuffleModeEnabled(!ApplicationClass.player.getShuffleModeEnabled());
+            BaseApplicationClass.player.setShuffleModeEnabled(!BaseApplicationClass.player.getShuffleModeEnabled());
 
-            if (ApplicationClass.player.getShuffleModeEnabled())
+            if (BaseApplicationClass.player.getShuffleModeEnabled())
                 binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)));
             else
                 binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.textSec)));
@@ -386,16 +386,16 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             popupMenu.setOnMenuItemClickListener(menuItem -> {
                 Toast.makeText(MusicOverviewActivity.this, menuItem.getTitle(), Toast.LENGTH_SHORT).show();
                 //Objects.requireNonNull(menuItem.getTitle());
-                ApplicationClass.setTrackQuality(menuItem.getTitle().toString());
+                BaseApplicationClass.setTrackQuality(menuItem.getTitle().toString());
                 onSongFetched(mSongResponse, true);
                 prepareMediaPLayer();
-                binding.trackQuality.setText(ApplicationClass.TRACK_QUALITY);
+                binding.trackQuality.setText(BaseApplicationClass.TRACK_QUALITY);
                 return true;
             });
             popupMenu.show();
         });
 
-        binding.trackQuality.setText(ApplicationClass.TRACK_QUALITY);
+        binding.trackQuality.setText(BaseApplicationClass.TRACK_QUALITY);
 
         showData();
 
@@ -436,16 +436,16 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         super.onResume();
 
         // Set as current activity in ApplicationClass
-        ApplicationClass.setCurrentActivity(this);
+        BaseApplicationClass.setCurrentActivity(this);
 
         // Bind to the service
         Intent intent = new Intent(this, MusicService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
 
         // Update UI with current playback state
-        if (ApplicationClass.player != null) {
+        if (BaseApplicationClass.player != null) {
             updateTrackInfo();
-            if (ApplicationClass.player.isPlaying()) {
+            if (BaseApplicationClass.player.isPlaying()) {
                 updateSeekbar();
             }
         }
@@ -505,9 +505,9 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         final String ID = getIntent().getExtras().getString("id", "");
         ID_FROM_EXTRA = ID;
         //((ApplicationClass)getApplicationContext()).setMusicDetails(null,null,null,ID);
-        if (ApplicationClass.MUSIC_ID.equals(ID)) {
+        if (BaseApplicationClass.MUSIC_ID.equals(ID)) {
             updateSeekbar();
-            if (ApplicationClass.player.isPlaying())
+            if (BaseApplicationClass.player.isPlaying())
                 binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
             else
                 binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
@@ -536,8 +536,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         };
 
         if (getIntent().getExtras().getString("type", "").equals("clear")) {
-            ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
-            applicationClass.setTrackQueue(new ArrayList<>(Collections.singletonList(ID)));
+            BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
+            baseApplicationClass.setTrackQueue(new ArrayList<>(Collections.singletonList(ID)));
         }
         if((ID.startsWith("http") || ID.startsWith("www")) && ID.contains("jiosaavn.com")){
             apiManager.retrieveSongByLink(ID, requestListener);
@@ -558,7 +558,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
     private void onSongFetched(SongResponse songResponse, boolean forced) {
         mSongResponse = songResponse;
-        ApplicationClass.CURRENT_TRACK = mSongResponse;
+        BaseApplicationClass.CURRENT_TRACK = mSongResponse;
         binding.title.setText(songResponse.data().get(0).name());
         binding.description.setText(
                 String.format("%s plays | %s | %s",
@@ -574,12 +574,12 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
         artsitsList = songResponse.data().get(0).artists().primary();
 
-        SONG_URL = ApplicationClass.getDownloadUrl(downloadUrls);
+        SONG_URL = BaseApplicationClass.getDownloadUrl(downloadUrls);
 
-        if ((!ApplicationClass.MUSIC_ID.equals(ID_FROM_EXTRA) || forced)) {
-            ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
-            applicationClass.setMusicDetails(IMAGE_URL, binding.title.getText().toString(), binding.description.getText().toString(), ID_FROM_EXTRA);
-            applicationClass.setSongUrl(SONG_URL);
+        if ((!BaseApplicationClass.MUSIC_ID.equals(ID_FROM_EXTRA) || forced)) {
+            BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
+            baseApplicationClass.setMusicDetails(IMAGE_URL, binding.title.getText().toString(), binding.description.getText().toString(), ID_FROM_EXTRA);
+            baseApplicationClass.setSongUrl(SONG_URL);
             prepareMediaPLayer();
         }
 
@@ -617,25 +617,25 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     @OptIn(markerClass = UnstableApi.class)
     void prepareMediaPLayer() {
         try {
-            ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
-            applicationClass.prepareMediaPlayer();
+            BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
+            baseApplicationClass.prepareMediaPlayer();
 
             // Wait until player is actually ready
-            if (ApplicationClass.player != null && ApplicationClass.player.getDuration() > 0) {
-                binding.totalDuration.setText(convertDuration(ApplicationClass.player.getDuration()));
+            if (BaseApplicationClass.player != null && BaseApplicationClass.player.getDuration() > 0) {
+                binding.totalDuration.setText(convertDuration(BaseApplicationClass.player.getDuration()));
             } else {
                 // If duration is not yet available, set a default or retry
                 binding.totalDuration.setText("00:00");
                 // Schedule a retry to get the duration
                 new Handler().postDelayed(() -> {
-                    if (ApplicationClass.player != null && ApplicationClass.player.getDuration() > 0) {
-                        binding.totalDuration.setText(convertDuration(ApplicationClass.player.getDuration()));
+                    if (BaseApplicationClass.player != null && BaseApplicationClass.player.getDuration() > 0) {
+                        binding.totalDuration.setText(convertDuration(BaseApplicationClass.player.getDuration()));
                     }
                 }, 500);
             }
 
             // Set play state
-            if (ApplicationClass.player.isPlaying()) {
+            if (BaseApplicationClass.player.isPlaying()) {
                 binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
                 updateSeekbar();
             } else {
@@ -643,7 +643,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             }
 
             // Update notification
-            showNotification(ApplicationClass.player.isPlaying() ?
+            showNotification(BaseApplicationClass.player.isPlaying() ?
                     R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
         } catch (Exception e) {
             Log.e(TAG, "Error preparing media player", e);
@@ -657,15 +657,15 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
     void updateSeekbar() {
         try {
-            if (ApplicationClass.player == null) {
+            if (BaseApplicationClass.player == null) {
                 Log.e(TAG, "Player is null in updateSeekbar");
                 return;
             }
 
-            if (ApplicationClass.player.isPlaying()) {
+            if (BaseApplicationClass.player.isPlaying()) {
                 try {
-                    long duration = ApplicationClass.player.getDuration();
-                    long currentPosition = ApplicationClass.player.getCurrentPosition();
+                    long duration = BaseApplicationClass.player.getDuration();
+                    long currentPosition = BaseApplicationClass.player.getCurrentPosition();
 
                     // Check for valid duration to avoid division by zero
                     if (duration > 0) {
@@ -682,8 +682,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             } else {
                 // If player is paused, still show correct position but don't schedule updates
                 try {
-                    long duration = ApplicationClass.player.getDuration();
-                    long currentPosition = ApplicationClass.player.getCurrentPosition();
+                    long duration = BaseApplicationClass.player.getDuration();
+                    long currentPosition = BaseApplicationClass.player.getCurrentPosition();
 
                     if (duration > 0) {
                         int progress = (int) (((float) currentPosition / duration) * 100);
@@ -703,22 +703,22 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     private final Runnable mUpdateTimeTask = this::updateTrackInfo;
 
     private void updateTrackInfo() {
-        if (!binding.title.getText().toString().equals(ApplicationClass.MUSIC_TITLE))
-            binding.title.setText(ApplicationClass.MUSIC_TITLE);
-        if (!binding.title.getText().toString().equals(ApplicationClass.MUSIC_TITLE))
-            binding.description.setText(ApplicationClass.MUSIC_DESCRIPTION);
-        Picasso.get().load(Uri.parse(ApplicationClass.IMAGE_URL)).into(binding.coverImage);
-        binding.seekbar.setProgress((int) (((float) ApplicationClass.player.getCurrentPosition() / ApplicationClass.player.getDuration()) * 100));
+        if (!binding.title.getText().toString().equals(BaseApplicationClass.MUSIC_TITLE))
+            binding.title.setText(BaseApplicationClass.MUSIC_TITLE);
+        if (!binding.title.getText().toString().equals(BaseApplicationClass.MUSIC_TITLE))
+            binding.description.setText(BaseApplicationClass.MUSIC_DESCRIPTION);
+        Picasso.get().load(Uri.parse(BaseApplicationClass.IMAGE_URL)).into(binding.coverImage);
+        binding.seekbar.setProgress((int) (((float) BaseApplicationClass.player.getCurrentPosition() / BaseApplicationClass.player.getDuration()) * 100));
 
-        binding.seekbar.setSecondaryProgress((int) (((float) ApplicationClass.player.getBufferedPosition() / ApplicationClass.player.getDuration()) * 100));
+        binding.seekbar.setSecondaryProgress((int) (((float) BaseApplicationClass.player.getBufferedPosition() / BaseApplicationClass.player.getDuration()) * 100));
 
-        long currentDuration = ApplicationClass.player.getCurrentPosition();
+        long currentDuration = BaseApplicationClass.player.getCurrentPosition();
         binding.elapsedDuration.setText(convertDuration(currentDuration));
 
-        if (!binding.totalDuration.getText().toString().equals(convertDuration(ApplicationClass.player.getDuration())))
-            binding.totalDuration.setText(convertDuration(ApplicationClass.player.getDuration()));
+        if (!binding.totalDuration.getText().toString().equals(convertDuration(BaseApplicationClass.player.getDuration())))
+            binding.totalDuration.setText(convertDuration(BaseApplicationClass.player.getDuration()));
 
-        if (ApplicationClass.player.isPlaying())
+        if (BaseApplicationClass.player.isPlaying())
             binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
         else
             binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
@@ -728,7 +728,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         // Update repeat and shuffle button UI
         updateRepeatButtonUI();
 
-        if (ApplicationClass.player.getShuffleModeEnabled())
+        if (BaseApplicationClass.player.getShuffleModeEnabled())
             binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)));
         else
             binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.textSec)));
@@ -738,7 +738,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
     private void updateRepeatButtonUI() {
         int tintColor;
-        int repeatMode = ApplicationClass.player.getRepeatMode();
+        int repeatMode = BaseApplicationClass.player.getRepeatMode();
 
         switch (repeatMode) {
             case Player.REPEAT_MODE_ONE:
@@ -769,7 +769,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     public void nextClicked() {
         Log.i(TAG, "nextClicked called from service");
         try {
-            if (ApplicationClass.player == null) {
+            if (BaseApplicationClass.player == null) {
                 Log.e(TAG, "Player is null in nextClicked");
                 return;
             }
@@ -779,15 +779,15 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             binding.nextIcon.animate().alpha(1.0f).setDuration(200).start();
 
             // Get application instance
-            ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
-            applicationClass.nextTrack();
+            BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
+            baseApplicationClass.nextTrack();
 
             // Update UI
             updateTrackInfo();
             updateSeekbar();
 
             // Ensure play/pause button shows correct state
-            if (ApplicationClass.player.isPlaying()) {
+            if (BaseApplicationClass.player.isPlaying()) {
                 binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
             } else {
                 binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
@@ -801,7 +801,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     public void prevClicked() {
         Log.i(TAG, "prevClicked called from service");
         try {
-            if (ApplicationClass.player == null) {
+            if (BaseApplicationClass.player == null) {
                 Log.e(TAG, "Player is null in prevClicked");
                 return;
             }
@@ -811,14 +811,14 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             binding.prevIcon.animate().alpha(1.0f).setDuration(200).start();
 
             // Get application instance
-            ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
+            BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
 
             // If we're already at the beginning of the track, go to previous track
             // Otherwise just restart the current track
-            if (ApplicationClass.player.getCurrentPosition() > 3000) {
-                ApplicationClass.player.seekTo(0);
+            if (BaseApplicationClass.player.getCurrentPosition() > 3000) {
+                BaseApplicationClass.player.seekTo(0);
             } else {
-                applicationClass.prevTrack();
+                baseApplicationClass.prevTrack();
             }
 
             // Update UI
@@ -826,7 +826,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             updateSeekbar();
 
             // Ensure play/pause button shows correct state
-            if (ApplicationClass.player.isPlaying()) {
+            if (BaseApplicationClass.player.isPlaying()) {
                 binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
             } else {
                 binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
@@ -839,7 +839,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     @Override
     public void playClicked() {
         //binding.playPauseImage.performClick();
-        if (!ApplicationClass.player.isPlaying()) {
+        if (!BaseApplicationClass.player.isPlaying()) {
             binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
         } else {
             binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
@@ -852,11 +852,11 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     }
 
     public void showNotification(int playPauseButton) {
-        ApplicationClass applicationClass = (ApplicationClass) getApplicationContext();
+        BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
         String songId = getIntent().getExtras().getString("id", "");
-        applicationClass.setMusicDetails(IMAGE_URL, binding.title.getText().toString(), binding.description.getText().toString(), songId);
+        baseApplicationClass.setMusicDetails(IMAGE_URL, binding.title.getText().toString(), binding.description.getText().toString(), songId);
         Log.i(TAG, "MusicOverviewActivity showNotification for song ID: " + songId);
-        applicationClass.showNotification();
+        baseApplicationClass.showNotification();
     }
 
 

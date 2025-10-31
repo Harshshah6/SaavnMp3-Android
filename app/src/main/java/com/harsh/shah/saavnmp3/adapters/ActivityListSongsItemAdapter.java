@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
-import com.harsh.shah.saavnmp3.ApplicationClass;
+import com.harsh.shah.saavnmp3.BaseApplicationClass;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity;
 import com.harsh.shah.saavnmp3.records.SongResponse;
@@ -60,9 +60,9 @@ public class ActivityListSongsItemAdapter extends RecyclerView.Adapter<ActivityL
         Picasso.get().load(Uri.parse(song.image().get(song.image().size() - 1).url())).into(((ImageView) holder.itemView.findViewById(R.id.coverImage)));
 
         holder.itemView.setOnClickListener(view -> {
-            if(ApplicationClass.trackQueue != null)
-                if(ApplicationClass.trackQueue.contains(song.id()))
-                    ApplicationClass.track_position = holder.getBindingAdapterPosition();
+            if(BaseApplicationClass.trackQueue != null)
+                if(BaseApplicationClass.trackQueue.contains(song.id()))
+                    BaseApplicationClass.track_position = holder.getBindingAdapterPosition();
             holder.itemView.getContext().startActivity(new Intent(view.getContext(), MusicOverviewActivity.class).putExtra("id", song.id()));
         });
     }

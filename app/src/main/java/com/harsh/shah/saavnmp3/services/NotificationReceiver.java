@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.harsh.shah.saavnmp3.ApplicationClass;
+import com.harsh.shah.saavnmp3.BaseApplicationClass;
 import com.harsh.shah.saavnmp3.R;
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity;
 
@@ -27,20 +27,20 @@ public class NotificationReceiver extends BroadcastReceiver {
         Intent serviceIntent = new Intent(context, MusicService.class);
         
         // Get ApplicationClass instance
-        final ApplicationClass applicationClass = (ApplicationClass) context.getApplicationContext();
+        final BaseApplicationClass baseApplicationClass = (BaseApplicationClass) context.getApplicationContext();
 
         switch (action) {
-            case ApplicationClass.ACTION_NEXT:
+            case BaseApplicationClass.ACTION_NEXT:
                 Log.i(TAG, "Processing NEXT action");
                 try {
                     // First check if player exists
-                    if (ApplicationClass.player == null) {
+                    if (BaseApplicationClass.player == null) {
                         Log.e(TAG, "Player is null in notification receiver - cannot process NEXT action");
                         return;
                     }
                     
                     // Call nextTrack through ApplicationClass for immediate effect
-                    applicationClass.nextTrack();
+                    baseApplicationClass.nextTrack();
                     
                     // Then notify the service for UI updates
                     serviceIntent.putExtra("action", action);
@@ -53,23 +53,23 @@ public class NotificationReceiver extends BroadcastReceiver {
                 }
                 break;
                 
-            case ApplicationClass.ACTION_PREV:
+            case BaseApplicationClass.ACTION_PREV:
                 Log.i(TAG, "Processing PREVIOUS action");
                 try {
                     // First check if player exists
-                    if (ApplicationClass.player == null) {
+                    if (BaseApplicationClass.player == null) {
                         Log.e(TAG, "Player is null in notification receiver - cannot process PREV action");
                         return;
                     }
                     
                     // If we're already at the beginning of the track, go to previous track
                     // Otherwise just restart the current track (standard music player behavior)
-                    if (ApplicationClass.player.getCurrentPosition() > 3000) {
-                        ApplicationClass.player.seekTo(0);
-                        ApplicationClass.player.play();
+                    if (BaseApplicationClass.player.getCurrentPosition() > 3000) {
+                        BaseApplicationClass.player.seekTo(0);
+                        BaseApplicationClass.player.play();
                     } else {
                         // Call prevTrack for track change
-                        applicationClass.prevTrack();
+                        baseApplicationClass.prevTrack();
                     }
                     
                     // Then notify service for UI updates
@@ -83,11 +83,11 @@ public class NotificationReceiver extends BroadcastReceiver {
                 }
                 break;
                 
-            case ApplicationClass.ACTION_PLAY:
+            case BaseApplicationClass.ACTION_PLAY:
                 Log.i(TAG, "Processing PLAY/PAUSE action");
                 try {
                     // Toggle playback
-                    applicationClass.togglePlayPause();
+                    baseApplicationClass.togglePlayPause();
                     
                     // Notify service
                     serviceIntent.putExtra("action", action);
@@ -95,8 +95,8 @@ public class NotificationReceiver extends BroadcastReceiver {
                     context.startService(serviceIntent);
                     
                     // Update notification with current state
-                    boolean isPlaying = ApplicationClass.player.isPlaying();
-                    applicationClass.showNotification(isPlaying ? 
+                    boolean isPlaying = BaseApplicationClass.player.isPlaying();
+                    baseApplicationClass.showNotification(isPlaying ?
                         R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
                     
                     // Show visual feedback
@@ -111,7 +111,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 try {
                     // Launch activity for the current track
                     Intent activityIntent = new Intent(context, MusicOverviewActivity.class)
-                        .putExtra("id", ApplicationClass.MUSIC_ID)
+                        .putExtra("id", BaseApplicationClass.MUSIC_ID)
                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(activityIntent);
                 } catch (Exception e) {

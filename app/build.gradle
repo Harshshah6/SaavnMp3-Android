@@ -11,8 +11,8 @@ android {
         applicationId "com.harsh.shah.saavnmp3"
         minSdk 23
         targetSdk 36
-        versionCode 5
-        versionName "1.0.11"
+        versionCode 6
+        versionName "1.0.12"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //Universal APK Supporting All ABIs
@@ -36,6 +36,11 @@ android {
 //            versionNameSuffix "-nofirebase"
             buildConfigField "boolean", "USE_FIREBASE", "false"
         }
+    }
+
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs (for IzzyOnDroid/F-Droid)
+        includeInApk = false
     }
 
 

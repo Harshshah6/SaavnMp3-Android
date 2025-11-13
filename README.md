@@ -2,18 +2,17 @@
 
 A clean, ad-free Android music streaming app powered by the unofficial JioSaavn API. Inspired by Spotify’s minimal interface, this app enables users to search, stream, and enjoy music seamlessly — all without login or tracking.
 
-<p align="center">
-  <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/Harshshah6/SaavnMp3-Android">
-  <img alt="GitHub watchers" src="https://img.shields.io/github/watchers/Harshshah6/SaavnMp3-Android">
-  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Harshshah6/SaavnMp3-Android">
-  <br>
-  <a href="https://github.com/Harshshah6/SaavnMp3-Android/releases/latest">
-    <img alt="Download APK" src="https://img.shields.io/badge/Download_APK-2ea44f?style=for-the-badge&logo=android&logoColor=white">
-  </a>
-  <a href="https://www.paypal.me/HarshShah06">
-    <img alt="PayPal" src="https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white">
-  </a>
-</p>
+![GitHub repo size](https://img.shields.io/github/repo-size/Harshshah6/SaavnMp3-Android)
+![GitHub watchers](https://img.shields.io/github/watchers/Harshshah6/SaavnMp3-Android)
+![GitHub Repo stars](https://img.shields.io/github/stars/Harshshah6/SaavnMp3-Android)
+
+[![Download APK](https://img.shields.io/badge/Download_APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Harshshah6/SaavnMp3-Android/releases/latest)
+[![Get it at IzzyOnDroid](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/com.harsh.shah.saavnmp3&style=for-the-badge)](https://apt.izzysoft.de/packages/com.harsh.shah.saavnmp3)
+
+[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.me/HarshShah06) 
+[![Donate with UPI](https://img.shields.io/badge/Donate_with_UPI-3DDC84?style=for-the-badge&logo=googlepay&logoColor=black)](upi://pay?pa=harshsandeep23@oksbi&pn=HarshShah&cu=INR)
+
+
 
 ## Features
 

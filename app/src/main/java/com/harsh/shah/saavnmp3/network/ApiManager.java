@@ -145,17 +145,6 @@ public class ApiManager {
 
     }
 
-
-    /**
-     * @param id
-     * @param page
-     * @param songCount
-     * @param albumCount
-     * @param sortBy
-     * @param sortOrder
-     * @param listener   <p>sortBy(popularity | latest | alphabetical)</p>
-     *                   <p>sortOrder(asc | desc)</p>
-     */
     public void retrieveArtistById(@NonNull String id, Integer page, Integer songCount, Integer albumCount, SortBy sortBy, SortOrder sortOrder, RequestNetwork.RequestListener listener) {
         HashMap<String, Object> queryMap = new HashMap<>();
 
@@ -219,7 +208,7 @@ public class ApiManager {
         if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name());
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM);
-        requestNetwork.startRequestNetwork(RequestNetworkController.GET, ARTISTS_URL + Integer.valueOf(artistId) + "/songs", "", requestListener);
+        requestNetwork.startRequestNetwork(RequestNetworkController.GET, ARTISTS_URL + "/" + Integer.valueOf(artistId) + "/songs", "", requestListener);
     }
 
     public void retrieveArtistSongs(String artistId, RequestNetwork.RequestListener requestListener) {
@@ -233,7 +222,7 @@ public class ApiManager {
         if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name());
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM);
-        requestNetwork.startRequestNetwork(RequestNetworkController.GET, ARTISTS_URL + Integer.valueOf(artistId) + "/albums", "", requestListener);
+        requestNetwork.startRequestNetwork(RequestNetworkController.GET, ARTISTS_URL + "/" + Integer.valueOf(artistId) + "/albums", "", requestListener);
     }
 
     public void retrieveArtistAlbums(String artistId, int page, RequestNetwork.RequestListener requestListener) {

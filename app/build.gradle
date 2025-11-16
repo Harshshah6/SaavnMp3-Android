@@ -146,4 +146,9 @@ dependencies {
 
     // FOR TAGGING METADATA INTO MP3 FILES
     implementation libs.jaudiotagger
+
+    // LOCAL DATABASE FOR CACHING DATA
+    implementation libs.room.runtime
+    annotationProcessor libs.room.compiler
+
 }

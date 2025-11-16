@@ -227,6 +227,8 @@ public class BaseApplicationClass extends Application {
         createNotificationChannel();
         sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
         TRACK_QUALITY = sharedPreferenceManager.getTrackQuality();
+
+        sharedPreferenceManager.migrateFromOldPrefs(this, () -> sharedPreferenceManager.clearOldPrefsAsync(this, null));
     }
 
     public static void updateTheme() {

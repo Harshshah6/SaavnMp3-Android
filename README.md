@@ -80,6 +80,15 @@ Follow these instructions to get a copy of the project up and running on your lo
 *   [SSP](https://github.com/intuit/ssp) & [SDP](https://github.com/intuit/sdp) - Libraries for responsive UI dimensions.
 *   [JAudioTagger](https://github.com/RouHim/jaudiotagger) - A Java library for reading and writing audio metadata.
 
+## Star History
+<a href="https://star-history.com/#harshshah6/SaavnMp3-Android&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=harshshah6/SaavnMp3-Android&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=harshshah6/SaavnMp3-Android&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=harshshah6/SaavnMp3-Android&type=Date" />
+ </picture>
+</a>
+
 ## Contributing
 
 If you'd like to contribute to Melotune (SaavnMp3-Android),

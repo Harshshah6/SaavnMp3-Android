@@ -18,6 +18,7 @@ overscrollDecorAndroid = "1.1.1"
 paginate = "1.0.0"
 palette = "1.0.0"
 picasso = "2.71828"
+roomRuntime = "2.8.3"
 sdpAndroid = "1.1.1"
 shimmer = "0.5.0"
 slidingrootnav = "v1.1.1"
@@ -50,6 +51,8 @@ overscroll-decor-android = { module = "io.github.everythingme:overscroll-decor-a
 paginate = { module = "com.github.markomilos:paginate", version.ref = "paginate" }
 palette = { module = "androidx.palette:palette", version.ref = "palette" }
 picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 sdp-android = { module = "com.intuit.sdp:sdp-android", version.ref = "sdpAndroid" }
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 slidingrootnav = { module = "com.github.yarolegovich:SlidingRootNav", version.ref = "slidingrootnav" }

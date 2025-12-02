@@ -44,7 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
             new AlertDialog.Builder(this)
                     .setTitle("Clear Cache")
                     .setMessage("Are you sure you want to clear the cache?")
-                    .setPositiveButton("Yes", (dialog, which) -> sharedPreferenceManager.getSharedPreferences().edit().clear().apply())
+                    .setPositiveButton("Yes", (dialog, which) -> sharedPreferenceManager.clearOldPrefsAsync(SettingsActivity.this, null))
                     .setNegativeButton("No", null)
                     .show();
         });

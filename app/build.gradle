@@ -11,8 +11,8 @@ android {
         applicationId "com.harsh.shah.saavnmp3"
         minSdk 23
         targetSdk 36
-        versionCode 6
-        versionName "1.0.12"
+        versionCode 7
+        versionName "1.0.13"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //Universal APK Supporting All ABIs
@@ -146,4 +146,9 @@ dependencies {
 
     // FOR TAGGING METADATA INTO MP3 FILES
     implementation libs.jaudiotagger
+
+    // LOCAL DATABASE FOR CACHING DATA
+    implementation libs.room.runtime
+    annotationProcessor libs.room.compiler
+
 }

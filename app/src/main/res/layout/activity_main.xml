@@ -5,8 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:background="@color/background"
+    android:fitsSystemWindows="true"
     tools:context=".activities.MainActivity">
 
     <LinearLayout
@@ -26,9 +26,9 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="@dimen/_25sdp"
             android:layout_height="@dimen/_25sdp"
+            app:cardBackgroundColor="@android:color/transparent"
             app:cardCornerRadius="999dp"
-            app:strokeWidth="0dp"
-            app:cardBackgroundColor="@android:color/transparent">
+            app:strokeWidth="0dp">
 
             <ImageView
                 android:id="@+id/profile_icon"
@@ -42,19 +42,20 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_12sdp"
+            android:layout_weight="1"
             android:fontFamily="@font/avenir_next_bold"
             android:includeFontPadding="false"
             android:text="@string/app_name"
             android:textColor="@color/textMain"
-            android:textSize="@dimen/_14ssp"
-            android:layout_weight="1" />
+            android:textSize="@dimen/_14ssp" />
 
         <ImageView
+            android:visibility="gone"
             android:layout_width="@dimen/_20ssp"
             android:layout_height="@dimen/_20sdp"
-            android:src="@drawable/search_24px"
             android:contentDescription="@android:string/search_go"
             android:onClick="openSearch"
+            android:src="@drawable/search_24px"
             tools:ignore="UsingOnClickInXml" />
 
     </LinearLayout>
@@ -72,7 +73,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/__navbar_divider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/__divider">
@@ -264,16 +265,16 @@
         android:id="@+id/play_bar_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginHorizontal="@dimen/_12sdp"
         android:layout_marginVertical="@dimen/_8sdp"
-        android:padding="@dimen/_8sdp"
-        android:gravity="center_vertical"
         android:background="@drawable/play_bar_background"
-        android:elevation="@dimen/_24sdp">
+        android:elevation="@dimen/_24sdp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/_8sdp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="@dimen/_30sdp"
@@ -293,9 +294,9 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginStart="@dimen/_8sdp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/play_bar_music_title"
@@ -303,8 +304,8 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text="@string/app_name"
-                android:textStyle="bold"
-                android:textSize="@dimen/_12ssp" />
+                android:textSize="@dimen/_12ssp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/play_bar_music_desc"
@@ -325,29 +326,148 @@
                 android:id="@+id/play_bar_prev_icon"
                 android:layout_width="@dimen/_30sdp"
                 android:layout_height="@dimen/_30sdp"
-                android:focusable="true"
-                android:src="@drawable/skip_previous_24px"
                 android:clickable="true"
-                android:padding="@dimen/_4sdp" />
+                android:focusable="true"
+                android:padding="@dimen/_4sdp"
+                android:src="@drawable/skip_previous_24px" />
 
             <ImageView
                 android:id="@+id/play_bar_play_pause_icon"
                 android:layout_width="@dimen/_30sdp"
                 android:layout_height="@dimen/_30sdp"
-                android:src="@drawable/play_arrow_24px"
-                android:padding="@dimen/_4sdp" />
+                android:padding="@dimen/_4sdp"
+                android:src="@drawable/play_arrow_24px" />
 
             <ImageView
                 android:id="@+id/play_bar_next_icon"
                 android:layout_width="@dimen/_30sdp"
                 android:layout_height="@dimen/_30sdp"
-                android:focusable="true"
-                android:src="@drawable/skip_next_24px"
                 android:clickable="true"
-                android:padding="@dimen/_4sdp" />
+                android:focusable="true"
+                android:padding="@dimen/_4sdp"
+                android:src="@drawable/skip_next_24px" />
 
         </LinearLayout>
 
+    </LinearLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/__navbar_divider"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_bar" />
+
+    <LinearLayout
+        android:id="@+id/bottom_nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:elevation="@dimen/_24sdp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/_4sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:padding="@dimen/_2sdp"
+            android:onClick="openLibrary"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:padding="@dimen/_6sdp"
+                android:src="@drawable/baseline_library_music_24"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Library"
+                android:textSize="@dimen/_10ssp"
+                android:textColor="@color/textSec"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:padding="@dimen/_2sdp"
+            android:onClick="openDownloads"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:padding="@dimen/_6sdp"
+                android:src="@drawable/baseline_download_for_offline_24"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Downloads"
+                android:textSize="@dimen/_10ssp"
+                android:textColor="@color/textSec"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:padding="@dimen/_2sdp"
+            android:onClick="openSearch"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:padding="@dimen/_6sdp"
+                android:src="@drawable/search_24px"
+                app:tint="@color/textSec" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Search"
+                android:textSize="@dimen/_10ssp"
+                android:textColor="@color/textSec"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:padding="@dimen/_2sdp"
+            android:onClick="openSettings"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:padding="@dimen/_6sdp"
+                android:src="@drawable/settings_24px"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textSize="@dimen/_10ssp"
+                android:textColor="@color/textSec"/>
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

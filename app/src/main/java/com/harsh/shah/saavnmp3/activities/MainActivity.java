@@ -13,8 +13,6 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.TranslateAnimation;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -43,7 +41,6 @@ import com.harsh.shah.saavnmp3.records.ArtistsSearch;
 import com.harsh.shah.saavnmp3.records.PlaylistsSearch;
 import com.harsh.shah.saavnmp3.records.SongSearch;
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries;
-import com.harsh.shah.saavnmp3.utils.NetworkUtil;
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager;
 import com.squareup.picasso.Picasso;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
@@ -504,17 +501,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    void tryConnect() {
-        if (!NetworkUtil.isNetworkAvailable(MainActivity.this)) {
-            try {
-                Thread.sleep(2000);
-                //showData();
-            } catch (Exception e) {
-                Log.e(TAG, "onErrorResponse: ", e);
-            }
-        }
-    }
-
     private void showOfflineData() {
         if (BaseApplicationClass.sharedPreferenceManager.getHomeSongsRecommended() != null) {
             SongSearch songSearch = BaseApplicationClass.sharedPreferenceManager.getHomeSongsRecommended();
@@ -562,75 +548,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void playBarPopUpAnimation() {
-        showPopup();
+    public void openLibrary(View view) {
+        startActivity(new Intent(this, SavedLibrariesActivity.class));
     }
-
-
-    private void showPopup() {
-        // Set the popup to visible
-        binding.playBarBackground.setVisibility(View.VISIBLE);
-
-        // Create an animation to make the popup appear
-        TranslateAnimation slideUp = new TranslateAnimation(0, 0, 1000, 0); // Slide from bottom
-        slideUp.setDuration(500);
-        slideUp.setFillAfter(true); // Keeps the position after animation
-
-        // You can add fade-in effect as well
-        AlphaAnimation fadeIn = new AlphaAnimation(0f, 1f);
-        fadeIn.setDuration(500);
-
-        // Combine the animations
-        slideUp.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(android.view.animation.Animation animation) {
-                binding.playBarBackground.startAnimation(fadeIn); // Start fade-in when slide-up starts
-            }
-
-            @Override
-            public void onAnimationEnd(android.view.animation.Animation animation) {
-                // You can add any logic after the animation ends
-            }
-
-            @Override
-            public void onAnimationRepeat(android.view.animation.Animation animation) {
-                // Not needed here
-            }
-        });
-
-        // Start the slide-up animation
-        binding.playBarBackground.startAnimation(slideUp);
+    public void openDownloads(View view) {
+        startActivity(new Intent(this, DownloadManagerActivity.class));
     }
-
-    // Method to close the popup (can be triggered by a button)
-    public void closePopup() {
-        // Fade-out animation
-        AlphaAnimation fadeOut = new AlphaAnimation(1f, 0f);
-        fadeOut.setDuration(500);
-        fadeOut.setFillAfter(true); // Ensures it stays hidden after the animation
-
-        fadeOut.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(android.view.animation.Animation animation) {
-                // You can add any logic before the animation starts
-            }
-
-            @Override
-            public void onAnimationEnd(android.view.animation.Animation animation) {
-                binding.playBarBackground.setVisibility(View.GONE); // Hide after animation ends
-            }
-
-            @Override
-            public void onAnimationRepeat(android.view.animation.Animation animation) {
-                // Not needed here
-            }
-        });
-
-        binding.playBarBackground.startAnimation(fadeOut); // Start fade-out animation
-    }
-
     public void openSearch(View view) {
         startActivity(new Intent(this, SearchActivity.class));
+    }
+    public void openSettings(View view) {
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
     // Declare the launcher at the top of your Activity/Fragment:

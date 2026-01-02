@@ -8,9 +8,9 @@ A clean, ad-free Android music streaming app powered by the unofficial JioSaavn 
 
 [![Download APK](https://img.shields.io/badge/Download_APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Harshshah6/SaavnMp3-Android/releases/latest)
 [![Get it at IzzyOnDroid](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/com.harsh.shah.saavnmp3&style=for-the-badge)](https://apt.izzysoft.de/packages/com.harsh.shah.saavnmp3)
-
-[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.me/HarshShah06) 
-[![Donate with UPI](https://img.shields.io/badge/Donate_with_UPI-3DDC84?style=for-the-badge&logo=googlepay&logoColor=black)](upi://pay?pa=harshsandeep23@oksbi&pn=HarshShah&cu=INR)
+<!-- 
+[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.me/HarshShah06)  -->
+<!-- [![Donate with UPI](https://img.shields.io/badge/Donate_with_UPI-3DDC84?style=for-the-badge&logo=googlepay&logoColor=black)](upi://pay?pa=harshsandeep23@oksbi&pn=HarshShah&cu=INR) -->
 
 
 
@@ -69,7 +69,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 ## Built With
 
 *   [Java 17](https://openjdk.org/projects/jdk/17/) - The programming language used.
-*   [Saavn.dev](https://github.com/sumitkolhe/jiosaavn-api) - The unofficial JioSaavn API.
+*   [saavn.sumit.co](https://github.com/sumitkolhe/jiosaavn-api) - The unofficial JioSaavn API.
 *   [Glide](https://github.com/bumptech/glide) - An image loading and caching library.
 *   [Picasso](https://github.com/square/picasso) - A powerful image downloading and caching library.
 *   [Gson](https://github.com/google/gson) - A Java library to convert Java Objects into their JSON representation.
@@ -102,7 +102,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgements
 
 - Inspired by the clean and minimal UI of Spotify.
-- A big thanks to [Saavn.dev](https://github.com/sumitkolhe/jiosaavn-api) for the unofficial JioSaavn API.
+- A big thanks to [saavn.sumit.co](https://github.com/sumitkolhe/jiosaavn-api) for the unofficial JioSaavn API.
 
 ## Contributors ✨
 

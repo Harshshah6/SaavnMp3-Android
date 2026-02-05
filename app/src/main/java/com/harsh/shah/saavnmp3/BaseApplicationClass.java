@@ -120,7 +120,7 @@ public class BaseApplicationClass extends Application {
         // Initialize player with better configuration
         player = new ExoPlayer.Builder(this)
                 .setMediaSourceFactory(new DefaultMediaSourceFactory(cacheDataSourceFactory))
-                .setHandleAudioBecomingNoisy(true) // Handle audio focus automatically 
+                .setHandleAudioBecomingNoisy(true) // Handle audio focus automatically
                 .setAudioAttributes(
                         new androidx.media3.common.AudioAttributes.Builder()
                                 .setUsage(androidx.media3.common.C.USAGE_MEDIA)
@@ -162,7 +162,6 @@ public class BaseApplicationClass extends Application {
                     nextTrack();
                 }
 
-
             }
 
             @Override
@@ -198,6 +197,11 @@ public class BaseApplicationClass extends Application {
         // Properly initialize media session with metadata
         mediaSession = new MediaSessionCompat(this, "ApplicationClass");
 
+        // Set flags to enable media buttons and transport controls for Android Auto
+        mediaSession.setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
         // Set callback for media session
         mediaSession.setCallback(new MediaSessionCompat.Callback() {
             @Override
@@ -221,6 +225,14 @@ public class BaseApplicationClass extends Application {
             public void onSkipToPrevious() {
                 prevTrack();
             }
+
+            @Override
+            public void onSeekTo(long pos) {
+                if (player != null) {
+                    player.seekTo(pos);
+                    showNotification();
+                }
+            }
         });
 
         mediaSession.setActive(true);
@@ -232,14 +244,17 @@ public class BaseApplicationClass extends Application {
     }
 
     public static void updateTheme() {
-        SettingsActivity.SettingsSharedPrefManager settingsSharedPrefManager = new SettingsActivity.SettingsSharedPrefManager(getCurrentActivity());
+        SettingsActivity.SettingsSharedPrefManager settingsSharedPrefManager = new SettingsActivity.SettingsSharedPrefManager(
+                getCurrentActivity());
         final String theme = settingsSharedPrefManager.getTheme();
-        AppCompatDelegate.setDefaultNightMode(theme.equals("dark") ? AppCompatDelegate.MODE_NIGHT_YES : theme.equals("light") ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        AppCompatDelegate.setDefaultNightMode(theme.equals("dark") ? AppCompatDelegate.MODE_NIGHT_YES
+                : theme.equals("light") ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
     }
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel1 = new NotificationChannel(CHANNEL_ID_1, "Media Controls", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel notificationChannel1 = new NotificationChannel(CHANNEL_ID_1, "Media Controls",
+                    NotificationManager.IMPORTANCE_DEFAULT);
             notificationChannel1.setDescription("Notifications for media playback");
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -248,9 +263,12 @@ public class BaseApplicationClass extends Application {
     }
 
     public void setMusicDetails(String image, String title, String description, String id) {
-        if (image != null) IMAGE_URL = image;
-        if (title != null) MUSIC_TITLE = title;
-        if (description != null) MUSIC_DESCRIPTION = description;
+        if (image != null)
+            IMAGE_URL = image;
+        if (title != null)
+            MUSIC_TITLE = title;
+        if (description != null)
+            MUSIC_DESCRIPTION = description;
         MUSIC_ID = id;
         Log.i(TAG, "setMusicDetails: " + MUSIC_TITLE + " - ID: " + MUSIC_ID);
     }
@@ -282,20 +300,21 @@ public class BaseApplicationClass extends Application {
                 return;
             }
 
-            // 🔹 Update playback state
+            // 🔹 Update playback state with actual position
+            long position = player != null ? player.getCurrentPosition() : 0;
             PlaybackStateCompat state = new PlaybackStateCompat.Builder()
                     .setActions(
                             PlaybackStateCompat.ACTION_PLAY |
                                     PlaybackStateCompat.ACTION_PAUSE |
                                     PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
-                                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-                    )
+                                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                    PlaybackStateCompat.ACTION_SEEK_TO)
                     .setState(
                             playPauseButton == R.drawable.play_arrow_24px
                                     ? PlaybackStateCompat.STATE_PAUSED
                                     : PlaybackStateCompat.STATE_PLAYING,
-                            0, 1.0f
-                    )
+                            position,
+                            1.0f)
                     .build();
 
             mediaSession.setPlaybackState(state);
@@ -320,30 +339,35 @@ public class BaseApplicationClass extends Application {
             PendingIntent prevPendingIntent = PendingIntent.getBroadcast(this, 0, prevIntent,
                     PendingIntent.FLAG_IMMUTABLE);
 
-            Intent playIntent = new Intent(this, NotificationReceiver.class).setAction(BaseApplicationClass.ACTION_PLAY);
+            Intent playIntent = new Intent(this, NotificationReceiver.class)
+                    .setAction(BaseApplicationClass.ACTION_PLAY);
             PendingIntent playPendingIntent = PendingIntent.getBroadcast(this, 0, playIntent,
                     PendingIntent.FLAG_IMMUTABLE);
 
-            Intent nextIntent = new Intent(this, NotificationReceiver.class).setAction(BaseApplicationClass.ACTION_NEXT);
+            Intent nextIntent = new Intent(this, NotificationReceiver.class)
+                    .setAction(BaseApplicationClass.ACTION_NEXT);
             PendingIntent nextPendingIntent = PendingIntent.getBroadcast(this, 0, nextIntent,
                     PendingIntent.FLAG_IMMUTABLE);
 
             // Create and show a simple notification as fallback in case image loading fails
-            androidx.core.app.NotificationCompat.Builder notificationBuilder =
-                    new androidx.core.app.NotificationCompat.Builder(BaseApplicationClass.this, CHANNEL_ID_1)
-                            .setSmallIcon(R.drawable.headphone)
-                            .setContentTitle(MUSIC_TITLE)
-                            .setOngoing(playPauseButton != R.drawable.play_arrow_24px)
-                            .setContentText(MUSIC_DESCRIPTION)
-                            .setStyle(new NotificationCompat.MediaStyle()
-                                    .setMediaSession(mediaSession.getSessionToken())
-                                    .setShowActionsInCompactView(0, 1, 2))
-                            .addAction(new androidx.core.app.NotificationCompat.Action(R.drawable.skip_previous_24px, "prev", prevPendingIntent))
-                            .addAction(new androidx.core.app.NotificationCompat.Action(playPauseButton, "play", playPendingIntent))
-                            .addAction(new androidx.core.app.NotificationCompat.Action(R.drawable.skip_next_24px, "next", nextPendingIntent))
-                            .setPriority(Notification.PRIORITY_DEFAULT)
-                            .setContentIntent(contentIntent)
-                            .setOnlyAlertOnce(true);
+            androidx.core.app.NotificationCompat.Builder notificationBuilder = new androidx.core.app.NotificationCompat.Builder(
+                    BaseApplicationClass.this, CHANNEL_ID_1)
+                    .setSmallIcon(R.drawable.headphone)
+                    .setContentTitle(MUSIC_TITLE)
+                    .setOngoing(playPauseButton != R.drawable.play_arrow_24px)
+                    .setContentText(MUSIC_DESCRIPTION)
+                    .setStyle(new NotificationCompat.MediaStyle()
+                            .setMediaSession(mediaSession.getSessionToken())
+                            .setShowActionsInCompactView(0, 1, 2))
+                    .addAction(new androidx.core.app.NotificationCompat.Action(R.drawable.skip_previous_24px, "prev",
+                            prevPendingIntent))
+                    .addAction(
+                            new androidx.core.app.NotificationCompat.Action(playPauseButton, "play", playPendingIntent))
+                    .addAction(new androidx.core.app.NotificationCompat.Action(R.drawable.skip_next_24px, "next",
+                            nextPendingIntent))
+                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setContentIntent(contentIntent)
+                    .setOnlyAlertOnce(true);
 
             try {
                 Picasso.get()
@@ -372,13 +396,22 @@ public class BaseApplicationClass extends Application {
                                         Log.e(TAG, "Error generating palette", e);
                                     }
 
+                                    // 🔹 Update MediaMetadata with album art for Android Auto
+                                    MediaMetadataCompat metadataWithArt = new MediaMetadataCompat.Builder()
+                                            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, MUSIC_TITLE)
+                                            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, MUSIC_DESCRIPTION)
+                                            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
+                                            .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, bitmap)
+                                            .build();
+                                    mediaSession.setMetadata(metadataWithArt);
+
                                     // Add bitmap to the notification
                                     notificationBuilder.setLargeIcon(bitmap);
 
                                     // Build and show the notification
                                     Notification notification = notificationBuilder.build();
-                                    NotificationManager notificationManager =
-                                            (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                                    NotificationManager notificationManager = (NotificationManager) getSystemService(
+                                            NOTIFICATION_SERVICE);
                                     notificationManager.notify(0, notification);
 
                                 } catch (Exception e) {
@@ -403,7 +436,6 @@ public class BaseApplicationClass extends Application {
                 showBasicNotification(notificationBuilder);
             }
 
-
         } catch (Exception e) {
             Log.e("ApplicationClass", "showNotification error: ", e);
         }
@@ -420,7 +452,8 @@ public class BaseApplicationClass extends Application {
     }
 
     public static void cancelNotification() {
-        NotificationManager notificationManager = (NotificationManager) getCurrentActivity().getSystemService(NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) getCurrentActivity()
+                .getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(0);
     }
 
@@ -648,12 +681,10 @@ public class BaseApplicationClass extends Application {
                 SongResponse songResponse = new Gson().fromJson(response, SongResponse.class);
                 if (songResponse.success()) {
                     MUSIC_TITLE = (songResponse.data().get(0).name());
-                    MUSIC_DESCRIPTION = (
-                            String.format("%s plays | %s | %s",
-                                    convertPlayCount(songResponse.data().get(0).playCount()),
-                                    songResponse.data().get(0).year(),
-                                    songResponse.data().get(0).copyright())
-                    );
+                    MUSIC_DESCRIPTION = (String.format("%s plays | %s | %s",
+                            convertPlayCount(songResponse.data().get(0).playCount()),
+                            songResponse.data().get(0).year(),
+                            songResponse.data().get(0).copyright()));
                     List<SongResponse.Image> image = songResponse.data().get(0).image();
                     IMAGE_URL = image.get(image.size() - 1).url();
 
@@ -662,7 +693,7 @@ public class BaseApplicationClass extends Application {
                     SONG_URL = getDownloadUrl(downloadUrls);
                     setMusicDetails(IMAGE_URL, MUSIC_TITLE, MUSIC_DESCRIPTION, MUSIC_ID);
                     prepareMediaPlayer();
-                    //showNotification();
+                    // showNotification();
                 }
             }
 
@@ -674,7 +705,8 @@ public class BaseApplicationClass extends Application {
     }
 
     public static String getDownloadUrl(List<SongResponse.DownloadUrl> downloadUrlList) {
-        if (downloadUrlList.isEmpty()) return "";
+        if (downloadUrlList.isEmpty())
+            return "";
 
         // Try to find HTTPS URL first
         String bestUrl = "";
@@ -716,7 +748,8 @@ public class BaseApplicationClass extends Application {
     }
 
     public void showNotification() {
-        //showNotification(mediaPlayerUtil.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+        // showNotification(mediaPlayerUtil.isPlaying() ? R.drawable.baseline_pause_24 :
+        // R.drawable.play_arrow_24px);
         showNotification(player.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
     }
 

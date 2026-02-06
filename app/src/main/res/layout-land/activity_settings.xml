@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.SettingsActivity"
+    android:fitsSystemWindows="true"
+    android:background="@color/background">
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="@dimen/_12sdp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="@dimen/_35sdp"
+            android:layout_height="@dimen/_35sdp"
+            app:cardBackgroundColor="#0D000000"
+            app:cardCornerRadius="999dp"
+            app:strokeWidth="0dp"
+            android:onClick="backPress">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/_8sdp"
+                android:src="@drawable/round_arrow_back_24"
+                android:contentDescription="back" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:textColor="@color/textMain"
+            android:textSize="@dimen/_18ssp"
+            android:fontFamily="@font/avenir_next_bold"
+            android:paddingHorizontal="@dimen/_12sdp" />
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_12sdp">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_mid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <!-- First Column: Data and Storage -->
+            <LinearLayout
+                android:id="@+id/section_data"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingEnd="@dimen/_8sdp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_mid">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Data-saving and offline"
+                    android:paddingVertical="@dimen/_8sdp"
+                    android:textColor="@color/textMain"
+                    android:fontFamily="@font/avenir_next_bold"
+                    android:textSize="@dimen/_14ssp" />
+
+                <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                    android:id="@+id/download_over_cellular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:textHead="Downloads over cellular"
+                    app:textOff="Download starts or continue only when you're connected to Wi-Fi."
+                    app:textOn="Download starts or continue when you're connected to Wi-Fi or cellular."
+                    app:checked="true" />
+
+                <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                    android:id="@+id/high_quality_track"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:textHead="Stream tracks in high quality"
+                    app:textOff="Stream tracks in low/medium quality when you're not connected to Wi-Fi."
+                    app:textOn="Stream tracks in high quality when you're connected to Wi-Fi or cellular."
+                    app:checked="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_16sdp"
+                    android:text="Storage"
+                    android:paddingVertical="@dimen/_8sdp"
+                    android:textColor="@color/textMain"
+                    android:fontFamily="@font/avenir_next_bold"
+                    android:textSize="@dimen/_14ssp" />
+
+                <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                    android:id="@+id/store_in_cache"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:textHead="Store Track &amp; Album Data"
+                    app:textOff="Will not store any details to cache. More Data Consumption."
+                    app:textOn="Will store data to cache. Less Data Consumption. Helps when API Server is down."
+                    app:checked="true" />
+
+                <TextView
+                    android:id="@+id/clear_cache"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Clear All Cached data"
+                    android:paddingVertical="@dimen/_12sdp"
+                    android:paddingHorizontal="@dimen/_4sdp"
+                    android:textColor="@color/textMain"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+
+            <!-- Second Column: Other and Theme -->
+            <LinearLayout
+                android:id="@+id/section_other"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="@dimen/_8sdp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/guideline_mid"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Other"
+                    android:paddingVertical="@dimen/_8sdp"
+                    android:textColor="@color/textMain"
+                    android:fontFamily="@font/avenir_next_bold"
+                    android:textSize="@dimen/_14ssp" />
+
+                <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                    android:id="@+id/explicit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:textHead="Allow explicit content"
+                    app:textOff="No explicit content will be listed or played."
+                    app:textOn="Explicit content (labelled as 18+) is playable."
+                    app:checked="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_16sdp"
+                    android:text="Theme"
+                    android:paddingVertical="@dimen/_8sdp"
+                    android:textColor="@color/textMain"
+                    android:fontFamily="@font/avenir_next_bold"
+                    android:textSize="@dimen/_14ssp" />
+
+                <RadioGroup
+                    android:id="@+id/theme_chip_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/dark"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Dark" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/light"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Light" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/system"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Follow System" />
+
+                </RadioGroup>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

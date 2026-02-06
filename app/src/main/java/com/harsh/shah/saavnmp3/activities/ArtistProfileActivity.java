@@ -240,4 +240,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public void backPress(View v){
+        finish();
+    }
+
 }

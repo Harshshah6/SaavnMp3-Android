@@ -62,7 +62,7 @@ public class ListActivity extends AppCompatActivity {
         binding.playAllBtn.setOnClickListener(view -> {
             if (!trackQueue.isEmpty()) {
                 ((BaseApplicationClass) getApplicationContext()).setTrackQueue(trackQueue);
-                ((BaseApplicationClass) getApplicationContext()).nextTrack();
+                BaseApplicationClass.track_position = 0;
                 Log.i(TAG, "trackQueueSet: " + BaseApplicationClass.trackQueue + " With POS " + BaseApplicationClass.track_position);
                 startActivity(new Intent(ListActivity.this, MusicOverviewActivity.class).putExtra("id", trackQueue.get(0)));
             }
@@ -98,7 +98,7 @@ public class ListActivity extends AppCompatActivity {
                         albumItem.albumCover(),
                         binding.albumSubTitle.getText().toString(),
                         new ArrayList<>()
-                );
+                    );
                 sharedPreferenceManager.addLibraryToSavedLibraries(library);
                 Snackbar.make(binding.getRoot(), "Added to Library", Snackbar.LENGTH_SHORT).show();
             }
@@ -258,7 +258,7 @@ public class ListActivity extends AppCompatActivity {
                     "",
                     null,
                     null, null, null
-            ));
+                ));
         }
         binding.recyclerView.setAdapter(new ActivityListSongsItemAdapter(data));
     }
@@ -354,7 +354,7 @@ public class ListActivity extends AppCompatActivity {
         isUserCreated = true;
 
         binding.shareIcon.setVisibility(View.INVISIBLE);
-//        binding.moreIcon.setVisibility(View.INVISIBLE);
+        // binding.moreIcon.setVisibility(View.INVISIBLE);
         binding.addToLibrary.setVisibility(View.INVISIBLE);
         binding.addMoreSongs.setVisibility(View.VISIBLE);
 
@@ -389,7 +389,7 @@ public class ListActivity extends AppCompatActivity {
         for (SongResponse.Song song : albumSearch.data().songs())
             trackQueue.add(song.id());
 
-        //((ApplicationClass)getApplicationContext()).setTrackQueue(trackQueue);
+        // ((ApplicationClass)getApplicationContext()).setTrackQueue(trackQueue);
         binding.shareIcon.setOnClickListener(view -> {
             if (albumSearch.data().url().isBlank()) return;
             Intent sendIntent = new Intent();
@@ -415,7 +415,7 @@ public class ListActivity extends AppCompatActivity {
         for (SongResponse.Song song : playlistSearch.data().songs())
             trackQueue.add(song.id());
 
-        //((ApplicationClass)getApplicationContext()).setTrackQueue(trackQueue);
+        // ((ApplicationClass)getApplicationContext()).setTrackQueue(trackQueue);
         binding.shareIcon.setOnClickListener(view -> {
             if (playlistSearch.data().url().isBlank()) return;
             Intent sendIntent = new Intent();
@@ -428,7 +428,7 @@ public class ListActivity extends AppCompatActivity {
         for (PlaylistSearch.Data.Artist artist : playlistSearch.data().artists()) {
             artistData.add(new ArtistData(artist.name(), artist.id(),
                     (!artist.image().isEmpty()) ?
-                            artist.image().get(artist.image().size() - 1).url()
+                    artist.image().get(artist.image().size() - 1).url()
                             : "https://i.pinimg.com/564x/1d/04/a8/1d04a87b8e6cf2c3829c7af2eccf6813.jpg"
             ));
         }

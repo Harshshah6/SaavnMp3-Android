@@ -30,8 +30,10 @@ public class ActivityListSongsItemAdapter extends RecyclerView.Adapter<ActivityL
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View _v = View.inflate(parent.getContext(), viewType == 0 ? R.layout.activity_list_song_item : R.layout.activity_list_shimmer, null);
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        View _v = View.inflate(parent.getContext(),
+                viewType == 0 ? R.layout.activity_list_song_item : R.layout.activity_list_shimmer, null);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
         _v.setLayoutParams(layoutParams);
         return new ViewHolder(_v);
     }
@@ -51,19 +53,29 @@ public class ActivityListSongsItemAdapter extends RecyclerView.Adapter<ActivityL
         ((TextView) holder.itemView.findViewById(R.id.title)).setText(song.name());
         StringBuilder artistsNames = new StringBuilder();
         for (int i = 0; i < song.artists().all().size(); i++) {
-            if (artistsNames.toString().contains(song.artists().all().get(i).name())) continue;
+            if (artistsNames.toString().contains(song.artists().all().get(i).name()))
+                continue;
             artistsNames.append(song.artists().all().get(i).name());
             artistsNames.append(", ");
         }
         ((TextView) holder.itemView.findViewById(R.id.artist)).setText(artistsNames.toString());
 
-        Picasso.get().load(Uri.parse(song.image().get(song.image().size() - 1).url())).into(((ImageView) holder.itemView.findViewById(R.id.coverImage)));
+        Picasso.get().load(Uri.parse(song.image().get(song.image().size() - 1).url()))
+                .into(((ImageView) holder.itemView.findViewById(R.id.coverImage)));
 
         holder.itemView.setOnClickListener(view -> {
-            if(BaseApplicationClass.trackQueue != null)
-                if(BaseApplicationClass.trackQueue.contains(song.id()))
-                    BaseApplicationClass.track_position = holder.getBindingAdapterPosition();
-            holder.itemView.getContext().startActivity(new Intent(view.getContext(), MusicOverviewActivity.class).putExtra("id", song.id()));
+            com.harsh.shah.saavnmp3.BaseApplicationClass.trackQueue.clear();
+            android.util.Log.d("AdapterDebug",
+                    "Click at pos: " + position + ". Populating queue with " + data.size() + " items.");
+            for (int i = 0; i < data.size(); i++) {
+                String id = data.get(i).id();
+                android.util.Log.d("AdapterDebug", "Queue[" + i + "]: " + id + " - " + data.get(i).name());
+                com.harsh.shah.saavnmp3.BaseApplicationClass.trackQueue.add(id);
+            }
+            com.harsh.shah.saavnmp3.BaseApplicationClass.track_position = holder.getBindingAdapterPosition();
+
+            holder.itemView.getContext().startActivity(
+                    new Intent(view.getContext(), MusicOverviewActivity.class).putExtra("id", song.id()));
         });
     }
 
@@ -74,8 +86,10 @@ public class ActivityListSongsItemAdapter extends RecyclerView.Adapter<ActivityL
 
     @Override
     public int getItemViewType(int position) {
-        if (data.get(position).id().equals("<shimmer>")) return 1;
-        else return 0;
+        if (data.get(position).id().equals("<shimmer>"))
+            return 1;
+        else
+            return 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -57,7 +57,7 @@ public class RequestNetworkController {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
             try {
-                final TrustManager[] trustAllCerts = new TrustManager[]{
+                final TrustManager[] trustAllCerts = new TrustManager[] {
                         new X509TrustManager() {
                             @Override
                             public void checkClientTrusted(X509Certificate[] chain, String authType)
@@ -71,7 +71,7 @@ public class RequestNetworkController {
 
                             @Override
                             public X509Certificate[] getAcceptedIssuers() {
-                                return new X509Certificate[]{};
+                                return new X509Certificate[] {};
                             }
                         }
                 };
@@ -98,7 +98,8 @@ public class RequestNetworkController {
         return client;
     }
 
-    public void execute(final RequestNetwork requestNetwork, String method, String url, final String tag, final RequestNetwork.RequestListener requestListener) {
+    public void execute(final RequestNetwork requestNetwork, String method, String url, final String tag,
+            final RequestNetwork.RequestListener requestListener) {
         Request.Builder reqBuilder = new Request.Builder();
         Headers.Builder headerBuilder = new Headers.Builder();
 
@@ -145,7 +146,8 @@ public class RequestNetworkController {
                     reqBuilder.url(url).headers(headerBuilder.build()).method(method, reqBody);
                 }
             } else {
-                RequestBody reqBody = RequestBody.create(MediaType.parse("application/json"), new Gson().toJson(requestNetwork.getParams()));
+                RequestBody reqBody = RequestBody.create(MediaType.parse("application/json"),
+                        new Gson().toJson(requestNetwork.getParams()));
 
                 if (method.equals(GET)) {
                     reqBuilder.url(url).headers(headerBuilder.build()).get();
@@ -159,23 +161,26 @@ public class RequestNetworkController {
             getClient().newCall(req).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, final IOException e) {
-                    requestNetwork.getActivity().runOnUiThread(() -> requestListener.onErrorResponse(tag, e.getMessage()));
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                        requestListener.onErrorResponse(tag, e.getMessage());
+                    });
                 }
 
                 @Override
                 public void onResponse(Call call, final Response response) throws IOException {
                     final String responseBody = response.body().string().trim();
-                    Activity activity = requestNetwork.getActivity();
-                    if (activity != null && !activity.isFinishing()) {
-                        activity.runOnUiThread(() -> {
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                        try {
                             Headers b = response.headers();
                             HashMap<String, Object> map = new HashMap<>();
                             for (String s : b.names()) {
                                 map.put(s, b.get(s) != null ? b.get(s) : "null");
                             }
                             requestListener.onResponse(tag, responseBody, map);
-                        });
-                    }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
                 }
             });
         } catch (Exception e) {

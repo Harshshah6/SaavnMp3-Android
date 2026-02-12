@@ -71,19 +71,19 @@ public class MainActivity extends AppCompatActivity {
     final List<AlbumItem> playlists = new ArrayList<>();
 
     NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver(new NetworkChangeReceiver.NetworkStatusListener() {
-        @Override
-        public void onNetworkConnected() {
-            if (songs.isEmpty() || artists.isEmpty() || albums.isEmpty() || playlists.isEmpty())
-                showData();
-        }
+                @Override
+                public void onNetworkConnected() {
+                    if (songs.isEmpty() || artists.isEmpty() || albums.isEmpty() || playlists.isEmpty())
+                        showData();
+                }
 
-        @Override
-        public void onNetworkDisconnected() {
-            if (songs.isEmpty() || artists.isEmpty() || albums.isEmpty() || playlists.isEmpty())
-                showOfflineData();
-            Snackbar.make(binding.getRoot(), "No Internet Connection", Snackbar.LENGTH_LONG).show();
-        }
-    });
+                @Override
+                public void onNetworkDisconnected() {
+                    if (songs.isEmpty() || artists.isEmpty() || albums.isEmpty() || playlists.isEmpty())
+                        showOfflineData();
+                    Snackbar.make(binding.getRoot(), "No Internet Connection", Snackbar.LENGTH_LONG).show();
+                }
+            });
 
     public static int calculateNoOfColumns(Context context, float columnWidthDp) { // For example columnWidthDp=180
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
@@ -129,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
         OverScrollDecoratorHelper.setUpOverScroll(binding.popularAlbumsRecyclerView, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
         OverScrollDecoratorHelper.setUpOverScroll(binding.savedRecyclerView, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
 
-
         binding.refreshLayout.setOnRefreshListener(() -> {
             showShimmerData();
             showData();
@@ -139,8 +138,14 @@ public class MainActivity extends AppCompatActivity {
         binding.playBarPlayPauseIcon.setOnClickListener(view -> {
             BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
             baseApplicationClass.togglePlayPause();
-            baseApplicationClass.showNotification(BaseApplicationClass.player.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
-            binding.playBarPlayPauseIcon.setImageResource(BaseApplicationClass.player.isPlaying() ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+            // Allow state to settle before updating UI
+            new Handler().postDelayed(() -> {
+                if (BaseApplicationClass.player != null) {
+                    binding.playBarPlayPauseIcon
+                            .setImageResource(BaseApplicationClass.player.isPlaying() ? R.drawable.baseline_pause_24
+                                    : R.drawable.play_arrow_24px);
+                }
+            }, 100);
         });
 
         binding.playBarBackground.setOnClickListener(view -> {
@@ -163,7 +168,8 @@ public class MainActivity extends AppCompatActivity {
                 // Call the previous track method
                 baseApplicationClass.prevTrack();
 
-                // Update play/pause icon
+                // UI update should happen via onResume/timer or observer,
+                // but for now we rely on the loop in showPlayBarData/onResume
                 updatePlaybarUi();
             } catch (Exception e) {
                 Log.e(TAG, "Error handling previous button click", e);
@@ -185,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
                 // Call the next track method
                 baseApplicationClass.nextTrack();
 
-                // Update play/pause icon
                 updatePlaybarUi();
             } catch (Exception e) {
                 Log.e(TAG, "Error handling next button click", e);
@@ -195,20 +200,21 @@ public class MainActivity extends AppCompatActivity {
         showShimmerData();
         showOfflineData();
 
-        //showData();
+        // showData();
         showPlayBarData();
 
         showSavedLibrariesData();
 
         askNotificationPermission();
 
-        requestStoragePermission = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-            if (result.containsValue(false)) {
-                Toast.makeText(this, "Storage Permission Denied", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Storage Permission Granted", Toast.LENGTH_SHORT).show();
-            }
-        });
+        requestStoragePermission = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+                result -> {
+                    if (result.containsValue(false)) {
+                        Toast.makeText(this, "Storage Permission Denied", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Storage Permission Granted", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
         getStoragePermission();
     }
@@ -221,7 +227,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestStoragePermission() {
         if (!checkIfStorageAccessAvailable()) {
-            requestStoragePermission.launch(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+            requestStoragePermission.launch(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE });
         }
     }
 
@@ -229,14 +236,17 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
             return true;
         } else {
-            return (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-                    && (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            return (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+                    && (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         }
     }
 
     private void showSavedLibrariesData() {
         SavedLibraries savedLibraries = SharedPreferenceManager.getInstance(this).getSavedLibrariesData();
-        binding.savedLibrariesSection.setVisibility(savedLibraries != null && !(savedLibraries.lists().isEmpty()) ? View.VISIBLE : View.GONE);
+        binding.savedLibrariesSection.setVisibility(
+                savedLibraries != null && !(savedLibraries.lists().isEmpty()) ? View.VISIBLE : View.GONE);
         if (savedLibraries != null)
             binding.savedRecyclerView.setAdapter(new SavedLibrariesAdapter(savedLibraries.lists()));
     }
@@ -247,7 +257,8 @@ public class MainActivity extends AppCompatActivity {
             slidingRootNavBuilder.closeMenu();
         });
 
-        slidingRootNavBuilder.getLayout().findViewById(R.id.logo).setOnClickListener(view -> slidingRootNavBuilder.closeMenu());
+        slidingRootNavBuilder.getLayout().findViewById(R.id.logo)
+                .setOnClickListener(view -> slidingRootNavBuilder.closeMenu());
 
         slidingRootNavBuilder.getLayout().findViewById(R.id.library).setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this, SavedLibrariesActivity.class));
@@ -266,7 +277,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Updates the version text in the navigation drawer with the app's current version
+     * Updates the version text in the navigation drawer with the app's current
+     * version
      */
     private void updateVersionTextInDrawer() {
         try {
@@ -288,8 +300,10 @@ public class MainActivity extends AppCompatActivity {
 
     void showPlayBarData() {
 
-        if (BaseApplicationClass.MUSIC_ID.isBlank()) binding.playBarBackground.setVisibility(View.GONE);
-        else binding.playBarBackground.setVisibility(View.VISIBLE);
+        if (BaseApplicationClass.MUSIC_ID.isBlank())
+            binding.playBarBackground.setVisibility(View.GONE);
+        else
+            binding.playBarBackground.setVisibility(View.VISIBLE);
 
         binding.playBarMusicTitle.setText(BaseApplicationClass.MUSIC_TITLE);
         binding.playBarMusicDesc.setText(BaseApplicationClass.MUSIC_DESCRIPTION);
@@ -309,7 +323,8 @@ public class MainActivity extends AppCompatActivity {
         binding.playBarPrevIcon.setImageTintList(ColorStateList.valueOf(BaseApplicationClass.TEXT_ON_IMAGE_COLOR));
         binding.playBarNextIcon.setImageTintList(ColorStateList.valueOf(BaseApplicationClass.TEXT_ON_IMAGE_COLOR));
 
-        OverScrollDecoratorHelper.setUpStaticOverScroll(binding.getRoot(), OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
+        OverScrollDecoratorHelper.setUpStaticOverScroll(binding.getRoot(),
+                OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
         handler.postDelayed(runnable, 1000);
     }
@@ -320,10 +335,8 @@ public class MainActivity extends AppCompatActivity {
     private void updatePlaybarUi() {
         if (BaseApplicationClass.player != null) {
             binding.playBarPlayPauseIcon.setImageResource(
-                    BaseApplicationClass.player.isPlaying() ?
-                            R.drawable.baseline_pause_24 :
-                            R.drawable.play_arrow_24px
-            );
+                    BaseApplicationClass.player.isPlaying() ? R.drawable.baseline_pause_24
+                            : R.drawable.play_arrow_24px);
         }
     }
 
@@ -370,7 +383,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "onResponse: " + response);
                 if (songSearch.success()) {
                     songSearch.data().results().forEach(results -> {
-                        songs.add(new AlbumItem(results.name(), results.language() + " " + results.year(), results.image().get(results.image().size() - 1).url(), results.id()));
+                        songs.add(new AlbumItem(results.name(), results.language() + " " + results.year(),
+                                results.image().get(results.image().size() - 1).url(), results.id()));
                         ActivityMainPopularSongs adapter = new ActivityMainPopularSongs(songs);
                         binding.popularSongsRecyclerView.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
@@ -379,7 +393,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     try {
                         showOfflineData();
-                        Toast.makeText(MainActivity.this, new JSONObject(response).getString("message"), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, new JSONObject(response).getString("message"),
+                                Toast.LENGTH_SHORT).show();
                     } catch (JSONException e) {
                         Log.e(TAG, "onResponse: ", e);
                     }
@@ -408,7 +423,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     try {
                         showOfflineData();
-                        Toast.makeText(MainActivity.this, new JSONObject(response).getString("message"), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, new JSONObject(response).getString("message"),
+                                Toast.LENGTH_SHORT).show();
                     } catch (JSONException e) {
                         Log.e(TAG, "onResponse: ", e);
                     }
@@ -428,7 +444,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "onResponse: " + response);
                 if (albumsSearch.success()) {
                     albumsSearch.data().results().forEach(results -> {
-                        albums.add(new AlbumItem(results.name(), results.language() + " " + results.year(), results.image().get(results.image().size() - 1).url(), results.id()));
+                        albums.add(new AlbumItem(results.name(), results.language() + " " + results.year(),
+                                results.image().get(results.image().size() - 1).url(), results.id()));
                         ActivityMainAlbumItemAdapter adapter = new ActivityMainAlbumItemAdapter(albums);
                         binding.popularAlbumsRecyclerView.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
@@ -436,7 +453,8 @@ public class MainActivity extends AppCompatActivity {
                     BaseApplicationClass.sharedPreferenceManager.setHomeAlbumsRecommended(albumsSearch);
                 } else {
                     try {
-                        Toast.makeText(MainActivity.this, new JSONObject(response).getString("message"), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, new JSONObject(response).getString("message"),
+                                Toast.LENGTH_SHORT).show();
                         showOfflineData();
                     } catch (JSONException e) {
                         Log.e(TAG, "onResponse: ", e);
@@ -451,36 +469,40 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // String.valueOf(Calendar.getInstance().get(Calendar.YEAR))
-        apiManager.searchPlaylists(String.valueOf(Calendar.getInstance().get(Calendar.YEAR)), null,null, new RequestNetwork.RequestListener() {
-            @Override
-            public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
-                PlaylistsSearch playlistsSearch = new Gson().fromJson(response, PlaylistsSearch.class);
-                Log.i(TAG, "onResponse: " + response);
-                if (playlistsSearch.success()) {
-                    playlistsSearch.data().results().forEach(results -> {
-                        playlists.add(new AlbumItem(results.name(), "", results.image().get(results.image().size() - 1).url(), results.id()));
-                        //binding.playlistRecyclerView.setAdapter(new ActivityMainPlaylistAdapter(playlists));
+        apiManager.searchPlaylists(String.valueOf(Calendar.getInstance().get(Calendar.YEAR)), null, null,
+                new RequestNetwork.RequestListener() {
+                    @Override
+                    public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
+                        PlaylistsSearch playlistsSearch = new Gson().fromJson(response, PlaylistsSearch.class);
+                        Log.i(TAG, "onResponse: " + response);
+                        if (playlistsSearch.success()) {
+                            playlistsSearch.data().results().forEach(results -> {
+                                playlists.add(new AlbumItem(results.name(), "",
+                                        results.image().get(results.image().size() - 1).url(), results.id()));
+                                // binding.playlistRecyclerView.setAdapter(new
+                                // ActivityMainPlaylistAdapter(playlists));
 
-                        ActivityMainPlaylistAdapter adapter = new ActivityMainPlaylistAdapter(playlists);
-                        binding.playlistRecyclerView.setAdapter(adapter);
-                        adapter.notifyDataSetChanged();
-                    });
-                    BaseApplicationClass.sharedPreferenceManager.setHomePlaylistRecommended(playlistsSearch);
-                } else {
-                    try {
-                        Toast.makeText(MainActivity.this, new JSONObject(response).getString("message"), Toast.LENGTH_SHORT).show();
-                        showOfflineData();
-                    } catch (JSONException e) {
-                        Log.e(TAG, "onResponse: ", e);
+                                ActivityMainPlaylistAdapter adapter = new ActivityMainPlaylistAdapter(playlists);
+                                binding.playlistRecyclerView.setAdapter(adapter);
+                                adapter.notifyDataSetChanged();
+                            });
+                            BaseApplicationClass.sharedPreferenceManager.setHomePlaylistRecommended(playlistsSearch);
+                        } else {
+                            try {
+                                Toast.makeText(MainActivity.this, new JSONObject(response).getString("message"),
+                                        Toast.LENGTH_SHORT).show();
+                                showOfflineData();
+                            } catch (JSONException e) {
+                                Log.e(TAG, "onResponse: ", e);
+                            }
+                        }
                     }
-                }
-            }
 
-            @Override
-            public void onErrorResponse(String tag, String message) {
-                showOfflineData();
-            }
-        });
+                    @Override
+                    public void onErrorResponse(String tag, String message) {
+                        showOfflineData();
+                    }
+                });
     }
 
     private void showShimmerData() {
@@ -494,8 +516,7 @@ public class MainActivity extends AppCompatActivity {
                     "<shimmer>",
                     "<shimmer>",
                     "<shimmer>",
-                    null
-            ));
+                    null));
         }
         binding.popularSongsRecyclerView.setAdapter(new ActivityMainAlbumItemAdapter(data_shimmer));
         binding.popularAlbumsRecyclerView.setAdapter(new ActivityMainAlbumItemAdapter(data_shimmer));
@@ -508,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
         if (!NetworkUtil.isNetworkAvailable(MainActivity.this)) {
             try {
                 Thread.sleep(2000);
-                //showData();
+                // showData();
             } catch (Exception e) {
                 Log.e(TAG, "onErrorResponse: ", e);
             }
@@ -519,7 +540,8 @@ public class MainActivity extends AppCompatActivity {
         if (BaseApplicationClass.sharedPreferenceManager.getHomeSongsRecommended() != null) {
             SongSearch songSearch = BaseApplicationClass.sharedPreferenceManager.getHomeSongsRecommended();
             songSearch.data().results().forEach(results -> {
-                songs.add(new AlbumItem(results.name(), results.language() + " " + results.year(), results.image().get(results.image().size() - 1).url(), results.id()));
+                songs.add(new AlbumItem(results.name(), results.language() + " " + results.year(),
+                        results.image().get(results.image().size() - 1).url(), results.id()));
                 ActivityMainPopularSongs adapter = new ActivityMainPopularSongs(songs);
                 binding.popularSongsRecyclerView.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
@@ -539,7 +561,8 @@ public class MainActivity extends AppCompatActivity {
         if (BaseApplicationClass.sharedPreferenceManager.getHomeAlbumsRecommended() != null) {
             AlbumsSearch albumsSearch = BaseApplicationClass.sharedPreferenceManager.getHomeAlbumsRecommended();
             albumsSearch.data().results().forEach(results -> {
-                albums.add(new AlbumItem(results.name(), results.language() + " " + results.year(), results.image().get(results.image().size() - 1).url(), results.id()));
+                albums.add(new AlbumItem(results.name(), results.language() + " " + results.year(),
+                        results.image().get(results.image().size() - 1).url(), results.id()));
                 ActivityMainAlbumItemAdapter adapter = new ActivityMainAlbumItemAdapter(albums);
                 binding.popularAlbumsRecyclerView.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
@@ -549,8 +572,10 @@ public class MainActivity extends AppCompatActivity {
         if (BaseApplicationClass.sharedPreferenceManager.getHomePlaylistRecommended() != null) {
             PlaylistsSearch playlistsSearch = BaseApplicationClass.sharedPreferenceManager.getHomePlaylistRecommended();
             playlistsSearch.data().results().forEach(results -> {
-                playlists.add(new AlbumItem(results.name(), "", results.image().get(results.image().size() - 1).url(), results.id()));
-                //binding.playlistRecyclerView.setAdapter(new ActivityMainPlaylistAdapter(playlists));
+                playlists.add(new AlbumItem(results.name(), "", results.image().get(results.image().size() - 1).url(),
+                        results.id()));
+                // binding.playlistRecyclerView.setAdapter(new
+                // ActivityMainPlaylistAdapter(playlists));
 
                 ActivityMainPlaylistAdapter adapter = new ActivityMainPlaylistAdapter(playlists);
                 binding.playlistRecyclerView.setAdapter(adapter);
@@ -558,14 +583,13 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        //showData(); //TODO: showData if new data is available
+        // showData(); //TODO: showData if new data is available
 
     }
 
     private void playBarPopUpAnimation() {
         showPopup();
     }
-
 
     private void showPopup() {
         // Set the popup to visible
@@ -634,19 +658,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Declare the launcher at the top of your Activity/Fragment:
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-//                if (isGranted) {
-//                    // FCM SDK (and your app) can post notifications.
-//                } else {
-//
-//                }
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), isGranted -> {
+                // if (isGranted) {
+                // // FCM SDK (and your app) can post notifications.
+                // } else {
+                //
+                // }
             });
 
     private void askNotificationPermission() {
         // This is only necessary for API level >= 33 (TIRAMISU)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 // Directly ask for the permission
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }

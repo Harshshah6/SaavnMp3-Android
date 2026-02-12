@@ -62,6 +62,10 @@ public class BaseApplicationClass extends Application {
     public static SongResponse CURRENT_TRACK = null;
 
     public static ExoPlayer player;
+
+    // Debounce variables for prepareMediaPlayer
+    private long lastPrepareTime = 0;
+    private String lastPreparedId = "";
     public static String TRACK_QUALITY = "320kbps";
     public static boolean isTrackDownloaded = false;
     private MediaSessionCompat mediaSession;
@@ -491,9 +495,24 @@ public class BaseApplicationClass extends Application {
         }
     }
 
-    @UnstableApi
     public void prepareMediaPlayer() {
         try {
+            // Debounce: If same song is requested within 2 seconds, ignore it.
+            long currentTime = System.currentTimeMillis();
+            if (MUSIC_ID.equals(lastPreparedId) && (currentTime - lastPrepareTime) < 2000) {
+                Log.i(TAG, "prepareMediaPlayer: Debouncing duplicate request for " + MUSIC_ID);
+                // If player is not playing (e.g. buffering or paused), ensure we Resume if
+                // intention was to play
+                if (player != null && !player.isPlaying() && player.getPlaybackState() != Player.STATE_ENDED) {
+                    player.play();
+                }
+                return;
+            }
+
+            // Allow processing and update debounce trackers
+            lastPrepareTime = currentTime;
+            lastPreparedId = MUSIC_ID;
+
             // Stop currently playing media first
             if (player != null && player.isPlaying()) {
                 player.stop();
@@ -518,7 +537,10 @@ public class BaseApplicationClass extends Application {
                 finalUrl = httpsUrl;
             }
 
-            MediaItem mediaItem = MediaItem.fromUri(finalUrl);
+            MediaItem mediaItem = new MediaItem.Builder()
+                    .setUri(finalUrl)
+                    .setMediaId(SONG_URL) // Set ID for comparison checks
+                    .build();
             isTrackDownloaded = false;
 
             if (currentActivity == null) {
@@ -535,18 +557,18 @@ public class BaseApplicationClass extends Application {
             // Update notification
             showNotification();
 
-            // Start playback after a short delay
-            new Handler().postDelayed(() -> {
-                try {
-                    if (player != null && !player.isPlaying() &&
-                            player.getPlaybackState() == Player.STATE_READY) {
-                        Log.i(TAG, "Starting delayed playback");
-                        player.play();
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Error in delayed play", e);
-                }
-            }, 500);
+            // // Start playback after a short delay
+            // new Handler().postDelayed(() -> {
+            // try {
+            // if (player != null && !player.isPlaying() &&
+            // player.getPlaybackState() == Player.STATE_READY) {
+            // Log.i(TAG, "Starting delayed playback");
+            // player.play();
+            // }
+            // } catch (Exception e) {
+            // Log.e(TAG, "Error in delayed play", e);
+            // }
+            // }, 500);
 
         } catch (Exception e) {
             Log.e(TAG, "prepareMediaPlayer: ", e);
@@ -554,6 +576,8 @@ public class BaseApplicationClass extends Application {
     }
 
     public void nextTrack() {
+        Log.d(TAG, "nextTrack() called. Current pos: " + track_position + ", Queue size: "
+                + (trackQueue != null ? trackQueue.size() : "null"));
         if (trackQueue.isEmpty()) {
             Log.i(TAG, "Cannot play next track: track queue is empty");
             return;
@@ -632,6 +656,12 @@ public class BaseApplicationClass extends Application {
             return;
         }
 
+        // if (player != null && player.getCurrentPosition() > 3000) {
+        //     player.seekTo(0);
+        //     player.play();
+        //     return;
+        // }
+
         if (track_position <= 0) {
             if (player.getRepeatMode() == Player.REPEAT_MODE_ALL) {
                 // Loop to the last track
@@ -673,7 +703,11 @@ public class BaseApplicationClass extends Application {
     }
 
     private void playTrack() {
-        ApiManager apiManager = new ApiManager(getCurrentActivity());
+        android.content.Context context = getCurrentActivity();
+        if (context == null) {
+            context = getApplicationContext();
+        }
+        ApiManager apiManager = new ApiManager(context);
         apiManager.retrieveSongById(MUSIC_ID, null, new RequestNetwork.RequestListener() {
             @OptIn(markerClass = UnstableApi.class)
             @Override

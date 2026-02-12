@@ -29,8 +29,10 @@ public class ActivityMainPopularSongs extends RecyclerView.Adapter<ActivityMainP
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View _v = View.inflate(parent.getContext(), viewType == 0 ? R.layout.activity_main_songs_item : R.layout.songs_item_shimmer, null);
-        _v.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        View _v = View.inflate(parent.getContext(),
+                viewType == 0 ? R.layout.activity_main_songs_item : R.layout.songs_item_shimmer, null);
+        _v.setLayoutParams(
+                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         return new ViewHolder(_v);
     }
 
@@ -51,7 +53,18 @@ public class ActivityMainPopularSongs extends RecyclerView.Adapter<ActivityMainP
         Picasso.get().load(Uri.parse(data.get(position).albumCover())).into(coverImage);
 
         holder.itemView.setOnClickListener(v -> {
-            v.getContext().startActivity(new Intent(v.getContext(), MusicOverviewActivity.class).putExtra("type", "clear").putExtra("id", data.get(position).id()));
+            com.harsh.shah.saavnmp3.BaseApplicationClass.trackQueue.clear();
+            android.util.Log.d("AdapterDebug",
+                    "Click at pos: " + position + ". Populating queue with " + data.size() + " items.");
+            for (int i = 0; i < data.size(); i++) {
+                String id = data.get(i).id();
+                android.util.Log.d("AdapterDebug", "Queue[" + i + "]: " + id + " - " + data.get(i).albumTitle());
+                com.harsh.shah.saavnmp3.BaseApplicationClass.trackQueue.add(id);
+            }
+            com.harsh.shah.saavnmp3.BaseApplicationClass.track_position = position;
+
+            v.getContext().startActivity(
+                    new Intent(v.getContext(), MusicOverviewActivity.class).putExtra("id", data.get(position).id()));
         });
     }
 
@@ -62,8 +75,10 @@ public class ActivityMainPopularSongs extends RecyclerView.Adapter<ActivityMainP
 
     @Override
     public int getItemViewType(int position) {
-        if (data.get(position).albumTitle().equals("<shimmer>")) return 1;
-        else return 0;
+        if (data.get(position).albumTitle().equals("<shimmer>"))
+            return 1;
+        else
+            return 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -53,7 +53,7 @@ import java.util.List;
 public class MusicOverviewActivity extends AppCompatActivity implements ActionPlaying, ServiceConnection {
 
     private final String TAG = "MusicOverviewActivity";
-    //private final MediaPlayer mediaPlayer = new MediaPlayer();
+    // private final MediaPlayer mediaPlayer = new MediaPlayer();
     private final Handler handler = new Handler();
     ActivityMusicOverviewBinding binding;
     private String SONG_URL = "";
@@ -62,8 +62,16 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     MusicService musicService;
     private List<SongResponse.Artist> artsitsList = new ArrayList<>();
     private final boolean isDebugMode = false;
+    private android.media.AudioManager audioManager;
 
-    //@SuppressLint("ClickableViewAccessibility")
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        showData();
+    }
+
+    // @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,24 +95,17 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 // Get application instance to control playback
                 BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
 
-                if (BaseApplicationClass.player.isPlaying()) {
-                    // Handle pause action
-                    Log.i(TAG, "Pausing playback");
-                    handler.removeCallbacks(runnable);
-                    BaseApplicationClass.player.pause();
-                    binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
-                } else {
-                    // Handle play action
-                    Log.i(TAG, "Starting playback");
-                    BaseApplicationClass.player.play();
-                    binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
-                    updateSeekbar();
-                }
+                // Toggle play/pause using BaseApplicationClass
+                Log.i(TAG, "Play/Pause button clicked");
+                baseApplicationClass.togglePlayPause();
 
-                // Update notification with correct playback state
-                boolean isPlaying = BaseApplicationClass.player.isPlaying();
-                Log.i(TAG, "Player state after click: isPlaying=" + isPlaying);
-                showNotification(isPlaying ? R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+                // Update UI based on new state
+                if (BaseApplicationClass.player.isPlaying()) {
+                    binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
+                } else {
+                    binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
+                }
+                updateSeekbar();
             } catch (Exception e) {
                 Log.e(TAG, "Error toggling playback", e);
                 Toast.makeText(this, "Error controlling playback. Try again.", Toast.LENGTH_SHORT).show();
@@ -126,7 +127,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                int playPosition = (int) ((BaseApplicationClass.player.getDuration() / 100) * binding.seekbar.getProgress());
+                int playPosition = (int) ((BaseApplicationClass.player.getDuration() / 100)
+                        * binding.seekbar.getProgress());
                 BaseApplicationClass.player.seekTo(playPosition);
                 binding.elapsedDuration.setText(convertDuration(BaseApplicationClass.player.getCurrentPosition()));
             }
@@ -187,7 +189,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 if (BaseApplicationClass.player.getCurrentPosition() > 3000) {
                     BaseApplicationClass.player.seekTo(0);
                     if (isDebugMode)
-                        Toast.makeText(MusicOverviewActivity.this, "Restarting current track", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MusicOverviewActivity.this, "Restarting current track", Toast.LENGTH_SHORT)
+                                .show();
                 } else {
                     // Call previous track method
                     baseApplicationClass.prevTrack();
@@ -252,7 +255,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             BaseApplicationClass.player.setShuffleModeEnabled(!BaseApplicationClass.player.getShuffleModeEnabled());
 
             if (BaseApplicationClass.player.getShuffleModeEnabled())
-                binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)));
+                binding.shuffleIcon
+                        .setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)));
             else
                 binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.textSec)));
 
@@ -261,7 +265,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         });
 
         binding.shareIcon.setOnClickListener(view -> {
-            if (SHARE_URL.isBlank()) return;
+            if (SHARE_URL.isBlank())
+                return;
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT, SHARE_URL);
@@ -270,29 +275,34 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         });
 
         binding.moreIcon.setOnClickListener(view -> {
-            final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MusicOverviewActivity.this, R.style.MyBottomSheetDialogTheme);
-            final MusicOverviewMoreInfoBottomSheetBinding _binding = MusicOverviewMoreInfoBottomSheetBinding.inflate(getLayoutInflater());
+            final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MusicOverviewActivity.this,
+                    R.style.MyBottomSheetDialogTheme);
+            final MusicOverviewMoreInfoBottomSheetBinding _binding = MusicOverviewMoreInfoBottomSheetBinding
+                    .inflate(getLayoutInflater());
             _binding.albumTitle.setText(binding.title.getText().toString());
             _binding.albumSubTitle.setText(binding.description.getText().toString());
             Picasso.get().load(Uri.parse(IMAGE_URL)).into(_binding.coverImage);
             final LinearLayout linearLayout = _binding.main;
 
             _binding.goToAlbum.setOnClickListener(go_to_album -> {
-                if (mSongResponse == null) return;
-                if (mSongResponse.data().get(0).album() == null) return;
+                if (mSongResponse == null)
+                    return;
+                if (mSongResponse.data().get(0).album() == null)
+                    return;
                 final SongResponse.Album album = mSongResponse.data().get(0).album();
                 startActivity(new Intent(MusicOverviewActivity.this, ListActivity.class)
                         .putExtra("type", "album")
                         .putExtra("id", album.id())
-                        .putExtra("data", new Gson().toJson(new AlbumItem(album.name(), "", "", album.id())))
-                );
+                        .putExtra("data", new Gson().toJson(new AlbumItem(album.name(), "", "", album.id()))));
             });
 
             _binding.addToLibrary.setOnClickListener(v -> {
                 int index = -1;
-                final SharedPreferenceManager sharedPreferenceManager = SharedPreferenceManager.getInstance(MusicOverviewActivity.this);
+                final SharedPreferenceManager sharedPreferenceManager = SharedPreferenceManager
+                        .getInstance(MusicOverviewActivity.this);
                 SavedLibraries savedLibraries = sharedPreferenceManager.getSavedLibrariesData();
-                if (savedLibraries == null) savedLibraries = new SavedLibraries(new ArrayList<>());
+                if (savedLibraries == null)
+                    savedLibraries = new SavedLibraries(new ArrayList<>());
                 if (savedLibraries.lists().isEmpty()) {
                     Snackbar.make(_binding.getRoot(), "No Libraries Found", Snackbar.LENGTH_SHORT).show();
                     return;
@@ -303,7 +313,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                         userCreatedLibraries.add(library.name());
                 }
 
-                MaterialAlertDialogBuilder materialAlertDialogBuilder = getMaterialAlertDialogBuilder(userCreatedLibraries, savedLibraries, sharedPreferenceManager);
+                MaterialAlertDialogBuilder materialAlertDialogBuilder = getMaterialAlertDialogBuilder(
+                        userCreatedLibraries, savedLibraries, sharedPreferenceManager);
                 materialAlertDialogBuilder.show();
 
             });
@@ -338,7 +349,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                             public void onFinished() {
                                 progressDialog.dismiss();
                                 if (TrackDownloader.isAlreadyDownloaded(song.name())) {
-                                    Toast.makeText(MusicOverviewActivity.this, "Successfully Downloaded.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MusicOverviewActivity.this, "Successfully Downloaded.",
+                                            Toast.LENGTH_SHORT).show();
                                     _binding.download.getTitleTextView().setText("Download Manager");
                                 }
                             }
@@ -346,29 +358,31 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                             @Override
                             public void onError(String errorMessage) {
                                 Toast.makeText(MusicOverviewActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
-                                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(MusicOverviewActivity.this);
+                                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(
+                                        MusicOverviewActivity.this);
                                 alertDialogBuilder.setTitle("Error");
                                 alertDialogBuilder.setMessage(errorMessage);
-                                alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
+                                alertDialogBuilder.setPositiveButton("OK",
+                                        (dialogInterface, i) -> dialogInterface.dismiss());
                                 alertDialogBuilder.show();
                             }
-                        }
-                );
+                        });
 
             });
 
             for (SongResponse.Artist artist : artsitsList) {
                 try {
-                    final String imgUrl = artist.image().isEmpty() ? "" : artist.image().get(artist.image().size() - 1).url();
-                    BottomSheetItemView bottomSheetItemView = new BottomSheetItemView(MusicOverviewActivity.this, artist.name(), imgUrl, artist.id());
+                    final String imgUrl = artist.image().isEmpty() ? ""
+                            : artist.image().get(artist.image().size() - 1).url();
+                    BottomSheetItemView bottomSheetItemView = new BottomSheetItemView(MusicOverviewActivity.this,
+                            artist.name(), imgUrl, artist.id());
                     bottomSheetItemView.setFocusable(true);
                     bottomSheetItemView.setClickable(true);
                     bottomSheetItemView.setOnClickListener(view1 -> {
                         Log.i(TAG, "BottomSheetItemView: onCLicked!");
                         startActivity(new Intent(MusicOverviewActivity.this, ArtistProfileActivity.class)
                                 .putExtra("data", new Gson().toJson(
-                                        new BasicDataRecord(artist.id(), artist.name(), "", imgUrl)))
-                        );
+                                        new BasicDataRecord(artist.id(), artist.name(), "", imgUrl))));
                     });
                     linearLayout.addView(bottomSheetItemView);
                 } catch (Exception e) {
@@ -385,7 +399,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             popupMenu.getMenuInflater().inflate(R.menu.track_quality_menu, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(menuItem -> {
                 Toast.makeText(MusicOverviewActivity.this, menuItem.getTitle(), Toast.LENGTH_SHORT).show();
-                //Objects.requireNonNull(menuItem.getTitle());
+                // Objects.requireNonNull(menuItem.getTitle());
                 BaseApplicationClass.setTrackQuality(menuItem.getTitle().toString());
                 onSongFetched(mSongResponse, true);
                 prepareMediaPLayer();
@@ -403,12 +417,15 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     }
 
     @NonNull
-    private MaterialAlertDialogBuilder getMaterialAlertDialogBuilder(List<String> userCreatedLibraries, SavedLibraries savedLibraries, SharedPreferenceManager sharedPreferenceManager) {
-        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MusicOverviewActivity.this);
-        ListAdapter listAdapter = new ArrayAdapter<>(MusicOverviewActivity.this, android.R.layout.simple_list_item_1, userCreatedLibraries);
+    private MaterialAlertDialogBuilder getMaterialAlertDialogBuilder(List<String> userCreatedLibraries,
+            SavedLibraries savedLibraries, SharedPreferenceManager sharedPreferenceManager) {
+        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(
+                MusicOverviewActivity.this);
+        ListAdapter listAdapter = new ArrayAdapter<>(MusicOverviewActivity.this, android.R.layout.simple_list_item_1,
+                userCreatedLibraries);
         final SavedLibraries finalSavedLibraries = savedLibraries;
         materialAlertDialogBuilder.setAdapter(listAdapter, (dialogInterface, i) -> {
-            //index = i;
+            // index = i;
             Log.i(TAG, "pickedLibrary: " + i);
 
             final SongResponse.Song song = mSongResponse.data().get(0);
@@ -417,19 +434,17 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                     song.id(),
                     song.name(),
                     binding.description.getText().toString(),
-                    IMAGE_URL
-            );
+                    IMAGE_URL);
 
             finalSavedLibraries.lists().get(i).songs().add(songs);
             sharedPreferenceManager.setSavedLibrariesData(finalSavedLibraries);
-            Toast.makeText(MusicOverviewActivity.this, "Added to " + finalSavedLibraries.lists().get(i).name(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(MusicOverviewActivity.this, "Added to " + finalSavedLibraries.lists().get(i).name(),
+                    Toast.LENGTH_SHORT).show();
         });
-
 
         materialAlertDialogBuilder.setTitle("Select Library");
         return materialAlertDialogBuilder;
     }
-
 
     @Override
     protected void onResume() {
@@ -500,11 +515,12 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     private String SHARE_URL = "";
 
     void showData() {
-        if (getIntent().getExtras() == null) return;
+        if (getIntent().getExtras() == null)
+            return;
         final ApiManager apiManager = new ApiManager(this);
         final String ID = getIntent().getExtras().getString("id", "");
         ID_FROM_EXTRA = ID;
-        //((ApplicationClass)getApplicationContext()).setMusicDetails(null,null,null,ID);
+        // ((ApplicationClass)getApplicationContext()).setMusicDetails(null,null,null,ID);
         if (BaseApplicationClass.MUSIC_ID.equals(ID)) {
             updateSeekbar();
             if (BaseApplicationClass.player.isPlaying())
@@ -519,9 +535,11 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 SongResponse songResponse = new Gson().fromJson(response, SongResponse.class);
                 if (songResponse.success()) {
                     onSongFetched(songResponse);
-                    SharedPreferenceManager.getInstance(MusicOverviewActivity.this).setSongResponseById(ID, songResponse);
+                    SharedPreferenceManager.getInstance(MusicOverviewActivity.this).setSongResponseById(ID,
+                            songResponse);
                 } else if (SharedPreferenceManager.getInstance(MusicOverviewActivity.this).isSongResponseById(ID))
-                    onSongFetched(SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
+                    onSongFetched(
+                            SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
                 else
                     finish();
             }
@@ -529,7 +547,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             @Override
             public void onErrorResponse(String tag, String message) {
                 if (SharedPreferenceManager.getInstance(MusicOverviewActivity.this).isSongResponseById(ID))
-                    onSongFetched(SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
+                    onSongFetched(
+                            SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
                 else
                     Toast.makeText(MusicOverviewActivity.this, message, Toast.LENGTH_SHORT).show();
             }
@@ -539,12 +558,12 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
             baseApplicationClass.setTrackQueue(new ArrayList<>(Collections.singletonList(ID)));
         }
-        if((ID.startsWith("http") || ID.startsWith("www")) && ID.contains("jiosaavn.com")){
+        if ((ID.startsWith("http") || ID.startsWith("www")) && ID.contains("jiosaavn.com")) {
             apiManager.retrieveSongByLink(ID, requestListener);
-        }else{
+        } else {
             if (SharedPreferenceManager.getInstance(MusicOverviewActivity.this).isSongResponseById(ID)) {
                 onSongFetched(SharedPreferenceManager.getInstance(MusicOverviewActivity.this).getSongResponseById(ID));
-            }else {
+            } else {
                 apiManager.retrieveSongById(ID, null, requestListener);
             }
         }
@@ -564,8 +583,7 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
                 String.format("%s plays | %s | %s",
                         convertPlayCount(songResponse.data().get(0).playCount()),
                         songResponse.data().get(0).year(),
-                        songResponse.data().get(0).copyright())
-        );
+                        songResponse.data().get(0).copyright()));
         List<SongResponse.Image> image = songResponse.data().get(0).image();
         IMAGE_URL = image.get(image.size() - 1).url();
         SHARE_URL = songResponse.data().get(0).url();
@@ -578,7 +596,8 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
         if ((!BaseApplicationClass.MUSIC_ID.equals(ID_FROM_EXTRA) || forced)) {
             BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
-            baseApplicationClass.setMusicDetails(IMAGE_URL, binding.title.getText().toString(), binding.description.getText().toString(), ID_FROM_EXTRA);
+            baseApplicationClass.setMusicDetails(IMAGE_URL, binding.title.getText().toString(),
+                    binding.description.getText().toString(), ID_FROM_EXTRA);
             baseApplicationClass.setSongUrl(SONG_URL);
             prepareMediaPLayer();
         }
@@ -590,8 +609,10 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     }
 
     public static String convertPlayCount(int playCount) {
-        if (playCount < 1000) return playCount + "";
-        if (playCount < 1000000) return playCount / 1000 + "K";
+        if (playCount < 1000)
+            return playCount + "";
+        if (playCount < 1000000)
+            return playCount / 1000 + "K";
         return playCount / 1000000 + "M";
     }
 
@@ -643,8 +664,10 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             }
 
             // Update notification
-            showNotification(BaseApplicationClass.player.isPlaying() ?
-                    R.drawable.baseline_pause_24 : R.drawable.play_arrow_24px);
+            // showNotification(BaseApplicationClass.player.isPlaying() ?
+            // R.drawable.baseline_pause_24
+            // : R.drawable.play_arrow_24px);
+            // BaseApplicationClass handles notification updates
         } catch (Exception e) {
             Log.e(TAG, "Error preparing media player", e);
             // Try to recover
@@ -708,14 +731,17 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         if (!binding.title.getText().toString().equals(BaseApplicationClass.MUSIC_TITLE))
             binding.description.setText(BaseApplicationClass.MUSIC_DESCRIPTION);
         Picasso.get().load(Uri.parse(BaseApplicationClass.IMAGE_URL)).into(binding.coverImage);
-        binding.seekbar.setProgress((int) (((float) BaseApplicationClass.player.getCurrentPosition() / BaseApplicationClass.player.getDuration()) * 100));
+        binding.seekbar.setProgress((int) (((float) BaseApplicationClass.player.getCurrentPosition()
+                / BaseApplicationClass.player.getDuration()) * 100));
 
-        binding.seekbar.setSecondaryProgress((int) (((float) BaseApplicationClass.player.getBufferedPosition() / BaseApplicationClass.player.getDuration()) * 100));
+        binding.seekbar.setSecondaryProgress((int) (((float) BaseApplicationClass.player.getBufferedPosition()
+                / BaseApplicationClass.player.getDuration()) * 100));
 
         long currentDuration = BaseApplicationClass.player.getCurrentPosition();
         binding.elapsedDuration.setText(convertDuration(currentDuration));
 
-        if (!binding.totalDuration.getText().toString().equals(convertDuration(BaseApplicationClass.player.getDuration())))
+        if (!binding.totalDuration.getText().toString()
+                .equals(convertDuration(BaseApplicationClass.player.getDuration())))
             binding.totalDuration.setText(convertDuration(BaseApplicationClass.player.getDuration()));
 
         if (BaseApplicationClass.player.isPlaying())
@@ -723,13 +749,14 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
         else
             binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
 
-        //((ApplicationClass)getApplicationContext()).showNotification();
+        // ((ApplicationClass)getApplicationContext()).showNotification();
 
         // Update repeat and shuffle button UI
         updateRepeatButtonUI();
 
         if (BaseApplicationClass.player.getShuffleModeEnabled())
-            binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)));
+            binding.shuffleIcon
+                    .setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)));
         else
             binding.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.textSec)));
 
@@ -775,23 +802,21 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             }
 
             // Update UI to show active button state
-            binding.nextIcon.setAlpha(0.5f);
-            binding.nextIcon.animate().alpha(1.0f).setDuration(200).start();
+            runOnUiThread(() -> {
+                binding.nextIcon.setAlpha(0.5f);
+                binding.nextIcon.animate().alpha(1.0f).setDuration(200).start();
 
-            // Get application instance
-            BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
-            baseApplicationClass.nextTrack();
+                // Update UI
+                updateTrackInfo();
+                updateSeekbar();
 
-            // Update UI
-            updateTrackInfo();
-            updateSeekbar();
-
-            // Ensure play/pause button shows correct state
-            if (BaseApplicationClass.player.isPlaying()) {
-                binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
-            } else {
-                binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
-            }
+                // Ensure play/pause button shows correct state
+                if (BaseApplicationClass.player.isPlaying()) {
+                    binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
+                } else {
+                    binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
+                }
+            });
         } catch (Exception e) {
             Log.e(TAG, "Error in nextClicked", e);
         }
@@ -807,30 +832,21 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
             }
 
             // Update UI to show active button state
-            binding.prevIcon.setAlpha(0.5f);
-            binding.prevIcon.animate().alpha(1.0f).setDuration(200).start();
+            runOnUiThread(() -> {
+                binding.prevIcon.setAlpha(0.5f);
+                binding.prevIcon.animate().alpha(1.0f).setDuration(200).start();
 
-            // Get application instance
-            BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
+                // Update UI
+                updateTrackInfo();
+                updateSeekbar();
 
-            // If we're already at the beginning of the track, go to previous track
-            // Otherwise just restart the current track
-            if (BaseApplicationClass.player.getCurrentPosition() > 3000) {
-                BaseApplicationClass.player.seekTo(0);
-            } else {
-                baseApplicationClass.prevTrack();
-            }
-
-            // Update UI
-            updateTrackInfo();
-            updateSeekbar();
-
-            // Ensure play/pause button shows correct state
-            if (BaseApplicationClass.player.isPlaying()) {
-                binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
-            } else {
-                binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
-            }
+                // Ensure play/pause button shows correct state
+                if (BaseApplicationClass.player.isPlaying()) {
+                    binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
+                } else {
+                    binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
+                }
+            });
         } catch (Exception e) {
             Log.e(TAG, "Error in prevClicked", e);
         }
@@ -838,12 +854,19 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
 
     @Override
     public void playClicked() {
-        //binding.playPauseImage.performClick();
-        if (!BaseApplicationClass.player.isPlaying()) {
-            binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
-        } else {
-            binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
-        }
+        Log.i(TAG, "playClicked called from service");
+        runOnUiThread(() -> {
+            // Retrieve application class to toggle playback
+            BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
+            baseApplicationClass.togglePlayPause();
+
+            // Update UI
+            if (BaseApplicationClass.player.isPlaying()) {
+                binding.playPauseImage.setImageResource(R.drawable.baseline_pause_24);
+            } else {
+                binding.playPauseImage.setImageResource(R.drawable.play_arrow_24px);
+            }
+        });
     }
 
     @Override
@@ -852,12 +875,12 @@ public class MusicOverviewActivity extends AppCompatActivity implements ActionPl
     }
 
     public void showNotification(int playPauseButton) {
+        // We should delegate notification updates to BaseApplicationClass
+        // to ensure it uses the correct global state (current song info).
+        // Calling setMusicDetails here risks overwriting with stale Activity data.
+
         BaseApplicationClass baseApplicationClass = (BaseApplicationClass) getApplicationContext();
-        String songId = getIntent().getExtras().getString("id", "");
-        baseApplicationClass.setMusicDetails(IMAGE_URL, binding.title.getText().toString(), binding.description.getText().toString(), songId);
-        Log.i(TAG, "MusicOverviewActivity showNotification for song ID: " + songId);
         baseApplicationClass.showNotification();
     }
-
 
 }

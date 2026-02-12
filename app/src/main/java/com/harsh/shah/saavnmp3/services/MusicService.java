@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -22,7 +23,6 @@ public class MusicService extends Service {
         return mBinder;
     }
 
-
     public class MyBinder extends Binder {
         public MusicService getService() {
             return MusicService.this;
@@ -31,32 +31,52 @@ public class MusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null || intent.getExtras() == null) return START_STICKY;
+        if (intent == null || intent.getExtras() == null)
+            return START_STICKY;
 
-        String actionName = intent.getExtras().getString("action","");
+        String actionName = intent.getExtras().getString("action", "");
+        Log.d("MusicService", "onStartCommand called with action: " + actionName);
         if (actionName != null) {
             switch (actionName) {
                 case BaseApplicationClass.ACTION_NEXT:
                     // Handle next action
+                    // Always use BaseApplicationClass as source of truth
+                    ((BaseApplicationClass) getApplicationContext()).nextTrack();
                     if (actionPlaying != null) {
-                        actionPlaying.nextClicked();
+                        try {
+                            actionPlaying.nextClicked();
+                        } catch (Exception e) {
+                            Log.e("MusicService", "Error in callback", e);
+                        }
                     }
                     break;
                 case BaseApplicationClass.ACTION_PREV:
                     // Handle previous action
+                    ((BaseApplicationClass) getApplicationContext()).prevTrack();
                     if (actionPlaying != null) {
-                        actionPlaying.prevClicked();
+                        try {
+                            actionPlaying.prevClicked();
+                        } catch (Exception e) {
+                            Log.e("MusicService", "Error in callback", e);
+                        }
                     }
                     break;
                 case BaseApplicationClass.ACTION_PLAY:
                     // Handle play/pause action
+                    ((BaseApplicationClass) getApplicationContext()).togglePlayPause();
                     if (actionPlaying != null) {
-                        actionPlaying.playClicked();
+                        try {
+                            actionPlaying.playClicked();
+                        } catch (Exception e) {
+                            Log.e("MusicService", "Error in callback", e);
+                        }
                     }
                     break;
 
                 case "action_click":
-                    startActivity(new Intent(this, MusicOverviewActivity.class).putExtra("id", intent.getStringExtra("id")).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
+                    startActivity(
+                            new Intent(this, MusicOverviewActivity.class).putExtra("id", intent.getStringExtra("id"))
+                                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
                     break;
             }
         }

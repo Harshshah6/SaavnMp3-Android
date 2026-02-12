@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 7,
-      "versionName": "1.0.13",
-      "outputFile": "Melotune-1.0.13-nofirebaseRelease.apk"
+      "versionCode": 8,
+      "versionName": "1.0.14",
+      "outputFile": "Melotune-1.0.14-nofirebaseRelease.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +22,14 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/Melotune-1.0.13-nofirebaseRelease.dm"
+        "baselineProfiles/1/Melotune-1.0.14-nofirebaseRelease.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/Melotune-1.0.13-nofirebaseRelease.dm"
+        "baselineProfiles/0/Melotune-1.0.14-nofirebaseRelease.dm"
       ]
     }
   ],

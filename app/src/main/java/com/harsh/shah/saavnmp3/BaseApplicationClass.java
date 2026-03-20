@@ -143,18 +143,18 @@ public class BaseApplicationClass extends Application {
                 // Auto-handle errors
                 if (playbackState == Player.STATE_IDLE) {
                     Log.e(TAG, "Player idle state detected, might need recovery");
-                    if (SONG_URL != null && !SONG_URL.isEmpty()) {
-                        new Handler().postDelayed(() -> {
-                            try {
-                                // Try to reload the media
-                                MediaItem mediaItem = MediaItem.fromUri(SONG_URL);
-                                player.setMediaItem(mediaItem);
-                                player.prepare();
-                            } catch (Exception e) {
-                                Log.e(TAG, "Error recovering from player error", e);
-                            }
-                        }, 2000);
-                    }
+//                    if (SONG_URL != null && !SONG_URL.isEmpty()) {
+//                        new Handler().postDelayed(() -> {
+//                            try {
+//                                // Try to reload the media
+//                                MediaItem mediaItem = MediaItem.fromUri(SONG_URL);
+//                                player.setMediaItem(mediaItem);
+//                                player.prepare();
+//                            } catch (Exception e) {
+//                                Log.e(TAG, "Error recovering from player error", e);
+//                            }
+//                        }, 2000);
+//                    }
                 } else if (playbackState == Player.STATE_READY) {
                     // Now it's safe to play
                     Log.i(TAG, "Player ready, starting playback...");
@@ -181,20 +181,20 @@ public class BaseApplicationClass extends Application {
                 Log.e(TAG, "Player error: " + error.getMessage());
 
                 // Auto-recovery from common errors
-                if (SONG_URL != null && !SONG_URL.isEmpty()) {
-                    Log.i(TAG, "Attempting to recover from error");
-                    new Handler().postDelayed(() -> {
-                        try {
-                            // Try to reload the media
-                            MediaItem mediaItem = MediaItem.fromUri(SONG_URL);
-                            player.setMediaItem(mediaItem);
-                            player.prepare();
-                            player.play();
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error recovering from player error", e);
-                        }
-                    }, 2000);
-                }
+//                if (SONG_URL != null && !SONG_URL.isEmpty()) {
+//                    Log.i(TAG, "Attempting to recover from error");
+//                    new Handler().postDelayed(() -> {
+//                        try {
+//                            // Try to reload the media
+//                            MediaItem mediaItem = MediaItem.fromUri(SONG_URL);
+//                            player.setMediaItem(mediaItem);
+//                            player.prepare();
+//                            player.play();
+//                        } catch (Exception e) {
+//                            Log.e(TAG, "Error recovering from player error", e);
+//                        }
+//                    }, 2000);
+//                }
             }
         });
 
@@ -498,20 +498,20 @@ public class BaseApplicationClass extends Application {
     public void prepareMediaPlayer() {
         try {
             // Debounce: If same song is requested within 2 seconds, ignore it.
-            long currentTime = System.currentTimeMillis();
-            if (MUSIC_ID.equals(lastPreparedId) && (currentTime - lastPrepareTime) < 2000) {
-                Log.i(TAG, "prepareMediaPlayer: Debouncing duplicate request for " + MUSIC_ID);
-                // If player is not playing (e.g. buffering or paused), ensure we Resume if
-                // intention was to play
-                if (player != null && !player.isPlaying() && player.getPlaybackState() != Player.STATE_ENDED) {
-                    player.play();
-                }
-                return;
-            }
-
-            // Allow processing and update debounce trackers
-            lastPrepareTime = currentTime;
-            lastPreparedId = MUSIC_ID;
+//            long currentTime = System.currentTimeMillis();
+//            if (MUSIC_ID.equals(lastPreparedId) && (currentTime - lastPrepareTime) < 2000) {
+//                Log.i(TAG, "prepareMediaPlayer: Debouncing duplicate request for " + MUSIC_ID);
+//                // If player is not playing (e.g. buffering or paused), ensure we Resume if
+//                // intention was to play
+//                if (player != null && !player.isPlaying() && player.getPlaybackState() != Player.STATE_ENDED) {
+//                    player.play();
+//                }
+//                return;
+//            }
+//
+//            // Allow processing and update debounce trackers
+//            lastPrepareTime = currentTime;
+//            lastPreparedId = MUSIC_ID;
 
             // Stop currently playing media first
             if (player != null && player.isPlaying()) {
@@ -551,7 +551,7 @@ public class BaseApplicationClass extends Application {
             player.setMediaItem(mediaItem);
 
             // Prepare player but don't auto-play to prevent race conditions
-            player.setPlayWhenReady(true);
+            player.setPlayWhenReady(false);
             player.prepare();
 
             // Update notification

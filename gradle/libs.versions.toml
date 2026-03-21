@@ -28,12 +28,14 @@ jaudiotagger = "3.0.1"
 googleGmsGoogleServices = "4.4.4"
 firebaseAnalytics = "23.2.0"
 firebaseMessaging = "25.0.1"
+kotlin = "2.3.20"
+coreKtx = "1.18.0"
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
 core = { module = "androidx.core:core", version.ref = "core" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "compiler" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+gson = { module = "com.google.code.gson:gson", name = "gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -61,6 +63,7 @@ swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout"
 jaudiotagger = { module = "net.jthink:jaudiotagger", version.ref = "jaudiotagger" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
 # Media3 Exoplayer related dependencies
 [bundles]
@@ -69,4 +72,5 @@ media3Exoplayer = ["media3-exoplayer", "media3-ui", "media3-exoplayer-dash"]
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
-
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

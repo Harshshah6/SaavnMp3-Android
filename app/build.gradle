@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    id 'kotlin-kapt'
 //    alias(libs.plugins.google.gms.google.services)
 }
 
@@ -74,6 +76,9 @@ android {
     viewBinding {
         enabled true
     }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
 
     applicationVariants.configureEach { variant ->
         variant.outputs.each { output ->
@@ -95,6 +100,7 @@ dependencies {
     implementation libs.material
     implementation libs.activity
     implementation libs.constraintlayout
+    implementation libs.core.ktx
 
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
@@ -125,7 +131,7 @@ dependencies {
 
     //IMAGE LOADING LIBRARIES
     implementation libs.glide
-    annotationProcessor libs.compiler
+    kapt libs.compiler
     implementation libs.picasso
 
     //IOS STYLE OVERSCROLL EFFECT
@@ -149,6 +155,6 @@ dependencies {
 
     // LOCAL DATABASE FOR CACHING DATA
     implementation libs.room.runtime
-    annotationProcessor libs.room.compiler
+    kapt libs.room.compiler
 
 }

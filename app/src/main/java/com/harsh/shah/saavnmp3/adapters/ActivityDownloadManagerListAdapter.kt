@@ -18,7 +18,7 @@ class ActivityDownloadManagerListAdapter(private val data: MutableList<Downloade
     RecyclerView.Adapter<ActivityDownloadManagerListAdapter.ViewHolder?>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val _v = View.inflate(
-            parent.getContext(),
+            parent.context,
             if (viewType == 0) R.layout.download_manager_list_item else R.layout.activity_list_shimmer,
             null
         )
@@ -26,7 +26,7 @@ class ActivityDownloadManagerListAdapter(private val data: MutableList<Downloade
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        _v.setLayoutParams(layoutParams)
+        _v.layoutParams = layoutParams
         return ViewHolder(_v)
     }
 
@@ -36,13 +36,13 @@ class ActivityDownloadManagerListAdapter(private val data: MutableList<Downloade
             return
         }
 
-        holder.itemView.findViewById<View?>(R.id.title).setSelected(true)
-        holder.itemView.findViewById<View?>(R.id.artist).setSelected(true)
+        holder.itemView.findViewById<View?>(R.id.title).isSelected = true
+        holder.itemView.findViewById<View?>(R.id.artist).isSelected = true
 
         val item = data.get(position)
 
-        (holder.itemView.findViewById<View?>(R.id.title) as TextView).setText(item.title)
-        (holder.itemView.findViewById<View?>(R.id.artist) as TextView).setText(item.artist)
+        (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = item.title
+        (holder.itemView.findViewById<View?>(R.id.artist) as TextView).text = item.artist
 
         if (item.coverImage != null) {
             (holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView).setImageBitmap(item.coverImage)
@@ -55,20 +55,20 @@ class ActivityDownloadManagerListAdapter(private val data: MutableList<Downloade
 
     private fun showDialog(track: DownloadedTrack, view: View) {
         val bottomSheetDialog =
-            BottomSheetDialog(view.getContext(), R.style.MyBottomSheetDialogTheme)
+            BottomSheetDialog(view.context, R.style.MyBottomSheetDialogTheme)
         val _binding =
-            DownloadManagerMoreViewBinding.inflate((view.getContext() as Activity).getLayoutInflater())
-        _binding.songTitle.setText(track.title)
-        _binding.songSubTitle.setText(track.artist)
+            DownloadManagerMoreViewBinding.inflate((view.context as Activity).layoutInflater)
+        _binding.songTitle.text = track.title
+        _binding.songSubTitle.text = track.artist
         _binding.coverImage.setImageBitmap(track.coverImage)
-        _binding.albumTitle.setText(track.album)
-        _binding.songYear.setText(track.year)
-        _binding.bitrate.setText(track.bitrate + " kbps")
-        _binding.duration.setText(track.trackLength + " Seconds")
-        if (track.trackUID == null || track.trackUID.isEmpty()) _binding.button.setVisibility(View.GONE)
+        _binding.albumTitle.text = track.album
+        _binding.songYear.text = track.year
+        _binding.bitrate.text = track.bitrate + " kbps"
+        _binding.duration.text = track.trackLength + " Seconds"
+        if (track.trackUID == null || track.trackUID.isEmpty()) _binding.button.visibility = View.GONE
         _binding.button.setOnClickListener(View.OnClickListener { v: View? ->
-            v!!.getContext().startActivity(
-                Intent(v.getContext(), MusicOverviewActivity::class.java).putExtra(
+            v!!.context.startActivity(
+                Intent(v.context, MusicOverviewActivity::class.java).putExtra(
                     "type",
                     "clear"
                 ).putExtra("id", track.trackUID)

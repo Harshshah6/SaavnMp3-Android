@@ -2,12 +2,12 @@
 
 import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
@@ -47,20 +47,18 @@ class ArtistProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityArtistProfileBinding.inflate(getLayoutInflater())
+        binding = ActivityArtistProfileBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
         setSupportActionBar(binding!!.collapsingToolbar)
-        if (getSupportActionBar() != null) getSupportActionBar()!!.setDisplayShowTitleEnabled(false)
+        if (supportActionBar != null) supportActionBar!!.setDisplayShowTitleEnabled(false)
         binding!!.collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent))
 
-        getWindow().getDecorView().setSystemUiVisibility(
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        )
-        getWindow().setStatusBarColor(Color.TRANSPARENT)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        window.statusBarColor = Color.TRANSPARENT
 
-        getSupportActionBar()!!.setDisplayHomeAsUpEnabled(true)
-        getSupportActionBar()!!.setDisplayShowHomeEnabled(true)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar!!.setDisplayShowHomeEnabled(true)
 
         //        binding.collapsingToolbarLayout.setTitle("Artist Name");
         binding!!.collapsingToolbarAppbarlayout.addOnOffsetChangedListener(OnOffsetChangedListener { appBarLayout: AppBarLayout?, verticalOffset: Int ->
@@ -73,23 +71,23 @@ class ArtistProfileActivity : AppCompatActivity() {
         binding!!.topAlbumsRecyclerview.setLayoutManager(LinearLayoutManager(this))
         binding!!.topSinglesRecyclerview.setLayoutManager(LinearLayoutManager(this))
 
-        binding!!.topSongsSeeMore.setOnClickListener(View.OnClickListener { v: View? ->
+        binding!!.topSongsSeeMore.setOnClickListener { v: View? ->
             startActivity(
                 Intent(this@ArtistProfileActivity, SeeMoreActivity::class.java)
                     .putExtra("id", artistId)
                     .putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_SONGS.name)
-                    .putExtra("artist_name", binding!!.artistName.getText().toString())
+                    .putExtra("artist_name", binding!!.artistName.text.toString())
             )
-        })
-        binding!!.topAlbumsSeeMore.setOnClickListener(View.OnClickListener { v: View? ->
+        }
+        binding!!.topAlbumsSeeMore.setOnClickListener { v: View? ->
             startActivity(
                 Intent(this@ArtistProfileActivity, SeeMoreActivity::class.java)
                     .putExtra("id", artistId)
                     .putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_ALBUMS.name)
-                    .putExtra("artist_name", binding!!.artistName.getText().toString())
+                    .putExtra("artist_name", binding!!.artistName.text.toString())
             )
-        })
-        binding!!.topSinglesSeeMore.setVisibility(View.GONE)
+        }
+        binding!!.topSinglesSeeMore.visibility = View.GONE
 
         //binding.topSinglesSeeMore.setOnClickListener(v -> startActivity(seeMoreIntent.putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_SINGLES.name())));
         showShimmerData()
@@ -108,14 +106,14 @@ class ArtistProfileActivity : AppCompatActivity() {
     private var artistSearch: ArtistSearch? = null
 
     fun showData() {
-        if (getIntent().getExtras() == null) return
-        Log.i(TAG, "showData: " + getIntent().getExtras())
-        val artist = getIntent().getExtras()!!.getString("data", "null")
+        if (intent.extras == null) return
+        Log.i(TAG, "showData: " + intent.extras)
+        val artist = intent.extras!!.getString("data", "null")
         val apiManager = ApiManager(this)
         val responseListener: RequestNetwork.RequestListener =
             object : RequestNetwork.RequestListener {
                 val sharedPreferenceManager: SharedPreferenceManager =
-                    SharedPreferenceManager.Companion.getInstance(this@ArtistProfileActivity)
+                    SharedPreferenceManager.getInstance(this@ArtistProfileActivity)
 
                 override fun onResponse(
                     tag: String?,
@@ -125,7 +123,7 @@ class ArtistProfileActivity : AppCompatActivity() {
                     try {
                         artistSearch =
                             Gson().fromJson<ArtistSearch>(response, ArtistSearch::class.java)
-                        Log.i(TAG, "onResponse: " + response)
+                        Log.i(TAG, "onResponse: $response")
                         val id = artistSearch?.data?.id
                         if (id != null) {
                             sharedPreferenceManager.setArtistData(id, artistSearch)
@@ -142,7 +140,7 @@ class ArtistProfileActivity : AppCompatActivity() {
                 }
 
                 override fun onErrorResponse(tag: String?, message: String?) {
-                    Log.i(TAG, "onErrorResponse: " + message)
+                    Log.i(TAG, "onErrorResponse: $message")
                     if (artistId != "9999") {
                         val offlineData = sharedPreferenceManager.getArtistData(artistId)
                         if (offlineData != null) {
@@ -158,30 +156,27 @@ class ArtistProfileActivity : AppCompatActivity() {
             return
         }
 
-        val artistItem = Gson().fromJson<BasicDataRecord?>(artist, BasicDataRecord::class.java)
-        if (artistItem == null) {
-            return
-        }
+        val artistItem = Gson().fromJson(artist, BasicDataRecord::class.java) ?: return
         artistId = artistItem.id ?: ""
 
-        Picasso.get().load(Uri.parse(artistItem.image)).into(binding!!.artistImg)
-        binding!!.artistName.setText(artistItem.title())
-        binding!!.collapsingToolbarLayout.setTitle(artistItem.title())
+        Picasso.get().load(artistItem.image?.toUri()).into(binding!!.artistImg)
+        binding!!.artistName.text = artistItem.title()
+        binding!!.collapsingToolbarLayout.title = artistItem.title()
 
         apiManager.retrieveArtistById(artistId, responseListener)
     }
 
     private fun display() {
-        Log.i(TAG, "display: " + artistSearch)
+        Log.i(TAG, "display: $artistSearch")
         if (artistSearch?.success == true && artistSearch?.data != null) {
             val data = artistSearch!!.data!!
             if (!data.image.isNullOrEmpty()) {
                 Picasso.get()
-                    .load(Uri.parse(data.image!![data.image!!.size - 1]?.url ?: ""))
+                    .load((data.image[data.image.size - 1]?.url ?: "").toUri())
                     .into(binding!!.artistImg)
             }
-            binding!!.artistName.setText(data.name())
-            binding!!.collapsingToolbarLayout.setTitle(data.name())
+            binding!!.artistName.text = data.name()
+            binding!!.collapsingToolbarLayout.title = data.name()
             binding!!.topSongsRecyclerview.setAdapter(
                 ActivityArtistProfileTopSongsAdapter(
                     data.topSongs ?: mutableListOf()
@@ -201,10 +196,8 @@ class ArtistProfileActivity : AppCompatActivity() {
     }
 
     fun showShimmerData() {
-        val shimmerData: MutableList<Song?> =
-            shimmerData
-        val shimmerDataAlbum: MutableList<AlbumsSearch.Data.Results?> =
-            ArrayList<AlbumsSearch.Data.Results?>()
+        val shimmerData: MutableList<Song?> = shimmerData
+        val shimmerDataAlbum: MutableList<AlbumsSearch.Data.Results?> = ArrayList()
         for (i in 0..10) {
             shimmerDataAlbum.add(
                 AlbumsSearch.Data.Results(
@@ -236,7 +229,7 @@ class ArtistProfileActivity : AppCompatActivity() {
         )
 
         val offlineData: ArtistSearch? =
-            SharedPreferenceManager.Companion.getInstance(this).getArtistData(artistId)
+            SharedPreferenceManager.getInstance(this).getArtistData(artistId)
         if (offlineData != null) {
             artistSearch = offlineData
             display()
@@ -244,7 +237,7 @@ class ArtistProfileActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.getItemId() == android.R.id.home) {
+        if (item.itemId == android.R.id.home) {
             onBackPressed()
             return true
         }

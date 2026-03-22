@@ -22,7 +22,7 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
     RecyclerView.Adapter<ActivitySearchListItemAdapter.ViewHolder?>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val _v = View.inflate(
-            parent.getContext(),
+            parent.context,
             if (viewType == 0) R.layout.activity_list_song_item else R.layout.activity_list_shimmer,
             null
         )
@@ -30,7 +30,7 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        _v.setLayoutParams(layoutParams)
+        _v.layoutParams = layoutParams
         return ViewHolder(_v)
     }
 
@@ -40,13 +40,13 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
             return
         }
 
-        holder.itemView.findViewById<View?>(R.id.title).setSelected(true)
-        holder.itemView.findViewById<View?>(R.id.artist).setSelected(true)
+        holder.itemView.findViewById<View?>(R.id.title).isSelected = true
+        holder.itemView.findViewById<View?>(R.id.artist).isSelected = true
 
         val item = data.get(position)
 
-        (holder.itemView.findViewById<View?>(R.id.title) as TextView).setText(item.title())
-        (holder.itemView.findViewById<View?>(R.id.artist) as TextView).setText(item.subtitle())
+        (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = item.title()
+        (holder.itemView.findViewById<View?>(R.id.artist) as TextView).text = item.subtitle()
 
         Picasso.get().load(Uri.parse(item.coverImage))
             .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?))
@@ -56,7 +56,7 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
             intent.putExtra("id", item.id)
             when (item.type) {
                 SearchListItem.Type.SONG -> {
-                    intent.setClass(holder.itemView.getContext(), MusicOverviewActivity::class.java)
+                    intent.setClass(holder.itemView.context, MusicOverviewActivity::class.java)
                 }
 
                 SearchListItem.Type.ALBUM -> {
@@ -64,18 +64,18 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
                         AlbumItem(item.title(), item.subtitle(), item.coverImage, item.id)
                     intent.putExtra("data", Gson().toJson(albumItem))
                     intent.putExtra("type", "album")
-                    intent.setClass(holder.itemView.getContext(), ListActivity::class.java)
+                    intent.setClass(holder.itemView.context, ListActivity::class.java)
                 }
 
                 SearchListItem.Type.PLAYLIST -> {
                     val albumItem =
                         AlbumItem(item.title(), item.subtitle(), item.coverImage, item.id)
                     intent.putExtra("data", Gson().toJson(albumItem))
-                    intent.setClass(holder.itemView.getContext(), ListActivity::class.java)
+                    intent.setClass(holder.itemView.context, ListActivity::class.java)
                 }
 
                 SearchListItem.Type.ARTIST -> {
-                    intent.setClass(holder.itemView.getContext(), ArtistProfileActivity::class.java)
+                    intent.setClass(holder.itemView.context, ArtistProfileActivity::class.java)
                     intent.putExtra(
                         "data",
                         Gson().toJson(BasicDataRecord(item.id, item.title(), "", item.coverImage))
@@ -84,7 +84,7 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
 
                 else -> {}
             }
-            holder.itemView.getContext().startActivity(intent)
+            holder.itemView.context.startActivity(intent)
         })
     }
 

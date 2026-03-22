@@ -19,11 +19,11 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(getLayoutInflater())
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
         val settingsSharedPrefManager = SettingsSharedPrefManager(this)
         val sharedPreferenceManager: SharedPreferenceManager =
-            SharedPreferenceManager.Companion.getInstance(this)
+            SharedPreferenceManager.getInstance(this)
 
         binding!!.downloadOverCellular.setOnCheckChangeListener(object : OnCheckChangeListener {
             override fun onCheckChanged(isChecked: Boolean) {
@@ -54,7 +54,7 @@ class SettingsActivity : AppCompatActivity() {
         binding!!.themeChipGroup.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
             settingsSharedPrefManager.theme =
                 if (checkedId == R.id.dark) "dark" else if (checkedId == R.id.light) "light" else "system"
-            BaseApplicationClass.Companion.updateTheme()
+            BaseApplicationClass.updateTheme()
         })
 
         binding!!.clearCache.setOnClickListener(View.OnClickListener { v: View? ->

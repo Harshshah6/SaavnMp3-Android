@@ -22,15 +22,13 @@ class ActivityMainAlbumItemAdapter(private val data: MutableList<AlbumItem?>) :
         viewType: Int
     ): ActivityMainAlbumItemAdapterViewHolder {
         val _v = View.inflate(
-            parent.getContext(),
+            parent.context,
             if (viewType == 0) R.layout.activity_main_songs_item else R.layout.songs_item_shimmer,
             null
         )
-        _v.setLayoutParams(
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        _v.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
         return ActivityMainAlbumItemAdapterViewHolder(_v)
     }
@@ -41,24 +39,21 @@ class ActivityMainAlbumItemAdapter(private val data: MutableList<AlbumItem?>) :
             return
         }
 
-        (holder.itemView.findViewById<View?>(R.id.albumTitle) as TextView).setText(
+        (holder.itemView.findViewById<View?>(R.id.albumTitle) as TextView).text =
             data.get(position)!!.albumTitle()
-        )
-        (holder.itemView.findViewById<View?>(R.id.albumSubTitle) as TextView).setText(
-            data.get(
-                position
-            )!!.albumSubTitle()
-        )
+        (holder.itemView.findViewById<View?>(R.id.albumSubTitle) as TextView).text = data.get(
+            position
+        )!!.albumSubTitle()
 
-        holder.itemView.findViewById<View?>(R.id.albumTitle).setSelected(true)
-        holder.itemView.findViewById<View?>(R.id.albumSubTitle).setSelected(true)
+        holder.itemView.findViewById<View?>(R.id.albumTitle).isSelected = true
+        holder.itemView.findViewById<View?>(R.id.albumSubTitle).isSelected = true
 
         val coverImage = holder.itemView.findViewById<ImageView?>(R.id.coverImage)
         Picasso.get().load(Uri.parse(data.get(position)!!.albumCover)).into(coverImage)
 
         holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->
-            v!!.getContext().startActivity(
-                Intent(v.getContext(), ListActivity::class.java)
+            v!!.context.startActivity(
+                Intent(v.context, ListActivity::class.java)
                     .putExtra("data", Gson().toJson(data.get(position)))
                     .putExtra("type", "album")
                     .putExtra("id", data.get(position)!!.id)

@@ -24,7 +24,7 @@ class SeeMoreActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySeeMoreBinding.inflate(getLayoutInflater())
+        binding = ActivitySeeMoreBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
         binding!!.recyclerView.setAdapter(activitySeeMoreListAdapter)
@@ -52,10 +52,10 @@ class SeeMoreActivity : AppCompatActivity() {
     }
 
     private fun showData() {
-        if (getIntent().getExtras() == null) finish()
-        binding!!.toolbarText.setText(getIntent().getExtras()!!.getString("artist_name"))
-        artistId = getIntent().getExtras()!!.getString("id")
-        val type = getIntent().getExtras()!!
+        if (intent.extras == null) finish()
+        binding!!.toolbarText.text = intent.extras!!.getString("artist_name")
+        artistId = intent.extras!!.getString("id")
+        val type = intent.extras!!
             .getString("type", ActivitySeeMoreListAdapter.Mode.TOP_SONGS.name)
         mode = ActivitySeeMoreListAdapter.Mode.valueOf(type!!)
         binding!!.recyclerView.setAdapter(

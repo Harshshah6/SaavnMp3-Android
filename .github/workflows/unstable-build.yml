@@ -1,0 +1,69 @@
+permissions:
+  contents: write
+
+name: Android Unstable Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/release.jks
+
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
+
+      - name: google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
+
+      - name: Build signed release APK
+        run: |
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=release.jks \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }} \
+            --no-daemon --warning-mode none -x lint -x test
+
+      - name: Prepare APKs
+        run: |
+          mkdir out
+          cp app/build/outputs/apk/prod/release/*.apk out/app-prod-unstable.apk || true
+          cp app/build/outputs/apk/nofirebase/release/*.apk out/app-nofirebase-unstable.apk || true
+
+      - name: Create/Update Unstable Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: unstable
+          name: Unstable Build (Pre-Release)
+          prerelease: true 
+          body: |
+            ⚠️ This is an **unstable build**.
+
+            - Built from latest commit on `master`
+            - May contain bugs or incomplete features
+            - Not recommended for daily use
+
+            Commit: ${{ github.sha }}
+          files: out/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

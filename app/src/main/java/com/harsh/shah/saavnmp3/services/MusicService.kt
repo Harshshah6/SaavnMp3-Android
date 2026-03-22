@@ -1,19 +1,30 @@
-﻿package com.harsh.shah.saavnmp3.services
+package com.harsh.shah.saavnmp3.services
 
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.harsh.shah.saavnmp3.BaseApplicationClass
-import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
+import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 
 class MusicService : Service() {
     private val mBinder: IBinder = MyBinder()
 
     var actionPlaying: ActionPlaying? = null
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onCreate() {
+        super.onCreate()
+        MusicPlayerManager.musicService = this
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (MusicPlayerManager.musicService == this) {
+            MusicPlayerManager.musicService = null
+        }
+    }
+
+    override fun onBind(intent: Intent?): IBinder {
         return mBinder
     }
 
@@ -29,10 +40,9 @@ class MusicService : Service() {
         Log.d("MusicService", "onStartCommand called with action: $actionName")
         if (actionName != null) {
             when (actionName) {
-                BaseApplicationClass.Companion.ACTION_NEXT -> {
+                MusicPlayerManager.ACTION_NEXT -> {
                     // Handle next action
-                    // Always use BaseApplicationClass as source of truth
-                    (applicationContext as BaseApplicationClass).nextTrack()
+                    MusicPlayerManager.nextTrack()
                     if (actionPlaying != null) {
                         try {
                             actionPlaying!!.nextClicked()
@@ -42,9 +52,9 @@ class MusicService : Service() {
                     }
                 }
 
-                BaseApplicationClass.Companion.ACTION_PREV -> {
+                MusicPlayerManager.ACTION_PREV -> {
                     // Handle previous action
-                    (applicationContext as BaseApplicationClass).prevTrack()
+                    MusicPlayerManager.prevTrack()
                     if (actionPlaying != null) {
                         try {
                             actionPlaying!!.prevClicked()
@@ -54,9 +64,9 @@ class MusicService : Service() {
                     }
                 }
 
-                BaseApplicationClass.Companion.ACTION_PLAY -> {
+                MusicPlayerManager.ACTION_PLAY -> {
                     // Handle play/pause action
-                    (getApplicationContext() as BaseApplicationClass).togglePlayPause()
+                    MusicPlayerManager.togglePlayPause()
                     if (actionPlaying != null) {
                         try {
                             actionPlaying!!.playClicked()
@@ -65,14 +75,6 @@ class MusicService : Service() {
                         }
                     }
                 }
-
-                "action_click" -> startActivity(
-                    Intent(this, MusicOverviewActivity::class.java).putExtra(
-                        "id",
-                        intent.getStringExtra("id")
-                    )
-                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                )
             }
         }
 

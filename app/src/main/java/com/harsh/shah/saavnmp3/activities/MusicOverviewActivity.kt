@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.activities
+package com.harsh.shah.saavnmp3.activities
 
 import android.app.ProgressDialog
 import android.content.ComponentName
@@ -43,6 +43,7 @@ import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
 import com.harsh.shah.saavnmp3.services.ActionPlaying
 import com.harsh.shah.saavnmp3.services.MusicService
 import com.harsh.shah.saavnmp3.services.MusicService.MyBinder
+import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.harsh.shah.saavnmp3.utils.TrackDownloader
 import com.harsh.shah.saavnmp3.utils.TrackDownloader.TrackDownloadListener
@@ -72,34 +73,29 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     // @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMusicOverviewBinding.inflate(getLayoutInflater())
+        binding = ActivityMusicOverviewBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
-        binding!!.title.setSelected(true)
-        binding!!.description.setSelected(true)
+        binding!!.title.isSelected = true
+        binding!!.description.isSelected = true
 
-        if ((applicationContext as BaseApplicationClass).trackQueue?.size ?: 0 <= 1) binding!!.shuffleIcon.setVisibility(
-            View.INVISIBLE
-        )
+        if ((MusicPlayerManager.trackQueue?.size ?: 0) <= 1) binding!!.shuffleIcon.visibility = View.INVISIBLE
 
         binding!!.playPauseImage.setOnClickListener(View.OnClickListener { view: View? ->
             try {
-                if (BaseApplicationClass.Companion.player == null) {
+                if (MusicPlayerManager.player == null) {
                     Log.e(TAG, "Player is null, cannot toggle playback")
                     Toast.makeText(this, "Media player not ready. Try again.", Toast.LENGTH_SHORT)
                         .show()
                     return@OnClickListener
                 }
 
-                // Get application instance to control playback
-                val baseApplicationClass = getApplicationContext() as BaseApplicationClass
-
-                // Toggle play/pause using BaseApplicationClass
+                // Toggle play/pause using MusicPlayerManager
                 Log.i(TAG, "Play/Pause button clicked")
-                baseApplicationClass.togglePlayPause()
+                MusicPlayerManager.togglePlayPause()
 
                 // Update UI based on new state
-                if (BaseApplicationClass.player?.isPlaying == true) {
+                if (MusicPlayerManager.player?.isPlaying == true) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -112,7 +108,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
         })
 
-        binding!!.seekbar.setMax(100)
+        binding!!.seekbar.max = 100
 
         binding!!.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, i: Int, b: Boolean) {
@@ -122,22 +118,22 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                val p = BaseApplicationClass.player
+                val p = MusicPlayerManager.player
                 if (p != null) {
                     val playPosition = ((p.duration / 100)
                             * binding!!.seekbar.progress).toInt()
                     p.seekTo(playPosition.toLong())
-                    binding!!.elapsedDuration.setText(convertDuration(p.currentPosition))
+                    binding!!.elapsedDuration.text = convertDuration(p.currentPosition)
                 }
             }
         })
 
-        val baseApplicationClass = getApplicationContext() as BaseApplicationClass
+        // val baseApplicationClass = getApplicationContext() as BaseApplicationClass
 
         binding!!.nextIcon.setOnClickListener(View.OnClickListener { view: View? ->
             try {
                 Log.i(TAG, "Next button clicked")
-                if (BaseApplicationClass.Companion.player == null) {
+                if (MusicPlayerManager.player == null) {
                     Log.e(TAG, "Player is null, cannot skip to next track")
                     Toast.makeText(
                         this@MusicOverviewActivity,
@@ -148,18 +144,18 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 }
 
                 // Add visual feedback
-                binding!!.nextIcon.setAlpha(0.5f)
+                binding!!.nextIcon.alpha = 0.5f
                 binding!!.nextIcon.animate().alpha(1.0f).setDuration(200).start()
 
                 // Call next track method
-                baseApplicationClass.nextTrack()
+                MusicPlayerManager.nextTrack()
 
                 // Update UI state
                 updateSeekbar()
                 updateTrackInfo()
 
                 // Make sure play icon reflects current state
-                if (BaseApplicationClass.player?.isPlaying == true) {
+                if (MusicPlayerManager.player?.isPlaying == true) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -183,7 +179,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         binding!!.prevIcon.setOnClickListener(View.OnClickListener { view: View? ->
             try {
                 Log.i(TAG, "Previous button clicked")
-                if (BaseApplicationClass.Companion.player == null) {
+                if (MusicPlayerManager.player == null) {
                     Log.e(TAG, "Player is null, cannot skip to previous track")
                     Toast.makeText(
                         this@MusicOverviewActivity,
@@ -194,12 +190,12 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 }
 
                 // Add visual feedback
-                binding!!.prevIcon.setAlpha(0.5f)
+                binding!!.prevIcon.alpha = 0.5f
                 binding!!.prevIcon.animate().alpha(1.0f).setDuration(200).start()
 
                 // If we're already at the beginning of the track, go to previous track
                 // Otherwise just restart the current track
-                val player = BaseApplicationClass.player
+                val player = MusicPlayerManager.player
                 if (player != null && player.currentPosition > 3000) {
                     player.seekTo(0)
                     if (isDebugMode) Toast.makeText(
@@ -210,7 +206,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                         .show()
                 } else {
                     // Call previous track method
-                    baseApplicationClass.prevTrack()
+                    MusicPlayerManager.prevTrack()
                     if (isDebugMode) Toast.makeText(
                         this@MusicOverviewActivity,
                         "Playing previous track",
@@ -223,7 +219,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 updateTrackInfo()
 
                 // Make sure play icon reflects current state
-                if (BaseApplicationClass.player?.isPlaying == true) {
+                if (MusicPlayerManager.player?.isPlaying == true) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -241,7 +237,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         binding!!.repeatIcon.setOnClickListener(View.OnClickListener { view: View? ->
             try {
                 // Cycle through all three repeat modes
-                val player = BaseApplicationClass.player
+                val player = MusicPlayerManager.player
                 if (player == null) return@OnClickListener
                 val currentMode: Int = player.repeatMode
                 val newMode: Int
@@ -291,16 +287,13 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         })
 
         binding!!.shuffleIcon.setOnClickListener(View.OnClickListener { view: View? ->
-            val player = BaseApplicationClass.player
+            val player = MusicPlayerManager.player
             if (player != null) {
                 player.shuffleModeEnabled = !player.shuffleModeEnabled
-                if (player.shuffleModeEnabled) binding!!.shuffleIcon
-                    .setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)))
-                else binding!!.shuffleIcon.setImageTintList(
-                    ColorStateList.valueOf(
-                        getResources().getColor(
-                            R.color.textSec
-                        )
+                if (player.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(getResources().getColor(R.color.spotify_green))
+                else binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(
+                    getResources().getColor(
+                        R.color.textSec
                     )
                 )
             }
@@ -314,9 +307,9 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         binding!!.shareIcon.setOnClickListener(View.OnClickListener { view: View? ->
             if (SHARE_URL.isBlank()) return@OnClickListener
             val sendIntent = Intent()
-            sendIntent.setAction(Intent.ACTION_SEND)
+            sendIntent.action = Intent.ACTION_SEND
             sendIntent.putExtra(Intent.EXTRA_TEXT, SHARE_URL)
-            sendIntent.setType("text/plain")
+            sendIntent.type = "text/plain"
             startActivity(sendIntent)
         })
 
@@ -326,9 +319,9 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 R.style.MyBottomSheetDialogTheme
             )
             val _binding = MusicOverviewMoreInfoBottomSheetBinding
-                .inflate(getLayoutInflater())
-            _binding.albumTitle.setText(binding!!.title.getText().toString())
-            _binding.albumSubTitle.setText(binding!!.description.getText().toString())
+                .inflate(layoutInflater)
+            _binding.albumTitle.text = binding!!.title.text.toString()
+            _binding.albumSubTitle.text = binding!!.description.text.toString()
             Picasso.get().load(Uri.parse(IMAGE_URL)).into(_binding.coverImage)
             val linearLayout = _binding.main
 
@@ -346,9 +339,9 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             })
 
             _binding.addToLibrary.setOnClickListener(View.OnClickListener { v: View? ->
-                val index = -1
+                -1
                 val sharedPreferenceManager: SharedPreferenceManager =
-                    SharedPreferenceManager.Companion.getInstance(this@MusicOverviewActivity)
+                    SharedPreferenceManager.getInstance(this@MusicOverviewActivity)
                 var savedLibraries = sharedPreferenceManager.savedLibrariesData as? SavedLibraries
                 if (savedLibraries == null) savedLibraries = SavedLibraries(ArrayList<Library?>())
                 val lists = savedLibraries.lists ?: emptyList<Library?>()
@@ -438,7 +431,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                         artist.name(), imgUrl, artist.id
                     )
                     bottomSheetItemView.setFocusable(true)
-                    bottomSheetItemView.setClickable(true)
+                    bottomSheetItemView.isClickable = true
                     bottomSheetItemView.setOnClickListener(View.OnClickListener { view1: View? ->
                         Log.i(TAG, "BottomSheetItemView: onCLicked!")
                         startActivity(
@@ -462,24 +455,24 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
         binding!!.trackQuality.setOnClickListener(View.OnClickListener { view: View? ->
             val popupMenu = PopupMenu(this@MusicOverviewActivity, view!!)
-            popupMenu.getMenuInflater().inflate(R.menu.track_quality_menu, popupMenu.getMenu())
-            popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { menuItem: MenuItem? ->
+            popupMenu.menuInflater.inflate(R.menu.track_quality_menu, popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener { menuItem: MenuItem? ->
                 Toast.makeText(
                     this@MusicOverviewActivity,
-                    menuItem!!.getTitle(),
+                    menuItem!!.title,
                     Toast.LENGTH_SHORT
                 ).show()
                 // Objects.requireNonNull(menuItem.getTitle());
-                BaseApplicationClass.Companion.setTrackQuality(menuItem.getTitle().toString())
+                MusicPlayerManager.setTrackQuality(menuItem.title.toString())
                 onSongFetched(mSongResponse!!, true)
                 prepareMediaPLayer()
-                binding!!.trackQuality.setText(BaseApplicationClass.Companion.TRACK_QUALITY)
+                binding!!.trackQuality.text = MusicPlayerManager.TRACK_QUALITY
                 true
-            })
+            }
             popupMenu.show()
         })
 
-        binding!!.trackQuality.setText(BaseApplicationClass.Companion.TRACK_QUALITY)
+        binding!!.trackQuality.text = MusicPlayerManager.TRACK_QUALITY
 
         showData()
 
@@ -509,7 +502,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 val songs = Library.Songs(
                     song.id,
                     song.name(),
-                    binding!!.description.getText().toString(),
+                    binding!!.description.text.toString(),
                     IMAGE_URL
                 )
 
@@ -536,9 +529,9 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         bindService(intent, this, BIND_AUTO_CREATE)
 
         // Update UI with current playback state
-        if (BaseApplicationClass.player != null) {
+        if (MusicPlayerManager.player != null) {
             updateTrackInfo()
-            if (BaseApplicationClass.player?.isPlaying == true) {
+            if (MusicPlayerManager.player?.isPlaying == true) {
                 updateSeekbar()
             }
         }
@@ -588,14 +581,14 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     private var SHARE_URL = ""
 
     fun showData() {
-        if (getIntent().getExtras() == null) return
+        if (intent.extras == null) return
         val apiManager = ApiManager(this)
-        val ID = getIntent().getExtras()!!.getString("id", "")
+        val ID = intent.extras!!.getString("id", "")
         ID_FROM_EXTRA = ID
         // ((ApplicationClass)getApplicationContext()).setMusicDetails(null,null,null,ID);
-        if (BaseApplicationClass.MUSIC_ID == ID) {
+        if (MusicPlayerManager.MUSIC_ID == ID) {
             updateSeekbar()
-            if (BaseApplicationClass.player?.isPlaying == true) binding!!.playPauseImage.setImageResource(
+            if (MusicPlayerManager.player?.isPlaying == true) binding!!.playPauseImage.setImageResource(
                 R.drawable.baseline_pause_24
             )
             else binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -612,13 +605,13 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                         Gson().fromJson<SongResponse>(response, SongResponse::class.java)
                     if (songResponse.success) {
                         onSongFetched(songResponse)
-                        SharedPreferenceManager.Companion.getInstance(this@MusicOverviewActivity)
+                        SharedPreferenceManager.getInstance(this@MusicOverviewActivity)
                             .setSongResponseById(
                                 ID,
                                 songResponse
                             )
                     } else {
-                        val cached = SharedPreferenceManager.Companion.getInstance(this@MusicOverviewActivity).getSongResponseById(ID)
+                        val cached = SharedPreferenceManager.getInstance(this@MusicOverviewActivity).getSongResponseById(ID)
                         if (cached != null) {
                             onSongFetched(cached)
                         } else {
@@ -628,7 +621,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 }
 
                 override fun onErrorResponse(tag: String?, message: String?) {
-                    val cached = SharedPreferenceManager.Companion.getInstance(this@MusicOverviewActivity).getSongResponseById(ID)
+                    val cached = SharedPreferenceManager.getInstance(this@MusicOverviewActivity).getSongResponseById(ID)
                     if (cached != null) {
                         onSongFetched(cached)
                     } else {
@@ -637,14 +630,13 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 }
             }
 
-        if (getIntent().getExtras()!!.getString("type", "") == "clear") {
-            val baseApplicationClass = getApplicationContext() as BaseApplicationClass
-            baseApplicationClass.trackQueue = ArrayList<String?>(mutableListOf<String?>(ID))
+        if (intent.extras!!.getString("type", "") == "clear") {
+            MusicPlayerManager.trackQueue = ArrayList<String?>(mutableListOf<String?>(ID))
         }
         if ((ID.startsWith("http") || ID.startsWith("www")) && ID.contains("jiosaavn.com")) {
             apiManager.retrieveSongByLink(ID, requestListener)
         } else {
-            val cached = SharedPreferenceManager.Companion.getInstance(this@MusicOverviewActivity).getSongResponseById(ID)
+            val cached = SharedPreferenceManager.getInstance(this@MusicOverviewActivity).getSongResponseById(ID)
             if (cached != null) {
                 onSongFetched(cached)
             } else {
@@ -657,16 +649,14 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
     private fun onSongFetched(songResponse: SongResponse, forced: Boolean = false) {
         mSongResponse = songResponse
-        BaseApplicationClass.CURRENT_TRACK = mSongResponse
+        MusicPlayerManager.CURRENT_TRACK = mSongResponse
         val song = songResponse.data?.get(0) ?: return
-        binding!!.title.setText(song.name())
-        binding!!.description.setText(
-            String.format(
-                "%s plays | %s | %s",
-                convertPlayCount(song.playCount ?: 0),
-                song.year,
-                song.copyright
-            )
+        binding!!.title.text = song.name()
+        binding!!.description.text = String.format(
+            "%s plays | %s | %s",
+            convertPlayCount(song.playCount ?: 0),
+            song.year,
+            song.copyright
         )
         val image = song.image
         IMAGE_URL = if (!image.isNullOrEmpty()) image[image.size - 1]?.url ?: "" else ""
@@ -678,15 +668,14 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
         artsitsList = song.artists?.primary?.filterNotNull()?.toMutableList() ?: mutableListOf()
 
-        SONG_URL = BaseApplicationClass.getDownloadUrl(downloadUrls)
+        SONG_URL = MusicPlayerManager.getDownloadUrl(downloadUrls)
 
-        if ((BaseApplicationClass.MUSIC_ID != ID_FROM_EXTRA || forced)) {
-            val baseApplicationClass = getApplicationContext() as BaseApplicationClass
-            baseApplicationClass.setMusicDetails(
-                IMAGE_URL, binding!!.title.getText().toString(),
-                binding!!.description.getText().toString(), ID_FROM_EXTRA
+        if ((MusicPlayerManager.MUSIC_ID != ID_FROM_EXTRA || forced)) {
+            MusicPlayerManager.setMusicDetails(
+                IMAGE_URL, binding!!.title.text.toString(),
+                binding!!.description.text.toString(), ID_FROM_EXTRA
             )
-            baseApplicationClass.setSongUrl(SONG_URL)
+            MusicPlayerManager.SONG_URL = SONG_URL
             prepareMediaPLayer()
         }
     }
@@ -698,11 +687,10 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     @OptIn(markerClass = [UnstableApi::class])
     fun prepareMediaPLayer() {
         try {
-            val baseApplicationClass = getApplicationContext() as BaseApplicationClass
-            baseApplicationClass.prepareMediaPlayer()
+            MusicPlayerManager.prepareMediaPlayer()
 
             // Wait until player is actually ready
-            val p = BaseApplicationClass.player
+            val p = MusicPlayerManager.player
             if (p != null && p.duration > 0) {
                 binding!!.totalDuration.text = convertDuration(p.duration)
             } else {
@@ -710,7 +698,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 binding!!.totalDuration.text = "00:00"
                 // Schedule a retry to get the duration
                 Handler(Looper.getMainLooper()).postDelayed({
-                    val p2 = BaseApplicationClass.player
+                    val p2 = MusicPlayerManager.player
                     if (p2 != null && p2.duration > 0) {
                         binding!!.totalDuration.text = convertDuration(p2.duration)
                     }
@@ -718,7 +706,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
 
             // Set play state
-            if (BaseApplicationClass.Companion.player?.isPlaying == true) {
+            if (MusicPlayerManager.player?.isPlaying == true) {
                 binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 updateSeekbar()
             } else {
@@ -742,12 +730,12 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
     fun updateSeekbar() {
         try {
-            if (BaseApplicationClass.Companion.player == null) {
+            if (MusicPlayerManager.player == null) {
                 Log.e(TAG, "Player is null in updateSeekbar")
                 return
             }
 
-            val p = BaseApplicationClass.Companion.player ?: return
+            val p = MusicPlayerManager.player ?: return
             if (p.isPlaying) {
                 try {
                     val duration: Long = p.duration
@@ -756,8 +744,8 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                     // Check for valid duration to avoid division by zero
                     if (duration > 0) {
                         val progress = ((currentPosition.toFloat() / duration) * 100).toInt()
-                        binding!!.seekbar.setProgress(progress)
-                        binding!!.elapsedDuration.setText(convertDuration(currentPosition))
+                        binding!!.seekbar.progress = progress
+                        binding!!.elapsedDuration.text = convertDuration(currentPosition)
                     }
 
                     // Schedule the next update
@@ -773,8 +761,8 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
                     if (duration > 0) {
                         val progress = ((currentPosition.toFloat() / duration) * 100).toInt()
-                        binding!!.seekbar.setProgress(progress)
-                        binding!!.elapsedDuration.setText(convertDuration(currentPosition))
+                        binding!!.seekbar.progress = progress
+                        binding!!.elapsedDuration.text = convertDuration(currentPosition)
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error updating seekbar while paused", e)
@@ -789,29 +777,25 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     private val mUpdateTimeTask = Runnable { this.updateTrackInfo() }
 
     private fun updateTrackInfo() {
-        if (binding!!.title.getText()
-                .toString() != BaseApplicationClass.Companion.MUSIC_TITLE
-        ) binding!!.title.setText(BaseApplicationClass.Companion.MUSIC_TITLE)
-        if (binding!!.title.getText()
-                .toString() != BaseApplicationClass.Companion.MUSIC_TITLE
-        ) binding!!.description.setText(BaseApplicationClass.Companion.MUSIC_DESCRIPTION)
-        Picasso.get().load(Uri.parse(BaseApplicationClass.Companion.IMAGE_URL))
+        if (binding!!.title.text
+                .toString() != MusicPlayerManager.MUSIC_TITLE
+        ) binding!!.title.text = MusicPlayerManager.MUSIC_TITLE
+        if (binding!!.title.text
+                .toString() != MusicPlayerManager.MUSIC_TITLE
+        ) binding!!.description.text = MusicPlayerManager.MUSIC_DESCRIPTION
+        Picasso.get().load(Uri.parse(MusicPlayerManager.IMAGE_URL))
             .into(binding!!.coverImage)
-        val p = BaseApplicationClass.Companion.player ?: return
-        binding!!.seekbar.setProgress(
-            ((p.currentPosition.toFloat() / p.duration) * 100).toInt()
-        )
+        val p = MusicPlayerManager.player ?: return
+        binding!!.seekbar.progress = ((p.currentPosition.toFloat() / p.duration) * 100).toInt()
 
-        binding!!.seekbar.setSecondaryProgress(
-            ((p.bufferedPosition.toFloat() / p.duration) * 100).toInt()
-        )
+        binding!!.seekbar.secondaryProgress = ((p.bufferedPosition.toFloat() / p.duration) * 100).toInt()
 
         val currentDuration: Long = p.currentPosition
-        binding!!.elapsedDuration.setText(convertDuration(currentDuration))
+        binding!!.elapsedDuration.text = convertDuration(currentDuration)
 
-        if (binding!!.totalDuration.getText().toString()
+        if (binding!!.totalDuration.text.toString()
             != convertDuration(p.duration)
-        ) binding!!.totalDuration.setText(convertDuration(p.duration))
+        ) binding!!.totalDuration.text = convertDuration(p.duration)
 
         if (p.isPlaying) binding!!.playPauseImage.setImageResource(
             R.drawable.baseline_pause_24
@@ -823,16 +807,15 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         // Update repeat and shuffle button UI
         updateRepeatButtonUI()
 
-        if (p.shuffleModeEnabled) binding!!.shuffleIcon
-            .setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.spotify_green)))
-        else binding!!.shuffleIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.textSec)))
+        if (p.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(getResources().getColor(R.color.spotify_green))
+        else binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(getResources().getColor(R.color.textSec))
 
         mHandler.postDelayed(mUpdateTimeTask, 1000)
     }
 
     private fun updateRepeatButtonUI() {
         val tintColor: Int
-        val p = BaseApplicationClass.Companion.player ?: return
+        val p = MusicPlayerManager.player ?: return
         val repeatMode: Int = p.repeatMode
 
         when (repeatMode) {
@@ -863,27 +846,27 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
         }
 
-        binding!!.repeatIcon.setImageTintList(ColorStateList.valueOf(tintColor))
+        binding!!.repeatIcon.imageTintList = ColorStateList.valueOf(tintColor)
     }
 
     override fun nextClicked() {
         Log.i(TAG, "nextClicked called from service")
         try {
-            if (BaseApplicationClass.Companion.player == null) {
+            if (MusicPlayerManager.player == null) {
                 Log.e(TAG, "Player is null in nextClicked")
                 return
             }
 
             // Update UI to show active button state
             runOnUiThread(Runnable {
-                binding!!.nextIcon.setAlpha(0.5f)
+                binding!!.nextIcon.alpha = 0.5f
                 binding!!.nextIcon.animate().alpha(1.0f).setDuration(200).start()
 
                 // Update UI
                 updateTrackInfo()
                 updateSeekbar()
 
-                if (BaseApplicationClass.Companion.player?.isPlaying == true) {
+                if (MusicPlayerManager.player?.isPlaying == true) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -897,21 +880,21 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     override fun prevClicked() {
         Log.i(TAG, "prevClicked called from service")
         try {
-            if (BaseApplicationClass.Companion.player == null) {
+            if (MusicPlayerManager.player == null) {
                 Log.e(TAG, "Player is null in prevClicked")
                 return
             }
 
             // Update UI to show active button state
             runOnUiThread(Runnable {
-                binding!!.prevIcon.setAlpha(0.5f)
+                binding!!.prevIcon.alpha = 0.5f
                 binding!!.prevIcon.animate().alpha(1.0f).setDuration(200).start()
 
                 // Update UI
                 updateTrackInfo()
                 updateSeekbar()
 
-                if (BaseApplicationClass.Companion.player?.isPlaying == true) {
+                if (MusicPlayerManager.player?.isPlaying == true) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -926,10 +909,9 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         Log.i(TAG, "playClicked called from service")
         runOnUiThread(Runnable {
             // Retrieve application class to toggle playback
-            val baseApplicationClass = getApplicationContext() as BaseApplicationClass
-            baseApplicationClass.togglePlayPause()
+            MusicPlayerManager.togglePlayPause()
 
-            if (BaseApplicationClass.Companion.player?.isPlaying == true) {
+            if (MusicPlayerManager.player?.isPlaying == true) {
                 binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
             } else {
                 binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -941,12 +923,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     }
 
     fun showNotification(playPauseButton: Int) {
-        // We should delegate notification updates to BaseApplicationClass
-        // to ensure it uses the correct global state (current song info).
-        // Calling setMusicDetails here risks overwriting with stale Activity data.
-
-        val baseApplicationClass = getApplicationContext() as BaseApplicationClass
-        baseApplicationClass.showNotification()
+        MusicPlayerManager.showNotification()
     }
 
     companion object {

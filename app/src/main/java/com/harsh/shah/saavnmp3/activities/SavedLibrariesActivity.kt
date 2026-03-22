@@ -25,7 +25,7 @@ class SavedLibrariesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySavedLibrariesBinding.inflate(getLayoutInflater())
+        binding = ActivitySavedLibrariesBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
@@ -36,7 +36,7 @@ class SavedLibrariesActivity : AppCompatActivity() {
 
         binding!!.addNewLibrary.setOnClickListener(View.OnClickListener { view: View? ->
             val addNewLibraryBottomSheetBinding =
-                AddNewLibraryBottomSheetBinding.inflate(getLayoutInflater())
+                AddNewLibraryBottomSheetBinding.inflate(layoutInflater)
             val bottomSheetDialog = BottomSheetDialog(this, R.style.MyBottomSheetDialogTheme)
             bottomSheetDialog.setContentView(addNewLibraryBottomSheetBinding.getRoot())
             addNewLibraryBottomSheetBinding.cancel.setOnClickListener(View.OnClickListener { view1: View? ->
@@ -45,10 +45,10 @@ class SavedLibrariesActivity : AppCompatActivity() {
             addNewLibraryBottomSheetBinding.create.setOnClickListener(View.OnClickListener { view1: View? ->
                 val name = addNewLibraryBottomSheetBinding.edittext.getText().toString()
                 if (name.isEmpty()) {
-                    addNewLibraryBottomSheetBinding.edittext.setError("Name cannot be empty")
+                    addNewLibraryBottomSheetBinding.edittext.error = "Name cannot be empty"
                     return@OnClickListener
                 }
-                addNewLibraryBottomSheetBinding.edittext.setError(null)
+                addNewLibraryBottomSheetBinding.edittext.error = null
                 Log.i("SavedLibrariesActivity", "BottomSheetDialog_create: " + name)
 
                 val currentTime = System.currentTimeMillis().toString()
@@ -64,7 +64,7 @@ class SavedLibrariesActivity : AppCompatActivity() {
                 )
 
                 val sharedPreferenceManager: SharedPreferenceManager =
-                    SharedPreferenceManager.Companion.getInstance(this)
+                    SharedPreferenceManager.getInstance(this)
                 sharedPreferenceManager.addLibraryToSavedLibraries(library)
                 Snackbar.make(
                     binding!!.getRoot(),
@@ -91,13 +91,13 @@ class SavedLibrariesActivity : AppCompatActivity() {
 
 
     private fun showData(
-        sharedPreferenceManager: SharedPreferenceManager = SharedPreferenceManager.Companion.getInstance(
+        sharedPreferenceManager: SharedPreferenceManager = SharedPreferenceManager.getInstance(
             this
         )
     ) {
         val libs = sharedPreferenceManager.savedLibrariesData
         savedLibraries = libs
-        binding!!.emptyListTv.setVisibility(if (libs == null) View.VISIBLE else View.GONE)
+        binding!!.emptyListTv.visibility = if (libs == null) View.VISIBLE else View.GONE
         if (libs != null) binding!!.recyclerView.setAdapter(
             SavedLibrariesAdapter(
                 libs.lists ?: mutableListOf()

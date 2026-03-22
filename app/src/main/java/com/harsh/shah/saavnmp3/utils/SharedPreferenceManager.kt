@@ -82,7 +82,7 @@ class SharedPreferenceManager private constructor(context: Context) {
         // IMPORTANT: allowMainThreadQueries is enabled here for drop-in sync compatibility.
         // Recommended: remove allowMainThreadQueries() and perform DB operations off the UI thread.
         db = databaseBuilder<AppDatabase>(
-            context.getApplicationContext(),
+            context.applicationContext,
             AppDatabase::class.java,
             "saavn_cache.db"
         )
@@ -338,10 +338,10 @@ class SharedPreferenceManager private constructor(context: Context) {
      * Recommended: call this once in Application.onCreate and then verify data in Room.
      */
     fun migrateFromOldPrefs(context: Context, onComplete: Runnable?) {
-        val prefs = context.getApplicationContext()
+        val prefs = context.applicationContext
             .getSharedPreferences(OLD_PREFS_NAME, Context.MODE_PRIVATE)
-        val all = prefs.getAll()
-        val now = now()
+        val all = prefs.all
+        now()
         if (all == null) {
             if (onComplete != null) onComplete.run()
             return
@@ -369,7 +369,7 @@ class SharedPreferenceManager private constructor(context: Context) {
      */
     fun clearOldPrefsAsync(context: Context, onComplete: Runnable?) {
         // This is synchronous operation on prefs but cheap; run it directly
-        val prefs = context.getApplicationContext()
+        val prefs = context.applicationContext
             .getSharedPreferences(OLD_PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().clear().apply()
         if (onComplete != null) onComplete.run()

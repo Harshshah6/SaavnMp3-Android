@@ -26,15 +26,13 @@ class ActivitySeeMoreListAdapter : RecyclerView.Adapter<ActivitySeeMoreListAdapt
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val _v = View.inflate(
-            parent.getContext(),
+            parent.context,
             if (viewType == 1) R.layout.activity_artist_profile_view_top_songs_item else R.layout.progress_bar_layout,
             null
         )
-        _v.setLayoutParams(
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        _v.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
         return ViewHolder(_v)
     }
@@ -49,13 +47,11 @@ class ActivitySeeMoreListAdapter : RecyclerView.Adapter<ActivitySeeMoreListAdapt
         val coverTitle = holder.itemView.findViewById<TextView>(R.id.coverTitle)
         val coverPlayed = holder.itemView.findViewById<TextView>(R.id.coverPlayed)
         val positionTextView = holder.itemView.findViewById<TextView>(R.id.position)
-        val moreImage = holder.itemView.findViewById<ImageView?>(R.id.more)
+        holder.itemView.findViewById<ImageView?>(R.id.more)
 
-        positionTextView.setText((position + 1).toString())
-        coverTitle.setText(data!!.get(position)!!.name())
-        coverPlayed.setText(
-            String.format("%s | %s", data.get(position)!!.year, data.get(position)!!.label)
-        )
+        positionTextView.text = (position + 1).toString()
+        coverTitle.text = data!!.get(position)!!.name()
+        coverPlayed.text = String.format("%s | %s", data.get(position)!!.year, data.get(position)!!.label)
         val images = data?.get(position)?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (url.isNotEmpty()) {
@@ -63,9 +59,9 @@ class ActivitySeeMoreListAdapter : RecyclerView.Adapter<ActivitySeeMoreListAdapt
         }
 
         holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
-            view!!.getContext().startActivity(
+            view!!.context.startActivity(
                 Intent(
-                    view.getContext(),
+                    view.context,
                     MusicOverviewActivity::class.java
                 ).putExtra("id", data.get(position)!!.id)
             )

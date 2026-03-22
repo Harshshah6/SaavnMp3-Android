@@ -16,9 +16,9 @@ class NetworkChangeReceiver(private val listener: NetworkStatusListener) : Broad
 
     override fun onReceive(context: Context, intent: Intent?) {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = cm.getActiveNetworkInfo()
+        val activeNetwork = cm.activeNetworkInfo
 
-        if (activeNetwork != null && activeNetwork.isConnected()) {
+        if (activeNetwork != null && activeNetwork.isConnected) {
             listener.onNetworkConnected() // Internet is connected
         } else {
             listener.onNetworkDisconnected() // No internet connection

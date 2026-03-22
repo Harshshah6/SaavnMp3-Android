@@ -22,19 +22,19 @@ jobs:
 
       - name: Decode keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.jks && ls -la
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/release.jks && ls -la app/
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/release.jks
 
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
       - name: google-services.json
         run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json && ls -la app/
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
 
       - name: Build signed release APK (skip lint/tests)
         run: |
-          ls -la && ls -la app && ./gradlew assembleRelease \
+          /gradlew assembleRelease \
             -Pandroid.injected.signing.store.file=release.jks \
             -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
             -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \

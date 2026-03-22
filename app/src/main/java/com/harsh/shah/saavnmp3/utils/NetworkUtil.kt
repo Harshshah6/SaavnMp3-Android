@@ -11,12 +11,12 @@ object NetworkUtil {
 
         // For Android 10 (API 29) and above, use the Network API
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val network = connectivityManager.getActiveNetwork()
+            val network = connectivityManager.activeNetwork
             return network != null && connectivityManager.getNetworkCapabilities(network) != null
         } else {
             // For below Android 10 (API 29), use the older method
-            val networkInfo = connectivityManager.getActiveNetworkInfo()
-            return networkInfo != null && networkInfo.isConnected()
+            val networkInfo = connectivityManager.activeNetworkInfo
+            return networkInfo != null && networkInfo.isConnected
         }
     }
 }

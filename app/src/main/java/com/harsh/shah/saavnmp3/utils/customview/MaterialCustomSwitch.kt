@@ -1,13 +1,11 @@
 package com.harsh.shah.saavnmp3.utils.customview
 
 import android.content.Context
-import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.harsh.shah.saavnmp3.R
 

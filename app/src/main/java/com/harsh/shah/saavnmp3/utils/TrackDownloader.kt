@@ -63,15 +63,15 @@ object TrackDownloader {
                 val bitrate: String?
                 val trackLength: String?
                 var trackUID: String?
-                val uidFieldIdPrefix = "----:" + context.getPackageName() + ":" // prefix for safety
+                val uidFieldIdPrefix = "----:" + context.packageName + ":" // prefix for safety
                 val uidFieldId = uidFieldIdPrefix + "TrackUID"
-                title = if (tag != null) tag.getFirst(FieldKey.TITLE) else file.getName()
+                title = if (tag != null) tag.getFirst(FieldKey.TITLE) else file.name
                 artist = if (tag != null) tag.getFirst(FieldKey.ARTIST) else ""
                 album = if (tag != null) tag.getFirst(FieldKey.ALBUM) else ""
                 year = if (tag != null) tag.getFirst(FieldKey.YEAR) else ""
-                bitrate = if (audioHeader != null) audioHeader.getBitRate().toString() else "344"
+                bitrate = if (audioHeader != null) audioHeader.bitRate.toString() else "344"
                 trackLength =
-                    if (audioHeader != null) audioHeader.getTrackLength().toString() else "0"
+                    if (audioHeader != null) audioHeader.trackLength.toString() else "0"
 
                 trackUID = null
                 if (tag != null) {
@@ -88,10 +88,10 @@ object TrackDownloader {
                         } catch (ignored: Exception) {
                         }
                     } else {
-                        val it = tag.getFields()
+                        val it = tag.fields
                         while (it.hasNext()) {
                             val fField = it.next()
-                            val id = fField.getId()
+                            val id = fField.id
                             if (id != null && id.equals(uidFieldId, ignoreCase = true)) {
                                 try {
                                     trackUID = fField.toString()
@@ -103,7 +103,7 @@ object TrackDownloader {
                     }
                 }
 
-                val coverImage = if (tag != null) tag.getFirstArtwork().getBinaryData() else null
+                val coverImage = if (tag != null) tag.firstArtwork.binaryData else null
                 val bitmap = if (coverImage != null) BitmapFactory.decodeByteArray(
                     coverImage,
                     0,
@@ -140,7 +140,7 @@ object TrackDownloader {
             Handler(Looper.getMainLooper()).post(Runnable { listener.onStarted() })
             Log.d(TAG, "⬇️ Downloading and embedding metadata...")
             try {
-                val tempFile = File(context.getCacheDir(), title + ".mp4")
+                val tempFile = File(context.cacheDir, title + ".mp4")
                 URL(audioUrl).openStream().use { `in` ->
                     FileOutputStream(tempFile).use { out ->
                         val buffer = ByteArray(4096)
@@ -161,14 +161,14 @@ object TrackDownloader {
 
                 val uidField = Mp4TagReverseDnsField(
                     "----",
-                    context.getPackageName(),
+                    context.packageName,
                     "TrackUID",
                     song.id
                 )
 
                 tag.setField(uidField)
 
-                val artworkFile = File(context.getCacheDir(), "artwork.jpg")
+                val artworkFile = File(context.cacheDir, "artwork.jpg")
                 URL(imageUrl).openStream().use { `in` ->
                     FileOutputStream(artworkFile).use { out ->
                         val buffer = ByteArray(4096)
@@ -187,7 +187,7 @@ object TrackDownloader {
 
                 val values = getContentValues(title, artist, album, song.id)
 
-                val resolver = context.getContentResolver()
+                val resolver = context.contentResolver
                 val audioCollection =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Media.getContentUri(
                         MediaStore.VOLUME_EXTERNAL_PRIMARY
@@ -200,7 +200,7 @@ object TrackDownloader {
                     return@Runnable
                 }
 
-                URL("file://" + tempFile.getAbsolutePath()).openStream().use { `in` ->
+                URL("file://" + tempFile.absolutePath).openStream().use { `in` ->
                     resolver.openOutputStream(newUri).use { out ->
                         val buffer = ByteArray(4096)
                         var bytesRead: Int

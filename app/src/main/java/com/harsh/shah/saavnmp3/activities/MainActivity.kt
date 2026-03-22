@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.activities
+package com.harsh.shah.saavnmp3.activities
 
 import android.Manifest
 import android.content.Context
@@ -17,7 +17,6 @@ import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -44,9 +43,9 @@ import com.harsh.shah.saavnmp3.network.utility.RequestNetwork
 import com.harsh.shah.saavnmp3.records.AlbumsSearch
 import com.harsh.shah.saavnmp3.records.ArtistsSearch
 import com.harsh.shah.saavnmp3.records.PlaylistsSearch
-import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.records.SongSearch
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries
+import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.harsh.shah.saavnmp3.utils.NetworkUtil
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.squareup.picasso.Picasso
@@ -56,7 +55,6 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.Calendar
-import java.util.function.Consumer
 
 class MainActivity : AppCompatActivity() {
     private var requestStoragePermission: ActivityResultLauncher<Array<String>>? = null
@@ -85,12 +83,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(getLayoutInflater())
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
-        baseApplicationClass = getApplicationContext() as BaseApplicationClass?
-        BaseApplicationClass.Companion.currentActivity = this
-        BaseApplicationClass.Companion.updateTheme()
+        baseApplicationClass = applicationContext as BaseApplicationClass?
+        BaseApplicationClass.currentActivity = this
+        BaseApplicationClass.updateTheme()
 
         slidingRootNavBuilder = SlidingRootNavBuilder(this)
             .withMenuLayout(R.layout.main_drawer_layout)
@@ -161,15 +159,14 @@ class MainActivity : AppCompatActivity() {
         binding!!.refreshLayout.setOnRefreshListener(OnRefreshListener {
             showShimmerData()
             showData()
-            binding!!.refreshLayout.setRefreshing(false)
+            binding!!.refreshLayout.isRefreshing = false
         })
 
         binding!!.playBarPlayPauseIcon.setOnClickListener(View.OnClickListener { view: View? ->
-            val baseApplicationClass = getApplicationContext() as BaseApplicationClass
-            baseApplicationClass.togglePlayPause()
+            MusicPlayerManager.togglePlayPause()
             // Allow state to settle before updating UI
             Handler().postDelayed(Runnable {
-                val p = BaseApplicationClass.player
+                val p = MusicPlayerManager.player
                 if (p != null) {
                     binding!!.playBarPlayPauseIcon
                         .setImageResource(
@@ -183,11 +180,11 @@ class MainActivity : AppCompatActivity() {
         })
 
         binding!!.playBarBackground.setOnClickListener(View.OnClickListener { view: View? ->
-            if (!BaseApplicationClass.MUSIC_ID.isNullOrBlank()) startActivity(
+            if (!MusicPlayerManager.MUSIC_ID.isNullOrBlank()) startActivity(
                 Intent(
                     this,
                     MusicOverviewActivity::class.java
-                ).putExtra("id", BaseApplicationClass.Companion.MUSIC_ID)
+                ).putExtra("id", MusicPlayerManager.MUSIC_ID)
             )
         })
 
@@ -200,11 +197,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // Add visual feedback
-                binding!!.playBarPrevIcon.setAlpha(0.5f)
+                binding!!.playBarPrevIcon.alpha = 0.5f
                 binding!!.playBarPrevIcon.animate().alpha(1.0f).setDuration(200).start()
 
                 // Call the previous track method
-                baseApplicationClass!!.prevTrack()
+                MusicPlayerManager.prevTrack()
 
                 // UI update should happen via onResume/timer or observer,
                 // but for now we rely on the loop in showPlayBarData/onResume
@@ -223,11 +220,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // Add visual feedback
-                binding!!.playBarNextIcon.setAlpha(0.5f)
+                binding!!.playBarNextIcon.alpha = 0.5f
                 binding!!.playBarNextIcon.animate().alpha(1.0f).setDuration(200).start()
 
                 // Call the next track method
-                baseApplicationClass!!.nextTrack()
+                MusicPlayerManager.nextTrack()
 
                 updatePlaybarUi()
             } catch (e: Exception) {
@@ -286,10 +283,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun showSavedLibrariesData() {
         val savedLibraries =
-            SharedPreferenceManager.Companion.getInstance(this).savedLibrariesData as? SavedLibraries
-        binding!!.savedLibrariesSection.setVisibility(
+            SharedPreferenceManager.getInstance(this).savedLibrariesData as? SavedLibraries
+        binding!!.savedLibrariesSection.visibility =
             if (savedLibraries != null && !(savedLibraries.lists?.isEmpty() ?: true)) View.VISIBLE else View.GONE
-        )
         if (savedLibraries != null) binding!!.savedRecyclerView.setAdapter(
             SavedLibrariesAdapter(
                 savedLibraries.lists ?: mutableListOf()
@@ -298,28 +294,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onDrawerItemsClicked() {
-        slidingRootNavBuilder!!.getLayout().findViewById<View?>(R.id.settings).setOnClickListener(
+        slidingRootNavBuilder!!.layout.findViewById<View?>(R.id.settings).setOnClickListener(
             View.OnClickListener { v: View? ->
                 startActivity(Intent(this, SettingsActivity::class.java))
                 slidingRootNavBuilder!!.closeMenu()
             })
 
-        slidingRootNavBuilder!!.getLayout().findViewById<View?>(R.id.logo)
+        slidingRootNavBuilder!!.layout.findViewById<View?>(R.id.logo)
             .setOnClickListener(View.OnClickListener { view: View? -> slidingRootNavBuilder!!.closeMenu() })
 
-        slidingRootNavBuilder!!.getLayout().findViewById<View?>(R.id.library).setOnClickListener(
+        slidingRootNavBuilder!!.layout.findViewById<View?>(R.id.library).setOnClickListener(
             View.OnClickListener { view: View? ->
                 startActivity(Intent(this@MainActivity, SavedLibrariesActivity::class.java))
                 slidingRootNavBuilder!!.closeMenu()
             })
 
-        slidingRootNavBuilder!!.getLayout().findViewById<View?>(R.id.about)
+        slidingRootNavBuilder!!.layout.findViewById<View?>(R.id.about)
             .setOnClickListener(View.OnClickListener { view: View? ->
                 startActivity(Intent(this@MainActivity, AboutActivity::class.java))
                 slidingRootNavBuilder!!.closeMenu()
             })
 
-        slidingRootNavBuilder!!.getLayout().findViewById<View?>(R.id.download_manager)
+        slidingRootNavBuilder!!.layout.findViewById<View?>(R.id.download_manager)
             .setOnClickListener(
                 View.OnClickListener { v: View? ->
                     startActivity(Intent(this@MainActivity, DownloadManagerActivity::class.java))
@@ -333,12 +329,12 @@ class MainActivity : AppCompatActivity() {
      */
     private fun updateVersionTextInDrawer() {
         try {
-            val versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName
-            val drawerLayout: View? = slidingRootNavBuilder!!.getLayout()
+            val versionName = packageManager.getPackageInfo(packageName, 0).versionName
+            val drawerLayout: View? = slidingRootNavBuilder!!.layout
             if (drawerLayout != null) {
                 val versionTextView = drawerLayout.findViewById<View?>(R.id.versionTxt)
                 if (versionTextView is TextView) {
-                    versionTextView.setText("version " + versionName)
+                    versionTextView.text = "version " + versionName
                 }
             }
         } catch (e: PackageManager.NameNotFoundException) {
@@ -350,29 +346,28 @@ class MainActivity : AppCompatActivity() {
     var runnable: Runnable = Runnable { this.showPlayBarData() }
 
     fun showPlayBarData() {
-        if (BaseApplicationClass.MUSIC_ID.isNullOrBlank()) binding!!.playBarBackground.setVisibility(
+        if (MusicPlayerManager.MUSIC_ID.isNullOrBlank()) binding!!.playBarBackground.visibility =
             View.GONE
-        )
-        else binding!!.playBarBackground.setVisibility(View.VISIBLE)
+        else binding!!.playBarBackground.visibility = View.VISIBLE
 
-        binding!!.playBarMusicTitle.setText(BaseApplicationClass.Companion.MUSIC_TITLE)
-        binding!!.playBarMusicDesc.setText(BaseApplicationClass.Companion.MUSIC_DESCRIPTION)
-        Picasso.get().load(Uri.parse(BaseApplicationClass.Companion.IMAGE_URL))
+        binding!!.playBarMusicTitle.text = MusicPlayerManager.MUSIC_TITLE
+        binding!!.playBarMusicDesc.text = MusicPlayerManager.MUSIC_DESCRIPTION
+        Picasso.get().load(Uri.parse(MusicPlayerManager.IMAGE_URL))
             .into(binding!!.playBarCoverImage)
         updatePlaybarUi()
 
         val gradientDrawable = GradientDrawable()
-        gradientDrawable.setColor(BaseApplicationClass.Companion.IMAGE_BG_COLOR)
-        gradientDrawable.setCornerRadius(18f)
+        gradientDrawable.setColor(MusicPlayerManager.IMAGE_BG_COLOR)
+        gradientDrawable.cornerRadius = 18f
 
-        binding!!.playBarBackground.setBackground(gradientDrawable)
+        binding!!.playBarBackground.background = gradientDrawable
 
-        binding!!.playBarMusicTitle.setTextColor(BaseApplicationClass.Companion.TEXT_ON_IMAGE_COLOR1)
-        binding!!.playBarMusicDesc.setTextColor(BaseApplicationClass.Companion.TEXT_ON_IMAGE_COLOR1)
+        binding!!.playBarMusicTitle.setTextColor(MusicPlayerManager.TEXT_ON_IMAGE_COLOR1)
+        binding!!.playBarMusicDesc.setTextColor(MusicPlayerManager.TEXT_ON_IMAGE_COLOR1)
 
-        binding!!.playBarPlayPauseIcon.setImageTintList(ColorStateList.valueOf(BaseApplicationClass.Companion.TEXT_ON_IMAGE_COLOR))
-        binding!!.playBarPrevIcon.setImageTintList(ColorStateList.valueOf(BaseApplicationClass.Companion.TEXT_ON_IMAGE_COLOR))
-        binding!!.playBarNextIcon.setImageTintList(ColorStateList.valueOf(BaseApplicationClass.Companion.TEXT_ON_IMAGE_COLOR))
+        binding!!.playBarPlayPauseIcon.imageTintList = ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
+        binding!!.playBarPrevIcon.imageTintList = ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
+        binding!!.playBarNextIcon.imageTintList = ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
 
         OverScrollDecoratorHelper.setUpStaticOverScroll(
             binding!!.getRoot(),
@@ -383,7 +378,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updatePlaybarUi() {
-        val p = BaseApplicationClass.player
+        val p = MusicPlayerManager.player
         if (p != null) {
             binding!!.playBarPlayPauseIcon.setImageResource(
                 if (p.isPlaying)
@@ -396,22 +391,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        NetworkChangeReceiver.Companion.registerReceiver(this, networkChangeReceiver)
+        NetworkChangeReceiver.registerReceiver(this, networkChangeReceiver)
         showSavedLibrariesData()
     }
 
     override fun onPause() {
         super.onPause()
-        NetworkChangeReceiver.Companion.unregisterReceiver(this, networkChangeReceiver)
+        NetworkChangeReceiver.unregisterReceiver(this, networkChangeReceiver)
     }
 
     override fun onBackPressed() {
-        if (slidingRootNavBuilder!!.isMenuOpened()) slidingRootNavBuilder!!.closeMenu()
+        if (slidingRootNavBuilder!!.isMenuOpened) slidingRootNavBuilder!!.closeMenu()
         else super.onBackPressed()
     }
 
     override fun onDestroy() {
-        BaseApplicationClass.Companion.cancelNotification()
+        MusicPlayerManager.cancelNotification()
         super.onDestroy()
     }
 
@@ -710,16 +705,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun showPopup() {
         // Set the popup to visible
-        binding!!.playBarBackground.setVisibility(View.VISIBLE)
+        binding!!.playBarBackground.visibility = View.VISIBLE
 
         // Create an animation to make the popup appear
         val slideUp = TranslateAnimation(0f, 0f, 1000f, 0f) // Slide from bottom
-        slideUp.setDuration(500)
-        slideUp.setFillAfter(true) // Keeps the position after animation
+        slideUp.duration = 500
+        slideUp.fillAfter = true // Keeps the position after animation
 
         // You can add fade-in effect as well
         val fadeIn = AlphaAnimation(0f, 1f)
-        fadeIn.setDuration(500)
+        fadeIn.duration = 500
 
         // Combine the animations
         slideUp.setAnimationListener(object : Animation.AnimationListener {
@@ -744,8 +739,8 @@ class MainActivity : AppCompatActivity() {
     fun closePopup() {
         // Fade-out animation
         val fadeOut = AlphaAnimation(1f, 0f)
-        fadeOut.setDuration(500)
-        fadeOut.setFillAfter(true) // Ensures it stays hidden after the animation
+        fadeOut.duration = 500
+        fadeOut.fillAfter = true // Ensures it stays hidden after the animation
 
         fadeOut.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation?) {
@@ -753,7 +748,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onAnimationEnd(animation: Animation?) {
-                binding!!.playBarBackground.setVisibility(View.GONE) // Hide after animation ends
+                binding!!.playBarBackground.visibility = View.GONE // Hide after animation ends
             }
 
             override fun onAnimationRepeat(animation: Animation?) {
@@ -791,7 +786,7 @@ class MainActivity : AppCompatActivity() {
             context: Context,
             columnWidthDp: Float
         ): Int { // For example columnWidthDp=180
-            val displayMetrics = context.getResources().getDisplayMetrics()
+            val displayMetrics = context.resources.displayMetrics
             val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
             return (screenWidthDp / columnWidthDp + 0.5).toInt() // +0.5 for correct rounding to int.
         }

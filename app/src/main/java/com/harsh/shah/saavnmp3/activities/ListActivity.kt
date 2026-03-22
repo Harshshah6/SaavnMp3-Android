@@ -1,20 +1,19 @@
-﻿package com.harsh.shah.saavnmp3.activities
+package com.harsh.shah.saavnmp3.activities
 
 import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.harsh.shah.saavnmp3.BaseApplicationClass
 import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.adapters.ActivityListSongsItemAdapter
 import com.harsh.shah.saavnmp3.adapters.UserCreatedSongsListAdapter
@@ -30,6 +29,7 @@ import com.harsh.shah.saavnmp3.records.PlaylistSearch
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
+import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
 import com.squareup.picasso.Picasso
@@ -41,11 +41,11 @@ class ListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityListBinding.inflate(getLayoutInflater())
+        binding = ActivityListBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
-        binding!!.addMoreSongs.setVisibility(View.GONE)
+        binding!!.addMoreSongs.visibility = View.GONE
 
         Log.i("ListActivity", "onCreate: reached ListActivity")
 
@@ -53,11 +53,11 @@ class ListActivity : AppCompatActivity() {
 
         binding!!.playAllBtn.setOnClickListener(View.OnClickListener { view: View? ->
             if (!trackQueue.isEmpty()) {
-                (getApplicationContext() as BaseApplicationClass).trackQueue = trackQueue
-                BaseApplicationClass.Companion.track_position = 0
+                MusicPlayerManager.trackQueue = ArrayList(trackQueue)
+                MusicPlayerManager.track_position = 0
                 Log.i(
                     TAG,
-                    "trackQueueSet: " + BaseApplicationClass.Companion.trackQueue + " With POS " + BaseApplicationClass.Companion.track_position
+                    "trackQueueSet: " + MusicPlayerManager.trackQueue + " With POS " + MusicPlayerManager.track_position
                 )
                 startActivity(
                     Intent(this@ListActivity, MusicOverviewActivity::class.java).putExtra(
@@ -68,7 +68,7 @@ class ListActivity : AppCompatActivity() {
             }
         })
         val sharedPreferenceManager: SharedPreferenceManager =
-            SharedPreferenceManager.Companion.getInstance(this@ListActivity)
+            SharedPreferenceManager.getInstance(this@ListActivity)
 
         binding!!.addToLibrary.setOnClickListener(View.OnClickListener { view: View? ->
             if (albumItem == null) return@OnClickListener
@@ -102,9 +102,9 @@ class ListActivity : AppCompatActivity() {
                     albumItem!!.id,
                     false,
                     isAlbum,
-                    binding!!.albumTitle.getText().toString(),
+                    binding!!.albumTitle.text.toString(),
                     albumItem!!.albumCover,
-                    binding!!.albumSubTitle.getText().toString(),
+                    binding!!.albumSubTitle.text.toString(),
                     ArrayList<Library.Songs?>()
                 )
                 sharedPreferenceManager.addLibraryToSavedLibraries(library)
@@ -124,7 +124,7 @@ class ListActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (getIntent().getExtras() != null && getIntent().getExtras()!!
+        if (intent.extras != null && intent.extras!!
                 .getBoolean("createdByUser", false)
         ) {
             onUserCreatedFetch()
@@ -141,14 +141,14 @@ class ListActivity : AppCompatActivity() {
 
         val bottomSheetDialog =
             BottomSheetDialog(this@ListActivity, R.style.MyBottomSheetDialogTheme)
-        val _binding = ActivityListMoreInfoBottomSheetBinding.inflate(getLayoutInflater())
+        val _binding = ActivityListMoreInfoBottomSheetBinding.inflate(layoutInflater)
 
-        _binding.albumTitle.setText(binding!!.albumTitle.getText().toString())
-        _binding.albumSubTitle.setText(binding!!.albumSubTitle.getText().toString())
-        Picasso.get().load(Uri.parse(albumItem!!.albumCover)).into(_binding.coverImage)
+        _binding.albumTitle.text = binding!!.albumTitle.text.toString()
+        _binding.albumSubTitle.text = binding!!.albumSubTitle.text.toString()
+        Picasso.get().load(albumItem!!.albumCover?.toUri()).into(_binding.coverImage)
 
         val sharedPreferenceManager: SharedPreferenceManager =
-            SharedPreferenceManager.Companion.getInstance(this@ListActivity)
+            SharedPreferenceManager.getInstance(this@ListActivity)
         val savedLibraries: SavedLibraries? = sharedPreferenceManager.savedLibrariesData as? SavedLibraries
         if (savedLibraries == null || savedLibraries.lists == null) {
             _binding.addToLibrary.titleTextView?.text = "Add to library"
@@ -173,7 +173,7 @@ class ListActivity : AppCompatActivity() {
                 val bottomSheetItemView =
                     BottomSheetItemView(this@ListActivity, artist.name, imgUrl, artist.id)
                 bottomSheetItemView.setFocusable(true)
-                bottomSheetItemView.setClickable(true)
+                bottomSheetItemView.isClickable = true
                 bottomSheetItemView.setOnClickListener(View.OnClickListener { view1: View? ->
                     Log.i("ListActivity", "BottomSheetItemView: onCLicked!")
                     startActivity(
@@ -199,11 +199,11 @@ class ListActivity : AppCompatActivity() {
     private fun onMoreIconClickedUserCreated() {
         val bottomSheetDialog =
             BottomSheetDialog(this@ListActivity, R.style.MyBottomSheetDialogTheme)
-        val _binding = UserCreatedListActivityMoreBottomSheetBinding.inflate(getLayoutInflater())
+        val _binding = UserCreatedListActivityMoreBottomSheetBinding.inflate(layoutInflater)
 
-        _binding.albumTitle.setText(binding!!.albumTitle.getText().toString())
-        _binding.albumSubTitle.setText(binding!!.albumSubTitle.getText().toString())
-        Picasso.get().load(Uri.parse(albumItem!!.albumCover)).into(_binding.coverImage)
+        _binding.albumTitle.text = binding!!.albumTitle.text.toString()
+        _binding.albumSubTitle.text = binding!!.albumSubTitle.text.toString()
+        Picasso.get().load(albumItem!!.albumCover?.toUri()).into(_binding.coverImage)
 
         _binding.removeLibrary.setOnClickListener(View.OnClickListener { view: View? ->
             bottomSheetDialog.dismiss()
@@ -217,7 +217,7 @@ class ListActivity : AppCompatActivity() {
 
     private fun updateAlbumInLibraryStatus() {
         val sharedPreferenceManager: SharedPreferenceManager =
-            SharedPreferenceManager.Companion.getInstance(this@ListActivity)
+            SharedPreferenceManager.getInstance(this@ListActivity)
         if (sharedPreferenceManager.savedLibrariesData == null) binding!!.addToLibrary.setImageResource(
             R.drawable.round_add_24
         )
@@ -238,8 +238,8 @@ class ListActivity : AppCompatActivity() {
         if (savedLibraries == null || savedLibraries.lists == null) {
             return false
         }
-        Log.i("ListActivity", "isAlbumInLibrary: " + savedLibraries)
-        if (savedLibraries.lists.isNullOrEmpty()) return false
+        Log.i("ListActivity", "isAlbumInLibrary: $savedLibraries")
+        if (savedLibraries.lists.isEmpty()) return false
         val lists = savedLibraries.lists ?: emptyList<Library?>()
         return lists.stream()
             .anyMatch { library: Library? -> library?.id == albumItem.id }
@@ -250,8 +250,8 @@ class ListActivity : AppCompatActivity() {
         if (savedLibraries == null || savedLibraries.lists == null) {
             return -1
         }
-        Log.i("ListActivity", "getAlbumIndexInLibrary: " + savedLibraries)
-        if (savedLibraries.lists.isNullOrEmpty()) return -1
+        Log.i("ListActivity", "getAlbumIndexInLibrary: $savedLibraries")
+        if (savedLibraries.lists.isEmpty()) return -1
         var index = -1
         val lists = savedLibraries.lists ?: emptyList<Library?>()
         for (library in lists) {
@@ -295,32 +295,32 @@ class ListActivity : AppCompatActivity() {
     private var isAlbum = false
 
     private fun showData() {
-        if (getIntent().getExtras() == null) return
+        if (intent.extras == null) return
         albumItem = Gson().fromJson<AlbumItem?>(
-            getIntent().getExtras()!!.getString("data"),
+            intent.extras!!.getString("data"),
             AlbumItem::class.java
         )
         updateAlbumInLibraryStatus()
         if (albumItem != null) {
-            binding!!.albumTitle.setText(albumItem!!.albumTitle())
-            binding!!.albumSubTitle.setText(albumItem!!.albumSubTitle())
+            binding!!.albumTitle.text = albumItem!!.albumTitle()
+            binding!!.albumSubTitle.text = albumItem!!.albumSubTitle()
             if (albumItem!!.albumCover?.isNotBlank() == true) Picasso.get()
-                .load(Uri.parse(albumItem!!.albumCover)).into(binding!!.albumCover)
+                .load(albumItem!!.albumCover!!.toUri()).into(binding!!.albumCover)
         }
 
         val apiManager = ApiManager(this)
         val sharedPreferenceManager: SharedPreferenceManager =
-            SharedPreferenceManager.Companion.getInstance(this)
-        val intentId = getIntent().getExtras()!!.getString("id", "")
+            SharedPreferenceManager.getInstance(this)
+        val intentId = intent.extras!!.getString("id", "")
 
-        if (getIntent().getExtras()!!.getBoolean("createdByUser", false)) {
+        if (intent.extras!!.getBoolean("createdByUser", false)) {
             onUserCreatedFetch()
             return
         }
 
         val checkIfUrlData =
             (intentId.startsWith("http") || intentId.startsWith("www")) && intentId.contains("jiosaavn.com")
-        if (getIntent().getExtras()!!.getString("type", "") == "album") {
+        if (intent.extras!!.getString("type", "") == "album") {
             isAlbum = true
             if (albumItem != null) {
                 val cached = sharedPreferenceManager.getAlbumResponseById(albumItem!!.id)
@@ -329,7 +329,7 @@ class ListActivity : AppCompatActivity() {
                     return
                 }
             }
-            val requestListener: RequestNetwork.RequestListener? =
+            val requestListener: RequestNetwork.RequestListener =
                 object : RequestNetwork.RequestListener {
                     override fun onResponse(
                         tag: String?,
@@ -338,7 +338,7 @@ class ListActivity : AppCompatActivity() {
                     ) {
                         val albumSearch =
                             Gson().fromJson<AlbumSearch>(response, AlbumSearch::class.java)
-                        Log.i("ListActivity", "onResponse: " + albumSearch)
+                        Log.i("ListActivity", "onResponse: $albumSearch")
                         if (albumSearch.success) {
                             val data = albumSearch.data ?: return
                             sharedPreferenceManager.setAlbumResponseById(
@@ -350,7 +350,7 @@ class ListActivity : AppCompatActivity() {
                     }
 
                     override fun onErrorResponse(tag: String?, message: String?) {
-                        Log.e("ListActivity", "onErrorResponse: " + message)
+                        Log.e("ListActivity", "onErrorResponse: $message")
                         Toast.makeText(
                             this@ListActivity,
                             "Failed to fetch Album",
@@ -374,7 +374,7 @@ class ListActivity : AppCompatActivity() {
                     response: String?,
                     responseHeaders: HashMap<String?, Any?>?
                 ) {
-                    Log.i("API_RESPONSE", "onResponse: " + response)
+                    Log.i("API_RESPONSE", "onResponse: $response")
                     val playlistSearch =
                         Gson().fromJson<PlaylistSearch>(response, PlaylistSearch::class.java)
                     if (playlistSearch.success) {
@@ -406,13 +406,13 @@ class ListActivity : AppCompatActivity() {
     private fun onUserCreatedFetch() {
         isUserCreated = true
 
-        binding!!.shareIcon.setVisibility(View.INVISIBLE)
+        binding!!.shareIcon.visibility = View.INVISIBLE
         // binding.moreIcon.setVisibility(View.INVISIBLE);
-        binding!!.addToLibrary.setVisibility(View.INVISIBLE)
-        binding!!.addMoreSongs.setVisibility(View.VISIBLE)
+        binding!!.addToLibrary.visibility = View.INVISIBLE
+        binding!!.addMoreSongs.visibility = View.VISIBLE
 
         val sharedPreferenceManager: SharedPreferenceManager =
-            SharedPreferenceManager.Companion.getInstance(this)
+            SharedPreferenceManager.getInstance(this)
         val savedLibraries = sharedPreferenceManager.savedLibrariesData as? SavedLibraries
         if (savedLibraries == null || savedLibraries.lists.isNullOrEmpty()) finish()
         var library: Library? = null
@@ -424,9 +424,9 @@ class ListActivity : AppCompatActivity() {
         }
         if (library == null) finish()
         if (library != null) {
-            binding!!.albumTitle.setText(library.name)
-            binding!!.albumSubTitle.setText(library.description)
-            Picasso.get().load(Uri.parse(library.image)).into(binding!!.albumCover)
+            binding!!.albumTitle.text = library.name
+            binding!!.albumSubTitle.text = library.description
+            Picasso.get().load(library.image?.toUri()).into(binding!!.albumCover)
             
             val songs = library.songs ?: mutableListOf()
             binding!!.recyclerView.setAdapter(UserCreatedSongsListAdapter(songs.filterNotNull().toMutableList()))
@@ -438,13 +438,13 @@ class ListActivity : AppCompatActivity() {
 
     private fun onAlbumFetched(albumSearch: AlbumSearch) {
         val data = albumSearch.data ?: return
-        
-        binding!!.albumTitle.setText(data.name())
-        binding!!.albumSubTitle.setText(data.description())
+
+        binding!!.albumTitle.text = data.name()
+        binding!!.albumSubTitle.text = data.description()
         val imageList = data.image
         if (!imageList.isNullOrEmpty()) {
             Picasso.get()
-                .load(Uri.parse(imageList[imageList.size - 1]?.url ?: ""))
+                .load((imageList[imageList.size - 1]?.url ?: "").toUri())
                 .into(binding!!.albumCover)
         }
         val songs = data.songs ?: mutableListOf()
@@ -457,9 +457,9 @@ class ListActivity : AppCompatActivity() {
         binding!!.shareIcon.setOnClickListener(View.OnClickListener { view: View? ->
             if (data.url.isNullOrBlank()) return@OnClickListener
             val sendIntent = Intent()
-            sendIntent.setAction(Intent.ACTION_SEND)
+            sendIntent.action = Intent.ACTION_SEND
             sendIntent.putExtra(Intent.EXTRA_TEXT, data.url)
-            sendIntent.setType("text/plain")
+            sendIntent.type = "text/plain"
             startActivity(sendIntent)
         })
 
@@ -480,13 +480,13 @@ class ListActivity : AppCompatActivity() {
 
     private fun onPlaylistFetched(playlistSearch: PlaylistSearch) {
         val data = playlistSearch.data ?: return
-        
-        binding!!.albumTitle.setText(data.name())
-        binding!!.albumSubTitle.setText(data.description())
+
+        binding!!.albumTitle.text = data.name()
+        binding!!.albumSubTitle.text = data.description()
         val imageList = data.image
         if (!imageList.isNullOrEmpty()) {
             Picasso.get()
-                .load(Uri.parse(imageList[imageList.size - 1]?.url ?: ""))
+                .load((imageList[imageList.size - 1]?.url ?: "").toUri())
                 .into(binding!!.albumCover)
         }
         val songs = data.songs ?: mutableListOf()
@@ -499,9 +499,9 @@ class ListActivity : AppCompatActivity() {
         binding!!.shareIcon.setOnClickListener(View.OnClickListener { view: View? ->
             if (data.url.isNullOrBlank()) return@OnClickListener
             val sendIntent = Intent()
-            sendIntent.setAction(Intent.ACTION_SEND)
+            sendIntent.action = Intent.ACTION_SEND
             sendIntent.putExtra(Intent.EXTRA_TEXT, data.url)
-            sendIntent.setType("text/plain")
+            sendIntent.type = "text/plain"
             startActivity(sendIntent)
         })
 

@@ -57,10 +57,10 @@ class RequestNetworkController {
 
                 val sslContext = SSLContext.getInstance("TLS")
                 sslContext.init(null, trustAllCerts, SecureRandom())
-                val sslSocketFactory = sslContext.getSocketFactory()
+                val sslSocketFactory = sslContext.socketFactory
                 builder.sslSocketFactory(
                     sslSocketFactory,
-                    (trustAllCerts[0] as javax.net.ssl.X509TrustManager?)!!
+                    (trustAllCerts[0] as X509TrustManager?)!!
                 )
                 builder.connectTimeout(SOCKET_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)
                 builder.readTimeout(READ_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)

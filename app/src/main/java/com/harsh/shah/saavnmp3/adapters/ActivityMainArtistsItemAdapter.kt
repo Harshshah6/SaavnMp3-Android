@@ -23,15 +23,13 @@ class ActivityMainArtistsItemAdapter(private val data: MutableList<ArtistsSearch
         viewType: Int
     ): ActivityMainArtistsItemAdapterViewHolder {
         val _v = View.inflate(
-            parent.getContext(),
+            parent.context,
             if (viewType == 0) R.layout.activity_main_artists_item else R.layout.artists_item_shimmer,
             null
         )
-        _v.setLayoutParams(
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        _v.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
         return ActivityMainArtistsItemAdapterViewHolder(_v)
     }
@@ -42,12 +40,10 @@ class ActivityMainArtistsItemAdapter(private val data: MutableList<ArtistsSearch
             return
         }
 
-        holder.itemView.findViewById<View?>(R.id.artist_name).setSelected(true)
-        (holder.itemView.findViewById<View?>(R.id.artist_name) as TextView).setText(
-            data.get(
-                position
-            )!!.name()
-        )
+        holder.itemView.findViewById<View?>(R.id.artist_name).isSelected = true
+        (holder.itemView.findViewById<View?>(R.id.artist_name) as TextView).text = data.get(
+            position
+        )!!.name()
         val imageView = holder.itemView.findViewById<ImageView?>(R.id.artist_img)
         val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""

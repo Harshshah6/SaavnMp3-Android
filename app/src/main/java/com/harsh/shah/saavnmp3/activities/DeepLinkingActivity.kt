@@ -10,7 +10,7 @@ class DeepLinkingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deep_linking)
-        handleIntent(getIntent())
+        handleIntent(intent)
         finish()
     }
 
@@ -22,15 +22,15 @@ class DeepLinkingActivity : AppCompatActivity() {
 
     private fun handleIntent(intent: Intent?) {
         if (intent == null) return
-        val data = intent.getData()
+        val data = intent.data
         if (data == null) {
             Log.w(TAG, "No data in intent")
             return
         }
 
-        val host = data.getHost()
-        val path = data.getPath()
-        Log.d(TAG, "Deep link host: " + host + " path: " + path)
+        val host = data.host
+        val path = data.path
+        Log.d(TAG, "Deep link host: $host path: $path")
 
         if (path == null) {
             openMainScreen()

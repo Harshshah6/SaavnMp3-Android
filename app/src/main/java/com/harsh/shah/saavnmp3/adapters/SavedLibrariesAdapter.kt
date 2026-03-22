@@ -18,19 +18,17 @@ import com.squareup.picasso.Picasso
 class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
     RecyclerView.Adapter<SavedLibrariesAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val _v = View.inflate(parent.getContext(), R.layout.activity_list_song_item, null)
-        _v.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        val _v = View.inflate(parent.context, R.layout.activity_list_song_item, null)
+        _v.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
         return ViewHolder(_v)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.title.setText(data.get(position)!!.name)
-        holder.artist.setText(data.get(position)!!.description)
+        holder.title.text = data.get(position)!!.name
+        holder.artist.text = data.get(position)!!.description
         Picasso.get().load(Uri.parse(data.get(position)!!.image)).into(holder.coverImage)
 
         holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->
@@ -41,8 +39,8 @@ class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
                 data.get(position)!!.id
             )
             if (data.get(position)!!.isCreatedByUser) {
-                v!!.getContext().startActivity(
-                    Intent(v.getContext(), ListActivity::class.java)
+                v!!.context.startActivity(
+                    Intent(v.context, ListActivity::class.java)
                         .putExtra("id", data.get(position)!!.id)
                         .putExtra("data", Gson().toJson(albumItem))
                         .putExtra("type", "playlist")
@@ -50,8 +48,8 @@ class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
                 )
                 return@OnClickListener
             }
-            v!!.getContext().startActivity(
-                Intent(v.getContext(), ListActivity::class.java)
+            v!!.context.startActivity(
+                Intent(v.context, ListActivity::class.java)
                     .putExtra("data", Gson().toJson(albumItem))
                     .putExtra("type", if (data.get(position)!!.isAlbum) "album" else "playlist")
                     .putExtra("id", data.get(position)!!.id)

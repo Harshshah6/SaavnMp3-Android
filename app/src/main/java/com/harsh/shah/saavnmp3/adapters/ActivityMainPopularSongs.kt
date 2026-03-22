@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.adapters
+package com.harsh.shah.saavnmp3.adapters
 
 import android.content.Intent
 import android.net.Uri
@@ -9,10 +9,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
-import com.harsh.shah.saavnmp3.BaseApplicationClass
 import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.model.AlbumItem
+import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.squareup.picasso.Picasso
 
 
@@ -20,15 +20,13 @@ class ActivityMainPopularSongs(private val data: MutableList<AlbumItem?>) :
     RecyclerView.Adapter<ActivityMainPopularSongs.ViewHolder?>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val _v = View.inflate(
-            parent.getContext(),
+            parent.context,
             if (viewType == 0) R.layout.activity_main_songs_item else R.layout.songs_item_shimmer,
             null
         )
-        _v.setLayoutParams(
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        _v.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
         return ViewHolder(_v)
     }
@@ -39,23 +37,20 @@ class ActivityMainPopularSongs(private val data: MutableList<AlbumItem?>) :
             return
         }
 
-        (holder.itemView.findViewById<View?>(R.id.albumTitle) as TextView).setText(
+        (holder.itemView.findViewById<View?>(R.id.albumTitle) as TextView).text =
             data.get(position)!!.albumTitle()
-        )
-        (holder.itemView.findViewById<View?>(R.id.albumSubTitle) as TextView).setText(
-            data.get(
-                position
-            )!!.albumSubTitle()
-        )
+        (holder.itemView.findViewById<View?>(R.id.albumSubTitle) as TextView).text = data.get(
+            position
+        )!!.albumSubTitle()
 
-        holder.itemView.findViewById<View?>(R.id.albumTitle).setSelected(true)
-        holder.itemView.findViewById<View?>(R.id.albumSubTitle).setSelected(true)
+        holder.itemView.findViewById<View?>(R.id.albumTitle).isSelected = true
+        holder.itemView.findViewById<View?>(R.id.albumSubTitle).isSelected = true
 
         val coverImage = holder.itemView.findViewById<ImageView?>(R.id.coverImage)
         Picasso.get().load(Uri.parse(data.get(position)!!.albumCover)).into(coverImage)
 
         holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->
-            BaseApplicationClass.Companion.trackQueue?.clear()
+            MusicPlayerManager.trackQueue?.clear()
             Log.d(
                 "AdapterDebug",
                 "Click at pos: " + position + ". Populating queue with " + data.size + " items."
@@ -66,11 +61,11 @@ class ActivityMainPopularSongs(private val data: MutableList<AlbumItem?>) :
                     "AdapterDebug",
                     "Queue[" + i + "]: " + id + " - " + data.get(i)!!.albumTitle()
                 )
-                BaseApplicationClass.Companion.trackQueue?.add(id)
+                MusicPlayerManager.trackQueue?.add(id)
             }
-            BaseApplicationClass.Companion.track_position = position
-            v!!.getContext().startActivity(
-                Intent(v.getContext(), MusicOverviewActivity::class.java).putExtra(
+            MusicPlayerManager.track_position = position
+            v!!.context.startActivity(
+                Intent(v.context, MusicOverviewActivity::class.java).putExtra(
                     "id",
                     data.get(position)!!.id
                 )

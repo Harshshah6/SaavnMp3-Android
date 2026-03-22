@@ -27,7 +27,6 @@ import com.harsh.shah.saavnmp3.records.GlobalSearch.Data.TopQuery
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.util.Locale
-import java.util.function.Consumer
 
 class SearchActivity : AppCompatActivity() {
     var binding: ActivitySearchBinding? = null
@@ -36,7 +35,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(getLayoutInflater())
+        binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
         OverScrollDecoratorHelper.setUpOverScroll(binding!!.hscrollview)
@@ -54,8 +53,8 @@ class SearchActivity : AppCompatActivity() {
         })
 
         binding!!.edittext.setOnEditorActionListener(OnEditorActionListener { textView: TextView?, i: Int, keyEvent: KeyEvent? ->
-            showData(textView!!.getText().toString())
-            Log.i(TAG, "onCreate: " + textView.getText().toString())
+            showData(textView!!.text.toString())
+            Log.i(TAG, "onCreate: " + textView.text.toString())
             binding!!.edittext.clearFocus()
             hideKeyboard(binding!!.edittext)
             true
@@ -65,9 +64,9 @@ class SearchActivity : AppCompatActivity() {
         binding!!.edittext.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {
                 if (s.toString().isEmpty()) {
-                    binding!!.clearIcon.setVisibility(View.GONE)
+                    binding!!.clearIcon.visibility = View.GONE
                 } else {
-                    binding!!.clearIcon.setVisibility(View.VISIBLE)
+                    binding!!.clearIcon.visibility = View.VISIBLE
                 }
             }
 
@@ -89,7 +88,7 @@ class SearchActivity : AppCompatActivity() {
     private fun hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
         if (inputMethodManager != null) {
-            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0)
+            inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
 
@@ -98,8 +97,8 @@ class SearchActivity : AppCompatActivity() {
 
         if ((query.startsWith("http") || query.startsWith("www")) && query.contains("jiosaavn.com")) {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(query))
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            intent.setData(Uri.parse(query))
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            intent.data = Uri.parse(query)
             startActivity(intent)
             return
         }
@@ -107,7 +106,7 @@ class SearchActivity : AppCompatActivity() {
         val apiManager = ApiManager(this)
         apiManager.globalSearch(query, object : RequestNetwork.RequestListener {
             val sharedPreferenceManager: SharedPreferenceManager =
-                SharedPreferenceManager.Companion.getInstance(this@SearchActivity)
+                SharedPreferenceManager.getInstance(this@SearchActivity)
 
             override fun onResponse(
                 tag: String?,
@@ -151,7 +150,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun refreshData() {
         val data: MutableList<SearchListItem?> = ArrayList<SearchListItem?>()
-        val checkedChipId = binding!!.chipGroup.getCheckedChipId()
+        val checkedChipId = binding!!.chipGroup.checkedChipId
         if (checkedChipId == R.id.chip_all) {
             globalSearch!!.data?.topQuery?.results?.forEach { item: TopQuery.Results? ->
                 if (item == null) return@forEach
@@ -183,7 +182,7 @@ class SearchActivity : AppCompatActivity() {
         } else if (checkedChipId == R.id.chip_artists) {
             addArtistsData(data)
         } else {
-            throw IllegalStateException("Unexpected value: " + binding!!.chipGroup.getCheckedChipId())
+            throw IllegalStateException("Unexpected value: " + binding!!.chipGroup.checkedChipId)
         }
         if (!data.isEmpty()) binding!!.recyclerView.setAdapter(ActivitySearchListItemAdapter(data.filterNotNull().toMutableList()))
     }

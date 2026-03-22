@@ -15,9 +15,9 @@ class ApiManager(context: Context?) {
     fun globalSearch(text: String?, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
         queryMap.put("query", Uri.encode(text))
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             SEARCH_URL,
             "",
             listener
@@ -32,9 +32,9 @@ class ApiManager(context: Context?) {
         queryMap.put("query", Uri.encode(query))
         if (page != null) queryMap.put("page", page)
         if (limit != null) queryMap.put("limit", limit)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             SEARCH_URL + SONGS,
             "",
             listener
@@ -49,9 +49,9 @@ class ApiManager(context: Context?) {
         queryMap.put("query", Uri.encode(query))
         if (page != null) queryMap.put("page", page)
         if (limit != null) queryMap.put("limit", limit)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             SEARCH_URL + ALBUMS,
             "",
             listener
@@ -66,9 +66,9 @@ class ApiManager(context: Context?) {
         queryMap.put("query", Uri.encode(query))
         if (page != null) queryMap.put("page", page)
         if (limit != null) queryMap.put("limit", limit)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             SEARCH_URL + ARTISTS,
             "",
             listener
@@ -83,9 +83,9 @@ class ApiManager(context: Context?) {
         queryMap.put("query", Uri.encode(query))
         if (page != null) queryMap.put("page", page)
         if (limit != null) queryMap.put("limit", limit)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             SEARCH_URL + PLAYLISTS,
             "",
             listener
@@ -95,9 +95,9 @@ class ApiManager(context: Context?) {
     fun retrieveSongsByIds(ids: String, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
         queryMap.put("ids", ids)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             SONGS_URL,
             "",
             listener
@@ -107,9 +107,9 @@ class ApiManager(context: Context?) {
     fun retrieveSongByLink(link: String, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
         queryMap.put("link", link)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             SONGS_URL,
             "",
             listener
@@ -119,9 +119,9 @@ class ApiManager(context: Context?) {
     fun retrieveSongById(id: String, lyrics: Boolean?, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
         queryMap.put("lyrics", lyrics)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             SONGS_URL + "/" + id,
             "",
             listener
@@ -130,7 +130,7 @@ class ApiManager(context: Context?) {
 
     fun retrieveLyricsById(id: String, listener: RequestNetwork.RequestListener?) {
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET, SONGS_URL + "/" + id + "/lyrics", "",
+            RequestNetworkController.GET, SONGS_URL + "/" + id + "/lyrics", "",
             listener
         )
     }
@@ -142,9 +142,9 @@ class ApiManager(context: Context?) {
     ) {
         val queryMap = HashMap<String?, Any?>()
         queryMap.put("limit", limit)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET, SONGS_URL + "/" + id + "/suggestions", "",
+            RequestNetworkController.GET, SONGS_URL + "/" + id + "/suggestions", "",
             listener
         )
     }
@@ -152,9 +152,9 @@ class ApiManager(context: Context?) {
     fun retrieveAlbumById(id: String, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
         queryMap.put("id", id)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             ALBUMS_URL,
             "",
             listener
@@ -164,9 +164,9 @@ class ApiManager(context: Context?) {
     fun retrieveAlbumByLink(link: String, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
         queryMap.put("link", link)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             ALBUMS_URL,
             "",
             listener
@@ -186,9 +186,9 @@ class ApiManager(context: Context?) {
         if (sortBy != null) queryMap.put("sortBy", sortBy)
         if (sortOrder != null) queryMap.put("sortOrder", sortOrder)
 
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             ARTISTS_URL,
             "",
             listener
@@ -207,9 +207,9 @@ class ApiManager(context: Context?) {
         if (albumCount != null) queryMap.put("albumCount", albumCount)
         if (sortBy != null) queryMap.put("sortBy", sortBy)
 
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             ARTISTS_URL,
             "",
             listener
@@ -228,9 +228,9 @@ class ApiManager(context: Context?) {
         if (sortBy != null) queryMap.put("sortBy", sortBy.name)
         if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name)
 
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             ARTISTS_URL + "/" + id,
             "",
             listener
@@ -245,9 +245,9 @@ class ApiManager(context: Context?) {
         if (page != null) queryMap.put("page", page)
         if (sortBy != null) queryMap.put("sortBy", sortBy.name)
         if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name)
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET, ARTISTS_URL + "/" + id + "/songs", "",
+            RequestNetworkController.GET, ARTISTS_URL + "/" + id + "/songs", "",
             listener
         )
     }
@@ -261,9 +261,9 @@ class ApiManager(context: Context?) {
         if (sortBy != null) queryMap.put("sortBy", sortBy.name)
         if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name)
 
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET, ARTISTS_URL + "/" + id + "/albums", "",
+            RequestNetworkController.GET, ARTISTS_URL + "/" + id + "/albums", "",
             listener
         )
     }
@@ -277,9 +277,9 @@ class ApiManager(context: Context?) {
         if (page != null) queryMap.put("page", page)
         if (limit != null) queryMap.put("limit", limit)
 
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             PLAYLISTS_URL,
             "",
             listener
@@ -295,9 +295,9 @@ class ApiManager(context: Context?) {
         if (page != null) queryMap.put("page", page)
         if (limit != null) queryMap.put("limit", limit)
 
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             PLAYLISTS_URL,
             "",
             listener
@@ -317,9 +317,9 @@ class ApiManager(context: Context?) {
         if (sortBy != null) queryMap.put("sortBy", sortBy.name)
         if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name)
 
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             ARTISTS_URL + "/" + artistId.toInt() + "/songs", "", requestListener
         )
     }
@@ -337,9 +337,9 @@ class ApiManager(context: Context?) {
         if (sortBy != null) queryMap.put("sortBy", sortBy.name)
         if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name)
 
-        requestNetwork.setParams(queryMap, RequestNetworkController.Companion.REQUEST_PARAM)
+        requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.Companion.GET,
+            RequestNetworkController.GET,
             ARTISTS_URL + "/" + artistId.toInt() + "/albums", "", requestListener
         )
     }

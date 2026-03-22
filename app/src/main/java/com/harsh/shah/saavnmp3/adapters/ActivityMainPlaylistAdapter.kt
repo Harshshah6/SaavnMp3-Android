@@ -20,16 +20,14 @@ import com.squareup.picasso.Picasso
 class ActivityMainPlaylistAdapter(private val data: MutableList<AlbumItem?>) :
     RecyclerView.Adapter<PlaylistAdapterViewHolder?>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistAdapterViewHolder {
-        val _v = LayoutInflater.from(parent.getContext()).inflate(
+        val _v = LayoutInflater.from(parent.context).inflate(
             if (viewType == 0) R.layout.activity_main_playlist_item else R.layout.main_playlist_item_shimmer,
             null,
             false
         )
-        _v.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        _v.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
         return PlaylistAdapterViewHolder(_v)
     }
@@ -44,15 +42,13 @@ class ActivityMainPlaylistAdapter(private val data: MutableList<AlbumItem?>) :
             return
         }
 
-        (holder.itemView.findViewById<View?>(R.id.title) as TextView).setText(
-            data.get(position)!!.albumTitle()
-        )
+        (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = data.get(position)!!.albumTitle()
         val imageView = holder.itemView.findViewById<ImageView?>(R.id.imageView)
         Picasso.get().load(Uri.parse(data.get(position)!!.albumCover)).into(imageView)
 
         holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->
-            v!!.getContext().startActivity(
-                Intent(v.getContext(), ListActivity::class.java).putExtra(
+            v!!.context.startActivity(
+                Intent(v.context, ListActivity::class.java).putExtra(
                     "data",
                     Gson().toJson(data.get(position))
                 )

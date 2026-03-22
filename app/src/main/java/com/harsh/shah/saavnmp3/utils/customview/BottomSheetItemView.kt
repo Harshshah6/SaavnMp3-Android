@@ -40,7 +40,7 @@ class BottomSheetItemView : LinearLayout {
         id: String?
     ) : super(context) {
         init(null, 0)
-        this.titleTextView?.setText(string)
+        this.titleTextView?.text = string
         if (!imageUrl.isBlank()) {
             this.iconImageView?.let {
                 Picasso.get().load(Uri.parse(imageUrl)).into(it)
@@ -56,10 +56,10 @@ class BottomSheetItemView : LinearLayout {
         val title: String?
         val mExampleDrawable: Drawable?
 
-        inflate(getContext(), R.layout.bottom_sheet_items_custom_view, this)
+        inflate(context, R.layout.bottom_sheet_items_custom_view, this)
 
         setFocusable(true)
-        setClickable(true)
+        isClickable = true
 
         setOnClickListener(OnClickListener { view: View? ->
             Log.i("BottomSheetItemView", "init: " + "Clicked!!")
@@ -68,7 +68,7 @@ class BottomSheetItemView : LinearLayout {
         if (attrs == null) return
 
         val a =
-            getContext().obtainStyledAttributes(attrs, R.styleable.BottomSheetItemView, defStyle, 0)
+            context.obtainStyledAttributes(attrs, R.styleable.BottomSheetItemView, defStyle, 0)
 
         title = a.getString(
             R.styleable.BottomSheetItemView_title
@@ -79,7 +79,7 @@ class BottomSheetItemView : LinearLayout {
         )
 
 
-        this.titleTextView?.setText(title)
+        this.titleTextView?.text = title
         this.iconImageView?.setImageDrawable(mExampleDrawable)
 
         val padding = a.getDimensionPixelSize(R.styleable.BottomSheetItemView_srcPadding, 4)

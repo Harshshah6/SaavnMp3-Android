@@ -13,7 +13,7 @@ class DownloadManagerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityDownloadManagerBinding.inflate(getLayoutInflater())
+        binding = ActivityDownloadManagerBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))

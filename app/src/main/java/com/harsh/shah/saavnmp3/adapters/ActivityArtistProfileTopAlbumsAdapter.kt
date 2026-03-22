@@ -18,15 +18,13 @@ class ActivityArtistProfileTopAlbumsAdapter(private val data: MutableList<Albums
     RecyclerView.Adapter<ActivityArtistProfileTopAlbumsAdapter.ViewHolder?>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val _v = View.inflate(
-            parent.getContext(),
+            parent.context,
             if (viewType == 1) R.layout.activity_artist_profile_view_top_songs_item else R.layout.artist_profile_view_top_songs_shimmer,
             null
         )
-        _v.setLayoutParams(
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        _v.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
         return ViewHolder(_v)
     }
@@ -39,11 +37,9 @@ class ActivityArtistProfileTopAlbumsAdapter(private val data: MutableList<Albums
 
         val itemView = ActivityArtistProfileViewTopSongsItemBinding.bind(holder.itemView)
 
-        itemView.position.setText((position + 1).toString())
-        itemView.coverTitle.setText(data.get(position)!!.name())
-        itemView.coverPlayed.setText(
-            String.format("%s | %s", data.get(position)!!.year, data.get(position)!!.language)
-        )
+        itemView.position.text = (position + 1).toString()
+        itemView.coverTitle.text = data.get(position)!!.name()
+        itemView.coverPlayed.text = String.format("%s | %s", data.get(position)!!.year, data.get(position)!!.language)
         val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (url.isNotEmpty()) {
@@ -60,8 +56,8 @@ class ActivityArtistProfileTopAlbumsAdapter(private val data: MutableList<Albums
                 itemUrl,
                 item.id
             )
-            holder.itemView.getContext().startActivity(
-                Intent(holder.itemView.getContext(), ListActivity::class.java)
+            holder.itemView.context.startActivity(
+                Intent(holder.itemView.context, ListActivity::class.java)
                     .putExtra("data", Gson().toJson(albumItem))
                     .putExtra("type", "album")
                     .putExtra("id", data.get(position)!!.id)

@@ -1,3 +1,6 @@
+permissions:
+  contents: write
+
 name: Android Release Build
 
 on:
@@ -34,7 +37,7 @@ jobs:
 
       - name: Build signed release APK (skip lint/tests)
         run: |
-          /gradlew assembleRelease \
+          ./gradlew assembleRelease \
             -Pandroid.injected.signing.store.file=release.jks \
             -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
             -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
@@ -58,4 +61,4 @@ jobs:
 
           body: ${{ steps.get_notes.outputs.notes }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TK }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

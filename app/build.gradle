@@ -157,4 +157,5 @@ dependencies {
     implementation libs.room.runtime
     kapt libs.room.compiler
 
+    implementation project(':lrclib')
 }

@@ -34,6 +34,14 @@
             android:layout_weight="1" />
 
         <ImageView
+            android:id="@+id/lyrics_icon"
+            android:visibility="gone"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:padding="@dimen/_10sdp"
+            android:src="@drawable/baseline_lyrics_24" />
+
+        <ImageView
             android:id="@+id/share_icon"
             android:layout_width="@dimen/_40sdp"
             android:layout_height="@dimen/_40sdp"
@@ -57,7 +65,7 @@
         app:layout_constraintGuide_percent="0.45" />
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/album_art_card"
+        android:id="@+id/coverImageCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/_24sdp"
@@ -77,6 +85,20 @@
             android:background="@color/textSec" />
 
     </com.google.android.material.card.MaterialCardView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/lyrics_recycler"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/_24sdp"
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/_100sdp"
+        android:paddingBottom="@dimen/_100sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_vertical_50"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/__toolbar" />
 
     <LinearLayout
         android:layout_width="0dp"

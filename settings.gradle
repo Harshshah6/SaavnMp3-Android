@@ -25,3 +25,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SaavnMp3"
 include ':app'
+include ':lrclib'

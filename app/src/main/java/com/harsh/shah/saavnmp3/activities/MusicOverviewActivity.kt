@@ -49,6 +49,10 @@ import com.harsh.shah.saavnmp3.utils.TrackDownloader
 import com.harsh.shah.saavnmp3.utils.TrackDownloader.TrackDownloadListener
 import com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
 import com.squareup.picasso.Picasso
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 
 class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnection {
     private val TAG = "MusicOverviewActivity"
@@ -60,6 +64,80 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     private var ID_FROM_EXTRA: String? = ""
     private var IMAGE_URL: String? = ""
     var musicService: MusicService? = null
+    private var currentLyricsList: List<Pair<Long, String>>? = null
+    private var lyricsAdapter: LyricsAdapter? = null
+    private var currentLyricsRecyclerView: androidx.recyclerview.widget.RecyclerView? = null
+
+    inner class LyricsAdapter(private val lyrics: List<Pair<Long, String>>) : androidx.recyclerview.widget.RecyclerView.Adapter<LyricsAdapter.ViewHolder>() {
+        var activeIndex = -1
+
+        inner class ViewHolder(val textView: android.widget.TextView) : androidx.recyclerview.widget.RecyclerView.ViewHolder(textView)
+
+        override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): ViewHolder {
+            val view = android.view.LayoutInflater.from(parent.context).inflate(R.layout.item_lyric, parent, false) as android.widget.TextView
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val text = lyrics[position].second
+            holder.textView.text = text
+            
+            if (position == activeIndex) {
+                holder.textView.setTypeface(null, android.graphics.Typeface.BOLD)
+                holder.textView.setTextColor(resources.getColor(R.color.textMain, null))
+                holder.textView.animate().alpha(1f).scaleX(1.1f).scaleY(1.1f).setDuration(200).start()
+            } else {
+                holder.textView.setTypeface(null, android.graphics.Typeface.NORMAL)
+                holder.textView.setTextColor(resources.getColor(R.color.textSec, null))
+                holder.textView.animate().alpha(0.5f).scaleX(1f).scaleY(1f).setDuration(200).start()
+            }
+            
+            holder.textView.setOnClickListener {
+                MusicPlayerManager.player?.seekTo(lyrics[position].first)
+            }
+        }
+
+        override fun getItemCount() = lyrics.size
+
+        fun updateTime(timeInMillis: Long, recyclerView: androidx.recyclerview.widget.RecyclerView?) {
+            var newIndex = -1
+            // Use binary search for efficiency if list is large
+            for (i in lyrics.indices) {
+                if (lyrics[i].first <= timeInMillis) {
+                    newIndex = i
+                } else {
+                    break
+                }
+            }
+            
+            if (newIndex != activeIndex) {
+                val oldIndex = activeIndex
+                activeIndex = newIndex
+                
+                if (oldIndex != -1) notifyItemChanged(oldIndex)
+                if (activeIndex != -1) {
+                    notifyItemChanged(activeIndex)
+                    
+                    // Keep the active item centered
+                    val layoutManager = recyclerView?.layoutManager as? androidx.recyclerview.widget.LinearLayoutManager
+                    if (layoutManager != null && recyclerView != null) {
+                        val smoothScroller = object : androidx.recyclerview.widget.LinearSmoothScroller(recyclerView.context) {
+                            override fun calculateDtToFit(viewStart: Int, viewEnd: Int, boxStart: Int, boxEnd: Int, snapPreference: Int): Int {
+                                return (boxStart + (boxEnd - boxStart) / 2) - (viewStart + (viewEnd - viewStart) / 2)
+                            }
+                            
+                            override fun calculateSpeedPerPixel(displayMetrics: android.util.DisplayMetrics): Float {
+                                return 100f / displayMetrics.densityDpi
+                            }
+                        }
+                        smoothScroller.targetPosition = activeIndex
+                        layoutManager.startSmoothScroll(smoothScroller)
+                    }
+                }
+            }
+        }
+    }
+
     private var artsitsList: MutableList<SongResponse.Artist> = ArrayList<SongResponse.Artist>()
     private val isDebugMode = false
     private val audioManager: AudioManager? = null
@@ -78,6 +156,38 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
         binding!!.title.isSelected = true
         binding!!.description.isSelected = true
+
+        val toggleLyrics = {
+            val parent = binding!!.root as android.view.ViewGroup
+            val transition = android.transition.Fade()
+            transition.duration = 300
+            android.transition.TransitionManager.beginDelayedTransition(parent, transition)
+            
+            if (binding!!.lyricsRecycler?.visibility == View.VISIBLE) {
+                binding!!.lyricsRecycler?.visibility = View.GONE
+                binding!!.coverImageCard?.visibility = View.VISIBLE
+                binding!!.lyricsIcon.setColorFilter(resources.getColor(R.color.textSec, null))
+            } else {
+                binding!!.lyricsRecycler?.visibility = View.VISIBLE
+                binding!!.coverImageCard?.visibility = View.GONE
+                binding!!.lyricsIcon.setColorFilter(resources.getColor(R.color.textMain, null))
+
+                val p = MusicPlayerManager.player
+                if (p != null) {
+                    lyricsAdapter?.updateTime(p.currentPosition, currentLyricsRecyclerView)
+                }
+            }
+        }
+
+        binding!!.lyricsIcon.setOnClickListener {
+            if (currentLyricsList.isNullOrEmpty()) return@setOnClickListener
+            toggleLyrics()
+        }
+        
+        binding!!.coverImageCard?.setOnClickListener {
+            if (currentLyricsList.isNullOrEmpty()) return@setOnClickListener
+            toggleLyrics()
+        }
 
         if ((MusicPlayerManager.trackQueue?.size ?: 0) <= 1) binding!!.shuffleIcon.visibility = View.INVISIBLE
 
@@ -678,6 +788,58 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             MusicPlayerManager.SONG_URL = SONG_URL
             prepareMediaPLayer()
         }
+
+        binding!!.lyricsIcon.visibility = View.GONE
+        binding!!.lyricsIcon.setColorFilter(resources.getColor(R.color.textSec, null))
+        
+        // Handle both possible IDs if naming was inconsistent, but we've standardized to lyrics_recycler
+        val recView = binding!!.lyricsRecycler
+        recView?.visibility = View.GONE
+        binding!!.coverImageCard?.visibility = View.VISIBLE
+        
+        currentLyricsList = null
+        lyricsAdapter = null
+        currentLyricsRecyclerView = null
+        
+        val durationInSecs = (song.duration ?: -1.0).toInt()
+        val artistName = if (!song.artists?.primary.isNullOrEmpty()) song.artists!!.primary!![0]?.name() ?: "" else ""
+        
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val fetchedLyrics = com.samyak.lrclib.LrcLib.getLyrics(
+                    title = song.name(),
+                    artist = artistName,
+                    duration = durationInSecs
+                ).getOrNull()
+
+                withContext(Dispatchers.Main) {
+                    if (!fetchedLyrics.isNullOrEmpty()) {
+                        val sentencesMap = com.samyak.lrclib.LrcLib.Lyrics(fetchedLyrics).sentences
+                        if (sentencesMap != null && sentencesMap.isNotEmpty()) {
+                            currentLyricsList = sentencesMap.toList()
+                            Log.i(TAG, "Fetched ${currentLyricsList?.size} lyric lines")
+                            
+                            lyricsAdapter = LyricsAdapter(currentLyricsList!!)
+                            val rv = binding!!.lyricsRecycler
+                            if (rv != null) {
+                                rv.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@MusicOverviewActivity)
+                                rv.adapter = lyricsAdapter
+                                currentLyricsRecyclerView = rv
+                                binding!!.lyricsIcon.visibility = View.VISIBLE
+                            } else {
+                                Log.e(TAG, "lyrics_recycler View not found in current binding")
+                            }
+                        }
+                    } else {
+                        Log.i(TAG, "No lyrics found for this song")
+                        // Optional: Toast or hint to user
+                        // Toast.makeText(this@MusicOverviewActivity, "Lyrics not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to fetch lyrics", e)
+            }
+        }
     }
 
     fun backPress(view: View?) {
@@ -746,10 +908,12 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                         val progress = ((currentPosition.toFloat() / duration) * 100).toInt()
                         binding!!.seekbar.progress = progress
                         binding!!.elapsedDuration.text = convertDuration(currentPosition)
+                        
+                        lyricsAdapter?.updateTime(currentPosition, currentLyricsRecyclerView)
                     }
 
                     // Schedule the next update
-                    handler.postDelayed(runnable, 1000)
+                    handler.postDelayed(runnable, 250)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error updating seekbar", e)
                 }
@@ -763,6 +927,8 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                         val progress = ((currentPosition.toFloat() / duration) * 100).toInt()
                         binding!!.seekbar.progress = progress
                         binding!!.elapsedDuration.text = convertDuration(currentPosition)
+                        
+                        lyricsAdapter?.updateTime(currentPosition, currentLyricsRecyclerView)
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error updating seekbar while paused", e)

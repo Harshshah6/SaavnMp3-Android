@@ -641,9 +641,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         // Update UI with current playback state
         if (MusicPlayerManager.player != null) {
             updateTrackInfo()
-            if (MusicPlayerManager.player?.isPlaying == true) {
-                updateSeekbar()
-            }
+            updateSeekbar()
         }
     }
 
@@ -870,10 +868,10 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             // Set play state
             if (MusicPlayerManager.player?.isPlaying == true) {
                 binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
-                updateSeekbar()
             } else {
                 binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
             }
+            updateSeekbar()
 
             // Update notification
             // showNotification(BaseApplicationClass.player.isPlaying() ?
@@ -891,6 +889,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     private val runnable = Runnable { this.updateSeekbar() }
 
     fun updateSeekbar() {
+        handler.removeCallbacks(runnable)
         try {
             if (MusicPlayerManager.player == null) {
                 Log.e(TAG, "Player is null in updateSeekbar")
@@ -898,56 +897,33 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
 
             val p = MusicPlayerManager.player ?: return
-            if (p.isPlaying) {
-                try {
-                    val duration: Long = p.duration
-                    val currentPosition: Long = p.currentPosition
+            
+            val duration: Long = p.duration
+            val currentPosition: Long = p.currentPosition
 
-                    // Check for valid duration to avoid division by zero
-                    if (duration > 0) {
-                        val progress = ((currentPosition.toFloat() / duration) * 100).toInt()
-                        binding!!.seekbar.progress = progress
-                        binding!!.elapsedDuration.text = convertDuration(currentPosition)
-                        
-                        lyricsAdapter?.updateTime(currentPosition, currentLyricsRecyclerView)
-                    }
-
-                    // Schedule the next update
-                    handler.postDelayed(runnable, 250)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error updating seekbar", e)
-                }
-            } else {
-                // If player is paused, still show correct position but don't schedule updates
-                try {
-                    val duration: Long = p.duration
-                    val currentPosition: Long = p.currentPosition
-
-                    if (duration > 0) {
-                        val progress = ((currentPosition.toFloat() / duration) * 100).toInt()
-                        binding!!.seekbar.progress = progress
-                        binding!!.elapsedDuration.text = convertDuration(currentPosition)
-                        
-                        lyricsAdapter?.updateTime(currentPosition, currentLyricsRecyclerView)
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error updating seekbar while paused", e)
-                }
+            if (duration > 0) {
+                val progress = ((currentPosition.toFloat() / duration) * 100).toInt()
+                binding!!.seekbar.progress = progress
+                binding!!.elapsedDuration.text = convertDuration(currentPosition)
+                
+                lyricsAdapter?.updateTime(currentPosition, currentLyricsRecyclerView)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Exception in updateSeekbar", e)
         }
+        handler.postDelayed(runnable, 250)
     }
 
     private val mHandler = Handler()
     private val mUpdateTimeTask = Runnable { this.updateTrackInfo() }
 
     private fun updateTrackInfo() {
+        mHandler.removeCallbacks(mUpdateTimeTask)
         if (binding!!.title.text
                 .toString() != MusicPlayerManager.MUSIC_TITLE
         ) binding!!.title.text = MusicPlayerManager.MUSIC_TITLE
-        if (binding!!.title.text
-                .toString() != MusicPlayerManager.MUSIC_TITLE
+        if (binding!!.description.text
+                .toString() != MusicPlayerManager.MUSIC_DESCRIPTION
         ) binding!!.description.text = MusicPlayerManager.MUSIC_DESCRIPTION
         Picasso.get().load(Uri.parse(MusicPlayerManager.IMAGE_URL))
             .into(binding!!.coverImage)

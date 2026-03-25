@@ -16,18 +16,20 @@ import com.harsh.shah.saavnmp3.records.ArtistAllSongs
 import com.paginate.Paginate
 
 class SeeMoreActivity : AppCompatActivity() {
-    var binding: ActivitySeeMoreBinding? = null
+    private var binding: ActivitySeeMoreBinding? = null
     private var totalItems = 0
     private var currentPage = 0
     private var isLoading = false
-    private val isLastPage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySeeMoreBinding.inflate(layoutInflater)
-        setContentView(binding!!.getRoot())
-        binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
-        binding!!.recyclerView.setAdapter(activitySeeMoreListAdapter)
+        setContentView(binding!!.root)
+        
+        binding!!.recyclerView.layoutManager = LinearLayoutManager(this)
+
+        // Set adapter before Paginate initialization to avoid "Adapter needs to be set!" exception
+        showData()
 
         val callbacks: Paginate.Callbacks = object : Paginate.Callbacks {
             override fun onLoadMore() {
@@ -35,11 +37,14 @@ class SeeMoreActivity : AppCompatActivity() {
             }
 
             override fun isLoading(): Boolean {
-                return isLoading
+                // Qualify with this@SeeMoreActivity to avoid infinite recursion
+                return this@SeeMoreActivity.isLoading
             }
 
             override fun hasLoadedAllItems(): Boolean {
-                return currentPage == totalItems / 10
+                if (totalItems == 0) return false
+                // Check if we have loaded all items (assuming 10 items per page)
+                return (currentPage + 1) * 10 >= totalItems
             }
         }
 
@@ -47,20 +52,25 @@ class SeeMoreActivity : AppCompatActivity() {
             .setLoadingTriggerThreshold(2)
             .addLoadingListItem(true)
             .build()
-
-        showData()
     }
 
     private fun showData() {
-        if (intent.extras == null) finish()
-        binding!!.toolbarText.text = intent.extras!!.getString("artist_name")
-        artistId = intent.extras!!.getString("id")
-        val type = intent.extras!!
-            .getString("type", ActivitySeeMoreListAdapter.Mode.TOP_SONGS.name)
+        val extras = intent.extras ?: run {
+            finish()
+            return
+        }
+        
+        binding!!.toolbarText.text = extras.getString("artist_name")
+        artistId = extras.getString("id")
+        val type = extras.getString("type", ActivitySeeMoreListAdapter.Mode.TOP_SONGS.name)
         mode = ActivitySeeMoreListAdapter.Mode.valueOf(type!!)
-        binding!!.recyclerView.setAdapter(
-            if (mode == ActivitySeeMoreListAdapter.Mode.TOP_SONGS) activitySeeMoreListAdapter else activitySeeMoreAlbumListAdapter
-        )
+        
+        binding!!.recyclerView.adapter = if (mode == ActivitySeeMoreListAdapter.Mode.TOP_SONGS) {
+            activitySeeMoreListAdapter
+        } else {
+            activitySeeMoreAlbumListAdapter
+        }
+        
         requestDataFirst()
     }
 
@@ -69,8 +79,10 @@ class SeeMoreActivity : AppCompatActivity() {
     private val activitySeeMoreListAdapter = ActivitySeeMoreListAdapter()
     private val activitySeeMoreAlbumListAdapter = ActivitySeeMoreAlbumListAdapter()
 
-    //private final ActivitySeeMoreSinglesListAdapter activitySeeMoreSinglesListAdapter = new ActivitySeeMoreSinglesListAdapter();
     private fun requestDataFirst() {
+        if (isLoading) return
+        isLoading = true
+        
         val apiManager = ApiManager(this)
         if (mode == ActivitySeeMoreListAdapter.Mode.TOP_SONGS) {
             apiManager.retrieveArtistSongs(
@@ -84,11 +96,13 @@ class SeeMoreActivity : AppCompatActivity() {
                         response: String?,
                         responseHeaders: HashMap<String?, Any?>?
                     ) {
-                        val artistAllSongs =
-                            Gson().fromJson<ArtistAllSongs>(response, ArtistAllSongs::class.java)
-                        if (!artistAllSongs.success) finish()
-                        val data = artistAllSongs.data ?: return
                         isLoading = false
+                        val artistAllSongs = Gson().fromJson(response, ArtistAllSongs::class.java)
+                        if (!artistAllSongs.success) {
+                            finish()
+                            return
+                        }
+                        val data = artistAllSongs.data ?: return
                         currentPage = 0
                         totalItems = data.total ?: 0
                         activitySeeMoreListAdapter.addAll(data.songs ?: mutableListOf())
@@ -106,11 +120,13 @@ class SeeMoreActivity : AppCompatActivity() {
                     response: String?,
                     responseHeaders: HashMap<String?, Any?>?
                 ) {
-                    val artistAllSongs =
-                        Gson().fromJson<ArtistAllAlbum>(response, ArtistAllAlbum::class.java)
-                    if (!artistAllSongs.success) finish()
-                    val data = artistAllSongs.data ?: return
                     isLoading = false
+                    val artistAllAlbum = Gson().fromJson(response, ArtistAllAlbum::class.java)
+                    if (!artistAllAlbum.success) {
+                        finish()
+                        return
+                    }
+                    val data = artistAllAlbum.data ?: return
                     currentPage = 0
                     totalItems = data.total ?: 0
                     activitySeeMoreAlbumListAdapter.addAll(data.albums ?: mutableListOf())
@@ -125,12 +141,15 @@ class SeeMoreActivity : AppCompatActivity() {
     }
 
     private fun requestDataNext() {
-        currentPage++
+        if (isLoading) return
+        isLoading = true
+        
+        val nextPage = currentPage + 1
         val apiManager = ApiManager(this)
         if (mode == ActivitySeeMoreListAdapter.Mode.TOP_SONGS) {
             apiManager.retrieveArtistSongs(
                 artistId ?: "",
-                currentPage,
+                nextPage,
                 null,
                 null,
                 object : RequestNetwork.RequestListener {
@@ -139,11 +158,11 @@ class SeeMoreActivity : AppCompatActivity() {
                         response: String?,
                         responseHeaders: HashMap<String?, Any?>?
                     ) {
-                        val artistAllSongs =
-                            Gson().fromJson<ArtistAllSongs>(response, ArtistAllSongs::class.java)
-                        if (!artistAllSongs.success) finish()
-                        val data = artistAllSongs.data ?: return
                         isLoading = false
+                        val artistAllSongs = Gson().fromJson(response, ArtistAllSongs::class.java)
+                        if (!artistAllSongs.success) return
+                        val data = artistAllSongs.data ?: return
+                        currentPage = nextPage
                         activitySeeMoreListAdapter.addAll(data.songs ?: mutableListOf())
                     }
 
@@ -155,18 +174,18 @@ class SeeMoreActivity : AppCompatActivity() {
         } else {
             apiManager.retrieveArtistAlbums(
                 artistId ?: "",
-                currentPage,
+                nextPage,
                 object : RequestNetwork.RequestListener {
                     override fun onResponse(
                         tag: String?,
                         response: String?,
                         responseHeaders: HashMap<String?, Any?>?
                     ) {
-                        val artistAllSongs =
-                            Gson().fromJson<ArtistAllAlbum>(response, ArtistAllAlbum::class.java)
-                        if (!artistAllSongs.success) finish()
-                        val data = artistAllSongs.data ?: return
                         isLoading = false
+                        val artistAllAlbum = Gson().fromJson(response, ArtistAllAlbum::class.java)
+                        if (!artistAllAlbum.success) return
+                        val data = artistAllAlbum.data ?: return
+                        currentPage = nextPage
                         activitySeeMoreAlbumListAdapter.addAll(data.albums ?: mutableListOf())
                     }
 

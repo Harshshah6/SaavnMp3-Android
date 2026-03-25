@@ -6,7 +6,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.res.ColorStateList
-import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -53,6 +52,8 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
+import androidx.core.net.toUri
+import androidx.core.view.isVisible
 
 class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnection {
     private val TAG = "MusicOverviewActivity"
@@ -120,7 +121,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                     
                     // Keep the active item centered
                     val layoutManager = recyclerView?.layoutManager as? androidx.recyclerview.widget.LinearLayoutManager
-                    if (layoutManager != null && recyclerView != null) {
+                    if (layoutManager != null) {
                         val smoothScroller = object : androidx.recyclerview.widget.LinearSmoothScroller(recyclerView.context) {
                             override fun calculateDtToFit(viewStart: Int, viewEnd: Int, boxStart: Int, boxEnd: Int, snapPreference: Int): Int {
                                 return (boxStart + (boxEnd - boxStart) / 2) - (viewStart + (viewEnd - viewStart) / 2)
@@ -138,9 +139,8 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         }
     }
 
-    private var artsitsList: MutableList<SongResponse.Artist> = ArrayList<SongResponse.Artist>()
+    private var artistsList: MutableList<SongResponse.Artist> = ArrayList<SongResponse.Artist>()
     private val isDebugMode = false
-    private val audioManager: AudioManager? = null
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -162,14 +162,14 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             val transition = android.transition.Fade()
             transition.duration = 300
             android.transition.TransitionManager.beginDelayedTransition(parent, transition)
-            
-            if (binding!!.lyricsRecycler?.visibility == View.VISIBLE) {
-                binding!!.lyricsRecycler?.visibility = View.GONE
-                binding!!.coverImageCard?.visibility = View.VISIBLE
+
+            if (binding!!.lyricsRecycler.isVisible) {
+                binding!!.lyricsRecycler.visibility = View.GONE
+                binding!!.coverImageCard.visibility = View.VISIBLE
                 binding!!.lyricsIcon.setColorFilter(resources.getColor(R.color.textSec, null))
             } else {
-                binding!!.lyricsRecycler?.visibility = View.VISIBLE
-                binding!!.coverImageCard?.visibility = View.GONE
+                binding!!.lyricsRecycler.visibility = View.VISIBLE
+                binding!!.coverImageCard.visibility = View.GONE
                 binding!!.lyricsIcon.setColorFilter(resources.getColor(R.color.textMain, null))
 
                 val p = MusicPlayerManager.player
@@ -183,15 +183,15 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             if (currentLyricsList.isNullOrEmpty()) return@setOnClickListener
             toggleLyrics()
         }
-        
-        binding!!.coverImageCard?.setOnClickListener {
+
+        binding!!.coverImageCard.setOnClickListener {
             if (currentLyricsList.isNullOrEmpty()) return@setOnClickListener
             toggleLyrics()
         }
 
         if ((MusicPlayerManager.trackQueue?.size ?: 0) <= 1) binding!!.shuffleIcon.visibility = View.INVISIBLE
 
-        binding!!.playPauseImage.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.playPauseImage.setOnClickListener(View.OnClickListener { _: View? ->
             try {
                 if (MusicPlayerManager.player == null) {
                     Log.e(TAG, "Player is null, cannot toggle playback")
@@ -240,7 +240,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
         // val baseApplicationClass = getApplicationContext() as BaseApplicationClass
 
-        binding!!.nextIcon.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.nextIcon.setOnClickListener(View.OnClickListener { _: View? ->
             try {
                 Log.i(TAG, "Next button clicked")
                 if (MusicPlayerManager.player == null) {
@@ -529,7 +529,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                     })
             })
 
-            for (artist in artsitsList) {
+            for (artist in artistsList) {
                 try {
                     val images = artist.image
                     val imgUrl = if (images.isNullOrEmpty())
@@ -739,7 +739,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
 
         if (intent.extras!!.getString("type", "") == "clear") {
-            MusicPlayerManager.trackQueue = ArrayList<String?>(mutableListOf<String?>(ID))
+            MusicPlayerManager.trackQueue = ArrayList(mutableListOf<String?>(ID))
         }
         if ((ID.startsWith("http") || ID.startsWith("www")) && ID.contains("jiosaavn.com")) {
             apiManager.retrieveSongByLink(ID, requestListener)
@@ -774,7 +774,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         }
         val downloadUrls = song.downloadUrl
 
-        artsitsList = song.artists?.primary?.filterNotNull()?.toMutableList() ?: mutableListOf()
+        artistsList = song.artists?.primary?.filterNotNull()?.toMutableList() ?: mutableListOf()
 
         SONG_URL = MusicPlayerManager.getDownloadUrl(downloadUrls)
 
@@ -813,7 +813,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 withContext(Dispatchers.Main) {
                     if (!fetchedLyrics.isNullOrEmpty()) {
                         val sentencesMap = com.samyak.lrclib.LrcLib.Lyrics(fetchedLyrics).sentences
-                        if (sentencesMap != null && sentencesMap.isNotEmpty()) {
+                        if (!sentencesMap.isNullOrEmpty()) {
                             currentLyricsList = sentencesMap.toList()
                             Log.i(TAG, "Fetched ${currentLyricsList?.size} lyric lines")
                             
@@ -925,7 +925,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         if (binding!!.description.text
                 .toString() != MusicPlayerManager.MUSIC_DESCRIPTION
         ) binding!!.description.text = MusicPlayerManager.MUSIC_DESCRIPTION
-        Picasso.get().load(Uri.parse(MusicPlayerManager.IMAGE_URL))
+        Picasso.get().load(MusicPlayerManager.IMAGE_URL?.toUri())
             .into(binding!!.coverImage)
         val p = MusicPlayerManager.player ?: return
         binding!!.seekbar.progress = ((p.currentPosition.toFloat() / p.duration) * 100).toInt()
@@ -1083,14 +1083,14 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             val minutes = (duration % (1000 * 60 * 60)).toInt() / (1000 * 60)
             val seconds = ((duration % (1000 * 60 * 60)) % (1000 * 60) / 1000).toInt()
             if (hours > 0) {
-                timeString = hours.toString() + ":"
+                timeString = "$hours:"
             }
-            if (seconds < 10) {
-                secondString = "0" + seconds
+            secondString = if (seconds < 10) {
+                "0$seconds"
             } else {
-                secondString = "" + seconds
+                "" + seconds
             }
-            timeString = timeString + minutes + ":" + secondString
+            timeString = "$timeString$minutes:$secondString"
             return timeString
         }
     }

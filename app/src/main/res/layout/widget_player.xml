@@ -1,42 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="72dp"
     android:background="@drawable/widget_background"
-    android:gravity="center"
-    android:orientation="horizontal"
-    android:padding="@dimen/_12sdp">
+    android:paddingHorizontal="12dp">
 
-
+    <!-- Album Art -->
     <ImageView
-        android:layout_width="@dimen/_32sdp"
-        android:layout_height="@dimen/_32sdp"
-        android:layout_marginEnd="@dimen/_4sdp"
+        android:id="@+id/widget_album_art"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:scaleType="centerCrop"
         android:src="@mipmap/ic_launcher" />
 
+    <!-- Text Information -->
     <LinearLayout
-        android:id="@+id/playback"
+        android:id="@+id/text_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="12dp"
+        android:layout_toStartOf="@+id/controls_container"
+        android:layout_toEndOf="@+id/widget_album_art"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_song_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:text="Not Playing"
+            android:textColor="@color/textMain"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_artist_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="SaavnMp3"
+            android:textColor="@color/textSec"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Controls -->
+    <LinearLayout
+        android:id="@+id/controls_container"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/button_prev"
-            android:layout_width="@dimen/_32sdp"
-            android:layout_height="@dimen/_32sdp"
-            android:src="@drawable/skip_previous_24px" />
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:focusable="true"
+            android:clickable="true"
+            android:contentDescription="Previous"
+            android:padding="6dp"
+            android:src="@drawable/skip_previous_24px"
+            app:tint="@color/textSec" />
 
         <ImageView
             android:id="@+id/button_play_pause"
-            android:layout_width="@dimen/_32sdp"
-            android:layout_height="@dimen/_32sdp"
-            android:src="@drawable/play_pause_24px" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Play/Pause"
+            android:padding="4dp"
+            android:src="@drawable/play_arrow_24px"
+            app:tint="@color/spotify_green" />
 
         <ImageView
             android:id="@+id/button_next"
-            android:layout_width="@dimen/_32sdp"
-            android:layout_height="@dimen/_32sdp"
-            android:src="@drawable/skip_next_24px" />
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Next"
+            android:padding="6dp"
+            android:src="@drawable/skip_next_24px"
+            app:tint="@color/textSec" />
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

@@ -40,6 +40,7 @@ import com.harsh.shah.saavnmp3.network.ApiManager
 import com.harsh.shah.saavnmp3.network.utility.RequestNetwork
 import com.harsh.shah.saavnmp3.records.SongResponse
 import com.harsh.shah.saavnmp3.services.NotificationReceiver
+import com.harsh.shah.saavnmp3.widgets.WidgetPlayerProvider
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import java.io.File
@@ -117,17 +118,21 @@ object MusicPlayerManager {
                 when (playbackState) {
                     Player.STATE_READY -> {
                         player?.play()
+                        updateWidget()
                     }
                     Player.STATE_ENDED -> {
                         nextTrack()
                     }
-                    else -> {}
+                    else -> {
+                        updateWidget()
+                    }
                 }
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 Log.i(TAG, "Player isPlaying changed to: $isPlaying")
                 showNotification()
+                updateWidget()
             }
 
             override fun onPlayerError(error: PlaybackException) {
@@ -175,11 +180,16 @@ object MusicPlayerManager {
         description?.let { MUSIC_DESCRIPTION = it }
         MUSIC_ID = id
         Log.i(TAG, "setMusicDetails: $MUSIC_TITLE - ID: $MUSIC_ID")
+        updateWidget()
     }
 
     fun cancelNotification() {
         val notificationManager = appContext?.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
         notificationManager?.cancel(1)
+    }
+
+    private fun updateWidget() {
+        appContext?.let { WidgetPlayerProvider.updateAllWidgets(it) }
     }
 
     fun getDownloadUrl(downloadUrlList: MutableList<SongResponse.DownloadUrl?>?): String {
@@ -303,7 +313,10 @@ object MusicPlayerManager {
         else if (p.playbackState == Player.STATE_IDLE) prepareMediaPlayer()
         else p.play()
 
-        Handler(Looper.getMainLooper()).postDelayed({ showNotification() }, 100)
+        Handler(Looper.getMainLooper()).postDelayed({ 
+            showNotification() 
+            updateWidget()
+        }, 100)
     }
 
     fun prepareMediaPlayer() {
@@ -321,6 +334,7 @@ object MusicPlayerManager {
         p.playWhenReady = false
         p.prepare()
         showNotification()
+        updateWidget()
     }
 
     fun playTrack() {
@@ -365,6 +379,7 @@ object MusicPlayerManager {
             MUSIC_ID = trackQueue!![track_position]
             playTrack()
             showNotification()
+            updateWidget()
         } catch (e: Exception) {
             if (trackQueue!!.isNotEmpty()) {
                 track_position = 0
@@ -390,6 +405,7 @@ object MusicPlayerManager {
         MUSIC_ID = trackQueue!![track_position]
         playTrack()
         showNotification()
+        updateWidget()
     }
 
     private fun getStateString(state: Int): String = when (state) {

@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.activities
+package com.harsh.shah.saavnmp3.activities
 
 import android.content.Intent
 import android.net.Uri
@@ -11,6 +11,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,6 +34,9 @@ class SearchActivity : AppCompatActivity() {
     var binding: ActivitySearchBinding? = null
     private val TAG = "SearchActivity"
     var globalSearch: GlobalSearch? = null
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private var searchRunnable: Runnable? = null
+    private var currentQuery: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +73,18 @@ class SearchActivity : AppCompatActivity() {
                 } else {
                     binding!!.clearIcon.visibility = View.VISIBLE
                 }
+
+                searchRunnable?.let { searchHandler.removeCallbacks(it) }
+                searchRunnable = Runnable {
+                    val query = s.toString().trim()
+                    if (query.isNotEmpty()) {
+                        showData(query)
+                    } else {
+                        currentQuery = ""
+                        binding!!.recyclerView.adapter = ActivitySearchListItemAdapter(mutableListOf())
+                    }
+                }
+                searchHandler.postDelayed(searchRunnable!!, 500)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -93,6 +110,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showData(query: String) {
+        currentQuery = query
         showShimmerData()
 
         if ((query.startsWith("http") || query.startsWith("www")) && query.contains("jiosaavn.com")) {
@@ -113,6 +131,7 @@ class SearchActivity : AppCompatActivity() {
                 response: String?,
                 responseHeaders: HashMap<String?, Any?>?
             ) {
+                if (query != currentQuery) return
                 globalSearch = Gson().fromJson<GlobalSearch?>(response, GlobalSearch::class.java)
                 if (globalSearch!!.success) {
                     sharedPreferenceManager.setSearchResultCache(query, globalSearch)
@@ -129,6 +148,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onErrorResponse(tag: String?, message: String?) {
+                if (query != currentQuery) return
                 Log.e(TAG, "onErrorResponse: " + message)
                 Toast.makeText(
                     this@SearchActivity,
@@ -139,6 +159,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             fun onFailed() {
+                if (query != currentQuery) return
                 val resultOffline = sharedPreferenceManager.getSearchResult(query)
                 if (resultOffline != null) {
                     globalSearch = resultOffline

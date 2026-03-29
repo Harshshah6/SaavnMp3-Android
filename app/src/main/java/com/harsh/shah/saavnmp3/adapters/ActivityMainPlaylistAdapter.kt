@@ -16,6 +16,7 @@ import com.harsh.shah.saavnmp3.activities.ListActivity
 import com.harsh.shah.saavnmp3.adapters.ActivityMainPlaylistAdapter.PlaylistAdapterViewHolder
 import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 class ActivityMainPlaylistAdapter(private val data: MutableList<AlbumItem?>) :
     RecyclerView.Adapter<PlaylistAdapterViewHolder?>() {
@@ -42,22 +43,22 @@ class ActivityMainPlaylistAdapter(private val data: MutableList<AlbumItem?>) :
             return
         }
 
-        (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = data.get(position)!!.albumTitle()
+        (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = data[position]!!.albumTitle()
         val imageView = holder.itemView.findViewById<ImageView?>(R.id.imageView)
-        Picasso.get().load(Uri.parse(data.get(position)!!.albumCover)).into(imageView)
+        Picasso.get().load(data[position]!!.albumCover?.toUri()).into(imageView)
 
-        holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->
+        holder.itemView.setOnClickListener { v: View? ->
             v!!.context.startActivity(
                 Intent(v.context, ListActivity::class.java).putExtra(
                     "data",
-                    Gson().toJson(data.get(position))
+                    Gson().toJson(data[position])
                 )
             )
-        })
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (data.get(position)!!.id == "<shimmer>") return 1
+        if (data[position]!!.id == "<shimmer>") return 1
         return 0
     }
 

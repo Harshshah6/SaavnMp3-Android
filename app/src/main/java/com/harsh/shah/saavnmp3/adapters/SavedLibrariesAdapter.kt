@@ -14,6 +14,7 @@ import com.harsh.shah.saavnmp3.activities.ListActivity
 import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
     RecyclerView.Adapter<SavedLibrariesAdapter.ViewHolder>() {
@@ -27,21 +28,21 @@ class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.title.text = data.get(position)!!.name
-        holder.artist.text = data.get(position)!!.description
-        Picasso.get().load(Uri.parse(data.get(position)!!.image)).into(holder.coverImage)
+        holder.title.text = data[position]!!.name
+        holder.artist.text = data[position]!!.description
+        Picasso.get().load(data[position]!!.image?.toUri()).into(holder.coverImage)
 
         holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->
             val albumItem = AlbumItem(
-                data.get(position)!!.name,
-                data.get(position)!!.description,
-                data.get(position)!!.image,
-                data.get(position)!!.id
+                data[position]!!.name,
+                data[position]!!.description,
+                data[position]!!.image,
+                data[position]!!.id
             )
-            if (data.get(position)!!.isCreatedByUser) {
+            if (data[position]!!.isCreatedByUser) {
                 v!!.context.startActivity(
                     Intent(v.context, ListActivity::class.java)
-                        .putExtra("id", data.get(position)!!.id)
+                        .putExtra("id", data[position]!!.id)
                         .putExtra("data", Gson().toJson(albumItem))
                         .putExtra("type", "playlist")
                         .putExtra("createdByUser", true)
@@ -51,8 +52,8 @@ class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
             v!!.context.startActivity(
                 Intent(v.context, ListActivity::class.java)
                     .putExtra("data", Gson().toJson(albumItem))
-                    .putExtra("type", if (data.get(position)!!.isAlbum) "album" else "playlist")
-                    .putExtra("id", data.get(position)!!.id)
+                    .putExtra("type", if (data[position]!!.isAlbum) "album" else "playlist")
+                    .putExtra("id", data[position]!!.id)
             )
         })
     }
@@ -62,14 +63,8 @@ class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val coverImage: ImageView?
-        val title: TextView
-        val artist: TextView
-
-        init {
-            coverImage = itemView.findViewById<ImageView?>(R.id.coverImage)
-            title = itemView.findViewById<TextView>(R.id.title)
-            artist = itemView.findViewById<TextView>(R.id.artist)
-        }
+        val coverImage: ImageView? = itemView.findViewById(R.id.coverImage)
+        val title: TextView = itemView.findViewById(R.id.title)
+        val artist: TextView = itemView.findViewById(R.id.artist)
     }
 }

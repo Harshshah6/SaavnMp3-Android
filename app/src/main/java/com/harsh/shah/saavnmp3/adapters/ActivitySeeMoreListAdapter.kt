@@ -11,10 +11,10 @@ import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 class ActivitySeeMoreListAdapter : RecyclerView.Adapter<ActivitySeeMoreListAdapter.ViewHolder?> {
     private val data: MutableList<Song?>?
-    private val isLoadingAdded = false
 
     constructor(data: MutableList<Song?>?) {
         this.data = data
@@ -50,26 +50,26 @@ class ActivitySeeMoreListAdapter : RecyclerView.Adapter<ActivitySeeMoreListAdapt
         holder.itemView.findViewById<ImageView?>(R.id.more)
 
         positionTextView.text = (position + 1).toString()
-        coverTitle.text = data!!.get(position)!!.name()
-        coverPlayed.text = String.format("%s | %s", data.get(position)!!.year, data.get(position)!!.label)
-        val images = data?.get(position)?.image
+        coverTitle.text = data!![position]!!.name()
+        coverPlayed.text = String.format("%s | %s", data[position]!!.year, data[position]!!.label)
+        val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (url.isNotEmpty()) {
-            Picasso.get().load(Uri.parse(url)).into(coverImage)
+            Picasso.get().load(url.toUri()).into(coverImage)
         }
 
-        holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
+        holder.itemView.setOnClickListener { view: View? ->
             view!!.context.startActivity(
                 Intent(
                     view.context,
                     MusicOverviewActivity::class.java
-                ).putExtra("id", data.get(position)!!.id)
+                ).putExtra("id", data[position]!!.id)
             )
-        })
+        }
     }
 
     override fun getItemCount(): Int {
-        return if (data == null) 0 else data.size
+        return data?.size ?: 0
     }
 
     override fun getItemViewType(position: Int): Int {

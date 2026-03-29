@@ -139,7 +139,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         }
     }
 
-    private var artistsList: MutableList<SongResponse.Artist> = ArrayList<SongResponse.Artist>()
+    private var artistsList: MutableList<SongResponse.Artist> = ArrayList()
     private val isDebugMode = false
 
     override fun onNewIntent(intent: Intent) {
@@ -240,7 +240,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
         // val baseApplicationClass = getApplicationContext() as BaseApplicationClass
 
-        binding!!.nextIcon.setOnClickListener(View.OnClickListener { _: View? ->
+        binding!!.nextIcon.setOnClickListener(View.OnClickListener {
             try {
                 Log.i(TAG, "Next button clicked")
                 if (MusicPlayerManager.player == null) {
@@ -286,7 +286,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
         })
 
-        binding!!.prevIcon.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.prevIcon.setOnClickListener(View.OnClickListener {
             try {
                 Log.i(TAG, "Previous button clicked")
                 if (MusicPlayerManager.player == null) {
@@ -344,11 +344,10 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
         })
 
-        binding!!.repeatIcon.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.repeatIcon.setOnClickListener(View.OnClickListener {
             try {
                 // Cycle through all three repeat modes
-                val player = MusicPlayerManager.player
-                if (player == null) return@OnClickListener
+                val player = MusicPlayerManager.player ?: return@OnClickListener
                 val currentMode: Int = player.repeatMode
                 val newMode: Int
                 val modeMessage: String?
@@ -385,7 +384,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                     Toast.LENGTH_SHORT
                 ).show()
 
-                Log.i(TAG, "Repeat mode changed to: " + newMode)
+                Log.i(TAG, "Repeat mode changed to: $newMode")
             } catch (e: Exception) {
                 Log.e(TAG, "Error changing repeat mode", e)
                 Toast.makeText(
@@ -396,11 +395,12 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
         })
 
-        binding!!.shuffleIcon.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.shuffleIcon.setOnClickListener {
             val player = MusicPlayerManager.player
             if (player != null) {
                 player.shuffleModeEnabled = !player.shuffleModeEnabled
-                if (player.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(getResources().getColor(R.color.spotify_green))
+                if (player.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList =
+                    ColorStateList.valueOf(getResources().getColor(R.color.spotify_green))
                 else binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(
                     getResources().getColor(
                         R.color.textSec
@@ -412,9 +412,9 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 "Shuffle Mode Changed.",
                 Toast.LENGTH_SHORT
             ).show()
-        })
+        }
 
-        binding!!.shareIcon.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.shareIcon.setOnClickListener(View.OnClickListener {
             if (SHARE_URL.isBlank()) return@OnClickListener
             val sendIntent = Intent()
             sendIntent.action = Intent.ACTION_SEND
@@ -423,7 +423,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             startActivity(sendIntent)
         })
 
-        binding!!.moreIcon.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.moreIcon.setOnClickListener(View.OnClickListener {
             val bottomSheetDialog = BottomSheetDialog(
                 this@MusicOverviewActivity,
                 R.style.MyBottomSheetDialogTheme
@@ -432,10 +432,10 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 .inflate(layoutInflater)
             _binding.albumTitle.text = binding!!.title.text.toString()
             _binding.albumSubTitle.text = binding!!.description.text.toString()
-            Picasso.get().load(Uri.parse(IMAGE_URL)).into(_binding.coverImage)
+            Picasso.get().load(IMAGE_URL?.toUri()).into(_binding.coverImage)
             val linearLayout = _binding.main
 
-            _binding.goToAlbum.setOnClickListener(View.OnClickListener { go_to_album: View? ->
+            _binding.goToAlbum.setOnClickListener(View.OnClickListener {
                 if (mSongResponse == null) return@OnClickListener
                 val song = mSongResponse!!.data?.get(0)
                 if (song?.album == null) return@OnClickListener
@@ -448,19 +448,18 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 )
             })
 
-            _binding.addToLibrary.setOnClickListener(View.OnClickListener { v: View? ->
-                -1
+            _binding.addToLibrary.setOnClickListener(View.OnClickListener {
                 val sharedPreferenceManager: SharedPreferenceManager =
                     SharedPreferenceManager.getInstance(this@MusicOverviewActivity)
-                var savedLibraries = sharedPreferenceManager.savedLibrariesData as? SavedLibraries
-                if (savedLibraries == null) savedLibraries = SavedLibraries(ArrayList<Library?>())
-                val lists = savedLibraries.lists ?: emptyList<Library?>()
+                var savedLibraries = sharedPreferenceManager.savedLibrariesData
+                if (savedLibraries == null) savedLibraries = SavedLibraries(ArrayList())
+                val lists = savedLibraries.lists ?: emptyList()
                 if (lists.isEmpty()) {
                     Snackbar.make(_binding.getRoot(), "No Libraries Found", Snackbar.LENGTH_SHORT)
                         .show()
                     return@OnClickListener
                 }
-                val userCreatedLibraries: MutableList<String?> = ArrayList<String?>()
+                val userCreatedLibraries: MutableList<String?> = ArrayList()
                 for (library in lists) {
                     if (library != null && library.isCreatedByUser) userCreatedLibraries.add(library.name)
                 }
@@ -522,8 +521,8 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                             alertDialogBuilder.setTitle("Error")
                             alertDialogBuilder.setMessage(errorMessage)
                             alertDialogBuilder.setPositiveButton(
-                                "OK",
-                                DialogInterface.OnClickListener { dialogInterface: DialogInterface?, i: Int -> dialogInterface!!.dismiss() })
+                                "OK"
+                            ) { dialogInterface: DialogInterface?, _: Int -> dialogInterface!!.dismiss() }
                             alertDialogBuilder.show()
                         }
                     })
@@ -542,7 +541,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                     )
                     bottomSheetItemView.setFocusable(true)
                     bottomSheetItemView.isClickable = true
-                    bottomSheetItemView.setOnClickListener(View.OnClickListener { view1: View? ->
+                    bottomSheetItemView.setOnClickListener {
                         Log.i(TAG, "BottomSheetItemView: onCLicked!")
                         startActivity(
                             Intent(this@MusicOverviewActivity, ArtistProfileActivity::class.java)
@@ -552,7 +551,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                                     )
                                 )
                         )
-                    })
+                    }
                     linearLayout.addView(bottomSheetItemView)
                 } catch (e: Exception) {
                     Log.e(TAG, "BottomSheetDialog: ", e)
@@ -563,7 +562,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             bottomSheetDialog.show()
         })
 
-        binding!!.trackQuality.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.trackQuality.setOnClickListener { view: View? ->
             val popupMenu = PopupMenu(this@MusicOverviewActivity, view!!)
             popupMenu.menuInflater.inflate(R.menu.track_quality_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener { menuItem: MenuItem? ->
@@ -580,7 +579,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 true
             }
             popupMenu.show()
-        })
+        }
 
         binding!!.trackQuality.text = MusicPlayerManager.TRACK_QUALITY
 
@@ -600,12 +599,11 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             this@MusicOverviewActivity, android.R.layout.simple_list_item_1,
             userCreatedLibraries
         )
-        val finalSavedLibraries = savedLibraries
         materialAlertDialogBuilder.setAdapter(
             listAdapter,
-            DialogInterface.OnClickListener { dialogInterface: DialogInterface?, i: Int ->
+            DialogInterface.OnClickListener { _: DialogInterface?, i: Int ->
                 // index = i;
-                Log.i(TAG, "pickedLibrary: " + i)
+                Log.i(TAG, "pickedLibrary: $i")
 
                 val song = mSongResponse!!.data?.get(0) ?: return@OnClickListener
 
@@ -616,10 +614,10 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                     IMAGE_URL
                 )
 
-                finalSavedLibraries.lists?.get(i)?.songs?.add(songs)
-                sharedPreferenceManager.savedLibrariesData = finalSavedLibraries
+                savedLibraries.lists?.get(i)?.songs?.add(songs)
+                sharedPreferenceManager.savedLibrariesData = savedLibraries
                 Toast.makeText(
-                    this@MusicOverviewActivity, "Added to " + finalSavedLibraries.lists?.get(i)?.name,
+                    this@MusicOverviewActivity, "Added to " + savedLibraries.lists?.get(i)?.name,
                     Toast.LENGTH_SHORT
                 ).show()
             })
@@ -770,7 +768,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         IMAGE_URL = if (!image.isNullOrEmpty()) image[image.size - 1]?.url ?: "" else ""
         SHARE_URL = song.url ?: ""
         if (IMAGE_URL!!.isNotEmpty()) {
-            Picasso.get().load(Uri.parse(IMAGE_URL)).into(binding!!.coverImage)
+            Picasso.get().load(IMAGE_URL?.toUri()).into(binding!!.coverImage)
         }
         val downloadUrls = song.downloadUrl
 
@@ -792,15 +790,15 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         
         // Handle both possible IDs if naming was inconsistent, but we've standardized to lyrics_recycler
         val recView = binding!!.lyricsRecycler
-        recView?.visibility = View.GONE
-        binding!!.coverImageCard?.visibility = View.VISIBLE
+        recView.visibility = View.GONE
+        binding!!.coverImageCard.visibility = View.VISIBLE
         
         currentLyricsList = null
         lyricsAdapter = null
         currentLyricsRecyclerView = null
         
         val durationInSecs = (song.duration ?: -1.0).toInt()
-        val artistName = if (!song.artists?.primary.isNullOrEmpty()) song.artists!!.primary!![0]?.name() ?: "" else ""
+        val artistName = if (!song.artists?.primary.isNullOrEmpty()) song.artists.primary[0]?.name() ?: "" else ""
         
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -819,13 +817,11 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                             
                             lyricsAdapter = LyricsAdapter(currentLyricsList!!)
                             val rv = binding!!.lyricsRecycler
-                            if (rv != null) {
+                            run {
                                 rv.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@MusicOverviewActivity)
                                 rv.adapter = lyricsAdapter
                                 currentLyricsRecyclerView = rv
                                 binding!!.lyricsIcon.visibility = View.VISIBLE
-                            } else {
-                                Log.e(TAG, "lyrics_recycler View not found in current binding")
                             }
                         }
                     } else {
@@ -1000,7 +996,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
 
             // Update UI to show active button state
-            runOnUiThread(Runnable {
+            runOnUiThread {
                 binding!!.nextIcon.alpha = 0.5f
                 binding!!.nextIcon.animate().alpha(1.0f).setDuration(200).start()
 
@@ -1013,7 +1009,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
                 }
-            })
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error in nextClicked", e)
         }
@@ -1028,7 +1024,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
 
             // Update UI to show active button state
-            runOnUiThread(Runnable {
+            runOnUiThread {
                 binding!!.prevIcon.alpha = 0.5f
                 binding!!.prevIcon.animate().alpha(1.0f).setDuration(200).start()
 
@@ -1041,7 +1037,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
                 }
-            })
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error in prevClicked", e)
         }
@@ -1049,7 +1045,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
     override fun playClicked() {
         Log.i(TAG, "playClicked called from service")
-        runOnUiThread(Runnable {
+        runOnUiThread {
             // Retrieve application class to toggle playback
             MusicPlayerManager.togglePlayPause()
 
@@ -1058,7 +1054,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             } else {
                 binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
             }
-        })
+        }
     }
 
     override fun onProgressChanged(progress: Int) {

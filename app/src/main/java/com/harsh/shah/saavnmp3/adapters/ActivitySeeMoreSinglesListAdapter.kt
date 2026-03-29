@@ -14,6 +14,7 @@ import com.harsh.shah.saavnmp3.activities.ListActivity
 import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.harsh.shah.saavnmp3.records.AlbumsSearch
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 class ActivitySeeMoreSinglesListAdapter :
     RecyclerView.Adapter<ActivitySeeMoreSinglesListAdapter.ViewHolder?> {
@@ -24,7 +25,7 @@ class ActivitySeeMoreSinglesListAdapter :
     }
 
     constructor() {
-        this.data = ArrayList<AlbumsSearch.Data.Results?>()
+        this.data = ArrayList()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -53,16 +54,16 @@ class ActivitySeeMoreSinglesListAdapter :
         holder.itemView.findViewById<ImageView?>(R.id.more)
 
         positionTextView.text = (position + 1).toString()
-        coverTitle.text = data!!.get(position)!!.name()
-        coverPlayed.text = String.format("%s | %s", data.get(position)!!.year, data.get(position)!!.language)
-        val images = data?.get(position)?.image
+        coverTitle.text = data!![position]!!.name()
+        coverPlayed.text = String.format("%s | %s", data[position]!!.year, data[position]!!.language)
+        val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (url.isNotEmpty()) {
-            Picasso.get().load(Uri.parse(url)).into(coverImage)
+            Picasso.get().load(url.toUri()).into(coverImage)
         }
 
-        holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
-            val item = data?.get(position) ?: return@OnClickListener
+        holder.itemView.setOnClickListener(View.OnClickListener {
+            val item = data[position] ?: return@OnClickListener
             val itemImages = item.image
             val itemUrl = if (itemImages.isNullOrEmpty()) "" else itemImages[itemImages.size - 1]?.url ?: ""
 
@@ -76,13 +77,13 @@ class ActivitySeeMoreSinglesListAdapter :
                 Intent(holder.itemView.context, ListActivity::class.java)
                     .putExtra("data", Gson().toJson(albumItem))
                     .putExtra("type", "album")
-                    .putExtra("id", data.get(position)!!.id)
+                    .putExtra("id", data[position]!!.id)
             )
         })
     }
 
     override fun getItemCount(): Int {
-        return if (data == null) 0 else data.size
+        return data?.size ?: 0
     }
 
     override fun getItemViewType(position: Int): Int {

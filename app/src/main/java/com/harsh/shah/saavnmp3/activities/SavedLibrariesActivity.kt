@@ -34,22 +34,22 @@ class SavedLibrariesActivity : AppCompatActivity() {
             OverScrollDecoratorHelper.ORIENTATION_VERTICAL
         )
 
-        binding!!.addNewLibrary.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.addNewLibrary.setOnClickListener(View.OnClickListener {
             val addNewLibraryBottomSheetBinding =
                 AddNewLibraryBottomSheetBinding.inflate(layoutInflater)
             val bottomSheetDialog = BottomSheetDialog(this, R.style.MyBottomSheetDialogTheme)
             bottomSheetDialog.setContentView(addNewLibraryBottomSheetBinding.getRoot())
-            addNewLibraryBottomSheetBinding.cancel.setOnClickListener(View.OnClickListener { view1: View? ->
+            addNewLibraryBottomSheetBinding.cancel.setOnClickListener {
                 bottomSheetDialog.dismiss()
-            })
-            addNewLibraryBottomSheetBinding.create.setOnClickListener(View.OnClickListener { view1: View? ->
+            }
+            addNewLibraryBottomSheetBinding.create.setOnClickListener(View.OnClickListener {
                 val name = addNewLibraryBottomSheetBinding.edittext.getText().toString()
                 if (name.isEmpty()) {
                     addNewLibraryBottomSheetBinding.edittext.error = "Name cannot be empty"
                     return@OnClickListener
                 }
                 addNewLibraryBottomSheetBinding.edittext.error = null
-                Log.i("SavedLibrariesActivity", "BottomSheetDialog_create: " + name)
+                Log.i("SavedLibrariesActivity", "BottomSheetDialog_create: $name")
 
                 val currentTime = System.currentTimeMillis().toString()
 

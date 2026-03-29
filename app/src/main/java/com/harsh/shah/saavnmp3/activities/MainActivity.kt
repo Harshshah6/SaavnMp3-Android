@@ -6,15 +6,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.View
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
-import android.view.animation.TranslateAnimation
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -24,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.harsh.shah.saavnmp3.BaseApplicationClass
@@ -44,9 +39,7 @@ import com.harsh.shah.saavnmp3.records.AlbumsSearch
 import com.harsh.shah.saavnmp3.records.ArtistsSearch
 import com.harsh.shah.saavnmp3.records.PlaylistsSearch
 import com.harsh.shah.saavnmp3.records.SongSearch
-import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
-import com.harsh.shah.saavnmp3.utils.NetworkUtil
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.squareup.picasso.Picasso
 import com.yarolegovich.slidingrootnav.SlidingRootNav
@@ -55,6 +48,7 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.Calendar
+import androidx.core.net.toUri
 
 class MainActivity : AppCompatActivity() {
     private var requestStoragePermission: ActivityResultLauncher<Array<String>>? = null
@@ -101,11 +95,11 @@ class MainActivity : AppCompatActivity() {
 
         onDrawerItemsClicked()
 
-        binding!!.profileIcon.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.profileIcon.setOnClickListener {
             slidingRootNavBuilder!!.openMenu(
                 true
             )
-        })
+        }
 
         val span: Int = calculateNoOfColumns(this, 200f)
         binding!!.playlistRecyclerView.setLayoutManager(GridLayoutManager(this, span))
@@ -156,16 +150,16 @@ class MainActivity : AppCompatActivity() {
             OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL
         )
 
-        binding!!.refreshLayout.setOnRefreshListener(OnRefreshListener {
+        binding!!.refreshLayout.setOnRefreshListener {
             showShimmerData()
             showData()
             binding!!.refreshLayout.isRefreshing = false
-        })
+        }
 
-        binding!!.playBarPlayPauseIcon.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.playBarPlayPauseIcon.setOnClickListener {
             MusicPlayerManager.togglePlayPause()
             // Allow state to settle before updating UI
-            Handler().postDelayed(Runnable {
+            Handler().postDelayed({
                 val p = MusicPlayerManager.player
                 if (p != null) {
                     binding!!.playBarPlayPauseIcon
@@ -177,18 +171,18 @@ class MainActivity : AppCompatActivity() {
                         )
                 }
             }, 100)
-        })
+        }
 
-        binding!!.playBarBackground.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.playBarBackground.setOnClickListener {
             if (!MusicPlayerManager.MUSIC_ID.isNullOrBlank()) startActivity(
                 Intent(
                     this,
                     MusicOverviewActivity::class.java
                 ).putExtra("id", MusicPlayerManager.MUSIC_ID)
             )
-        })
+        }
 
-        binding!!.playBarPrevIcon.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.playBarPrevIcon.setOnClickListener(View.OnClickListener {
             try {
                 Log.i(TAG, "Play bar previous button clicked")
                 if (baseApplicationClass == null) {
@@ -211,7 +205,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        binding!!.playBarNextIcon.setOnClickListener(View.OnClickListener { view: View? ->
+        binding!!.playBarNextIcon.setOnClickListener(View.OnClickListener {
             try {
                 Log.i(TAG, "Play bar next button clicked")
                 if (baseApplicationClass == null) {
@@ -242,14 +236,15 @@ class MainActivity : AppCompatActivity() {
 
         askNotificationPermission()
 
-        requestStoragePermission = registerForActivityResult(RequestMultiplePermissions()) { result ->
-            if (result.containsValue(false)) {
-                Toast.makeText(this, "Storage Permission Denied", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Storage Permission Granted", Toast.LENGTH_SHORT).show()
+        requestStoragePermission =
+            registerForActivityResult(RequestMultiplePermissions()) { result ->
+                if (result.containsValue(false)) {
+                    Toast.makeText(this, "Storage Permission Denied", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Storage Permission Granted", Toast.LENGTH_SHORT).show()
+                }
             }
-        }
-        
+
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
             requestStoragePermission()
         }
@@ -258,7 +253,7 @@ class MainActivity : AppCompatActivity() {
     private fun requestStoragePermission() {
         if (!checkIfStorageAccessAvailable()) {
             requestStoragePermission!!.launch(
-                arrayOf<String>(
+                arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
@@ -283,9 +278,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun showSavedLibrariesData() {
         val savedLibraries =
-            SharedPreferenceManager.getInstance(this).savedLibrariesData as? SavedLibraries
+            SharedPreferenceManager.getInstance(this).savedLibrariesData
         binding!!.savedLibrariesSection.visibility =
-            if (savedLibraries != null && !(savedLibraries.lists?.isEmpty() ?: true)) View.VISIBLE else View.GONE
+            if (savedLibraries != null && !(savedLibraries.lists?.isEmpty()
+                    ?: true)
+            ) View.VISIBLE else View.GONE
         if (savedLibraries != null) binding!!.savedRecyclerView.setAdapter(
             SavedLibrariesAdapter(
                 savedLibraries.lists ?: mutableListOf()
@@ -294,33 +291,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onDrawerItemsClicked() {
-        slidingRootNavBuilder!!.layout.findViewById<View?>(R.id.settings).setOnClickListener(
-            View.OnClickListener { v: View? ->
-                startActivity(Intent(this, SettingsActivity::class.java))
-                slidingRootNavBuilder!!.closeMenu()
-            })
+        slidingRootNavBuilder!!.layout.findViewById<View>(R.id.settings).setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+            slidingRootNavBuilder!!.closeMenu()
+        }
 
-        slidingRootNavBuilder!!.layout.findViewById<View?>(R.id.logo)
-            .setOnClickListener(View.OnClickListener { view: View? -> slidingRootNavBuilder!!.closeMenu() })
+        slidingRootNavBuilder!!.layout.findViewById<View>(R.id.logo)
+            .setOnClickListener { slidingRootNavBuilder!!.closeMenu() }
 
-        slidingRootNavBuilder!!.layout.findViewById<View?>(R.id.library).setOnClickListener(
-            View.OnClickListener { view: View? ->
-                startActivity(Intent(this@MainActivity, SavedLibrariesActivity::class.java))
-                slidingRootNavBuilder!!.closeMenu()
-            })
+        slidingRootNavBuilder!!.layout.findViewById<View>(R.id.library).setOnClickListener {
+            startActivity(Intent(this@MainActivity, SavedLibrariesActivity::class.java))
+            slidingRootNavBuilder!!.closeMenu()
+        }
 
-        slidingRootNavBuilder!!.layout.findViewById<View?>(R.id.about)
-            .setOnClickListener(View.OnClickListener { view: View? ->
+        slidingRootNavBuilder!!.layout.findViewById<View>(R.id.about)
+            .setOnClickListener {
                 startActivity(Intent(this@MainActivity, AboutActivity::class.java))
                 slidingRootNavBuilder!!.closeMenu()
-            })
+            }
 
-        slidingRootNavBuilder!!.layout.findViewById<View?>(R.id.download_manager)
-            .setOnClickListener(
-                View.OnClickListener { v: View? ->
-                    startActivity(Intent(this@MainActivity, DownloadManagerActivity::class.java))
-                    slidingRootNavBuilder!!.closeMenu()
-                })
+        slidingRootNavBuilder!!.layout.findViewById<View>(R.id.download_manager)
+            .setOnClickListener {
+                startActivity(Intent(this@MainActivity, DownloadManagerActivity::class.java))
+                slidingRootNavBuilder!!.closeMenu()
+            }
     }
 
     /**
@@ -334,7 +328,7 @@ class MainActivity : AppCompatActivity() {
             if (drawerLayout != null) {
                 val versionTextView = drawerLayout.findViewById<View?>(R.id.versionTxt)
                 if (versionTextView is TextView) {
-                    versionTextView.text = "version " + versionName
+                    versionTextView.text = "version $versionName"
                 }
             }
         } catch (e: PackageManager.NameNotFoundException) {
@@ -352,7 +346,7 @@ class MainActivity : AppCompatActivity() {
 
         binding!!.playBarMusicTitle.text = MusicPlayerManager.MUSIC_TITLE
         binding!!.playBarMusicDesc.text = MusicPlayerManager.MUSIC_DESCRIPTION
-        Picasso.get().load(Uri.parse(MusicPlayerManager.IMAGE_URL))
+        Picasso.get().load(MusicPlayerManager.IMAGE_URL?.toUri())
             .into(binding!!.playBarCoverImage)
         updatePlaybarUi()
 
@@ -365,9 +359,12 @@ class MainActivity : AppCompatActivity() {
         binding!!.playBarMusicTitle.setTextColor(MusicPlayerManager.TEXT_ON_IMAGE_COLOR1)
         binding!!.playBarMusicDesc.setTextColor(MusicPlayerManager.TEXT_ON_IMAGE_COLOR1)
 
-        binding!!.playBarPlayPauseIcon.imageTintList = ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
-        binding!!.playBarPrevIcon.imageTintList = ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
-        binding!!.playBarNextIcon.imageTintList = ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
+        binding!!.playBarPlayPauseIcon.imageTintList =
+            ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
+        binding!!.playBarPrevIcon.imageTintList =
+            ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
+        binding!!.playBarNextIcon.imageTintList =
+            ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
 
         OverScrollDecoratorHelper.setUpStaticOverScroll(
             binding!!.getRoot(),
@@ -425,13 +422,15 @@ class MainActivity : AppCompatActivity() {
                 responseHeaders: HashMap<String?, Any?>?
             ) {
                 val songSearch = Gson().fromJson(response, SongSearch::class.java)
-                Log.i(TAG, "onResponse: " + response)
+                Log.i(TAG, "onResponse: $response")
                 if (songSearch.success) {
                     val resultsList = songSearch.data?.results ?: emptyList()
                     for (results in resultsList) {
                         if (results == null) continue
                         val imageList = results.image
-                        val imageUrl = if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: "" else ""
+                        val imageUrl =
+                            if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url
+                                ?: "" else ""
                         songs.add(
                             AlbumItem(
                                 results.name(), results.language + " " + results.year,
@@ -447,7 +446,7 @@ class MainActivity : AppCompatActivity() {
                     try {
                         showOfflineData()
                         Toast.makeText(
-                            this@MainActivity, JSONObject(response).getString("message"),
+                            this@MainActivity, JSONObject(response.toString()).getString("message"),
                             Toast.LENGTH_SHORT
                         ).show()
                     } catch (e: JSONException) {
@@ -469,7 +468,7 @@ class MainActivity : AppCompatActivity() {
             ) {
                 val artistSearch =
                     Gson().fromJson(response, ArtistsSearch::class.java)
-                Log.i(TAG, "onResponse: " + response)
+                Log.i(TAG, "onResponse: $response")
                 if (artistSearch.success) {
                     val resultsList = artistSearch.data?.results ?: emptyList()
                     for (results in resultsList) {
@@ -478,12 +477,13 @@ class MainActivity : AppCompatActivity() {
                     val adapter = ActivityMainArtistsItemAdapter(artists)
                     binding!!.popularArtistsRecyclerView.setAdapter(adapter)
                     adapter.notifyDataSetChanged()
-                    BaseApplicationClass.sharedPreferenceManager?.homeArtistsRecommended = artistSearch
+                    BaseApplicationClass.sharedPreferenceManager?.homeArtistsRecommended =
+                        artistSearch
                 } else {
                     try {
                         showOfflineData()
                         Toast.makeText(
-                            this@MainActivity, JSONObject(response).getString("message"),
+                            this@MainActivity, JSONObject(response.toString()).getString("message"),
                             Toast.LENGTH_SHORT
                         ).show()
                     } catch (e: JSONException) {
@@ -504,13 +504,15 @@ class MainActivity : AppCompatActivity() {
                 responseHeaders: HashMap<String?, Any?>?
             ) {
                 val albumsSearch = Gson().fromJson(response, AlbumsSearch::class.java)
-                Log.i(TAG, "onResponse: " + response)
+                Log.i(TAG, "onResponse: $response")
                 if (albumsSearch.success) {
                     val resultsList = albumsSearch.data?.results ?: emptyList()
                     for (results in resultsList) {
                         if (results == null) continue
                         val imageList = results.image
-                        val imageUrl = if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: "" else ""
+                        val imageUrl =
+                            if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url
+                                ?: "" else ""
                         albums.add(
                             AlbumItem(
                                 results.name(), results.language + " " + results.year,
@@ -521,11 +523,12 @@ class MainActivity : AppCompatActivity() {
                     val adapter = ActivityMainAlbumItemAdapter(albums)
                     binding!!.popularAlbumsRecyclerView.setAdapter(adapter)
                     adapter.notifyDataSetChanged()
-                    BaseApplicationClass.sharedPreferenceManager?.homeAlbumsRecommended = albumsSearch
+                    BaseApplicationClass.sharedPreferenceManager?.homeAlbumsRecommended =
+                        albumsSearch
                 } else {
                     try {
                         Toast.makeText(
-                            this@MainActivity, JSONObject(response).getString("message"),
+                            this@MainActivity, JSONObject(response.toString()).getString("message"),
                             Toast.LENGTH_SHORT
                         ).show()
                         showOfflineData()
@@ -551,13 +554,15 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     val playlistsSearch =
                         Gson().fromJson(response, PlaylistsSearch::class.java)
-                    Log.i(TAG, "onResponse: " + response)
+                    Log.i(TAG, "onResponse: $response")
                     if (playlistsSearch.success) {
                         val resultsList = playlistsSearch.data?.results ?: emptyList()
                         for (results in resultsList) {
                             if (results == null) continue
                             val imageList = results.image
-                            val imageUrl = if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: "" else ""
+                            val imageUrl =
+                                if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url
+                                    ?: "" else ""
                             playlists.add(
                                 AlbumItem(
                                     results.name(), "",
@@ -568,11 +573,13 @@ class MainActivity : AppCompatActivity() {
                         val adapter = ActivityMainPlaylistAdapter(playlists)
                         binding!!.playlistRecyclerView.setAdapter(adapter)
                         adapter.notifyDataSetChanged()
-                        BaseApplicationClass.sharedPreferenceManager?.homePlaylistRecommended = playlistsSearch
+                        BaseApplicationClass.sharedPreferenceManager?.homePlaylistRecommended =
+                            playlistsSearch
                     } else {
                         try {
                             Toast.makeText(
-                                this@MainActivity, JSONObject(response).getString("message"),
+                                this@MainActivity,
+                                JSONObject(response.toString()).getString("message"),
                                 Toast.LENGTH_SHORT
                             ).show()
                             showOfflineData()
@@ -589,12 +596,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showShimmerData() {
-        val data_shimmer: MutableList<AlbumItem?> = ArrayList<AlbumItem?>()
-        val artists_shimmer: MutableList<ArtistsSearch.Data.Results?> =
-            ArrayList<ArtistsSearch.Data.Results?>()
+        val dataShimmer: MutableList<AlbumItem?> = ArrayList()
+        val artistsShimmer: MutableList<ArtistsSearch.Data.Results?> =
+            ArrayList()
         for (i in 0..10) {
-            data_shimmer.add(AlbumItem("<shimmer>", "<shimmer>", "<shimmer>", "<shimmer>"))
-            artists_shimmer.add(
+            dataShimmer.add(AlbumItem("<shimmer>", "<shimmer>", "<shimmer>", "<shimmer>"))
+            artistsShimmer.add(
                 ArtistsSearch.Data.Results(
                     "<shimmer>",
                     "<shimmer>",
@@ -605,25 +612,14 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }
-        binding!!.popularSongsRecyclerView.setAdapter(ActivityMainAlbumItemAdapter(data_shimmer))
-        binding!!.popularAlbumsRecyclerView.setAdapter(ActivityMainAlbumItemAdapter(data_shimmer))
+        binding!!.popularSongsRecyclerView.setAdapter(ActivityMainAlbumItemAdapter(dataShimmer))
+        binding!!.popularAlbumsRecyclerView.setAdapter(ActivityMainAlbumItemAdapter(dataShimmer))
         binding!!.popularArtistsRecyclerView.setAdapter(
             ActivityMainArtistsItemAdapter(
-                artists_shimmer
+                artistsShimmer
             )
         )
-        binding!!.playlistRecyclerView.setAdapter(ActivityMainPlaylistAdapter(data_shimmer))
-    }
-
-    fun tryConnect() {
-        if (!NetworkUtil.isNetworkAvailable(this@MainActivity)) {
-            try {
-                Thread.sleep(2000)
-                // showData();
-            } catch (e: Exception) {
-                Log.e(TAG, "onErrorResponse: ", e)
-            }
-        }
+        binding!!.playlistRecyclerView.setAdapter(ActivityMainPlaylistAdapter(dataShimmer))
     }
 
     private fun showOfflineData() {
@@ -634,7 +630,8 @@ class MainActivity : AppCompatActivity() {
             for (results in resultsList) {
                 if (results == null) continue
                 val imageList = results.image
-                val imageUrl = if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: "" else ""
+                val imageUrl =
+                    if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: "" else ""
                 songs.add(
                     AlbumItem(
                         results.name(), results.language + " " + results.year,
@@ -664,7 +661,8 @@ class MainActivity : AppCompatActivity() {
             for (results in resultsList) {
                 if (results == null) continue
                 val imageList = results.image
-                val imageUrl = if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: "" else ""
+                val imageUrl =
+                    if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: "" else ""
                 albums.add(
                     AlbumItem(
                         results.name(), results.language + " " + results.year,
@@ -683,7 +681,8 @@ class MainActivity : AppCompatActivity() {
             for (results in resultsList) {
                 if (results == null) continue
                 val imageList = results.image
-                val imageUrl = if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: "" else ""
+                val imageUrl =
+                    if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: "" else ""
                 playlists.add(
                     AlbumItem(
                         results.name(), "", imageUrl,
@@ -699,73 +698,11 @@ class MainActivity : AppCompatActivity() {
         // showData(); //TODO: showData if new data is available
     }
 
-    private fun playBarPopUpAnimation() {
-        showPopup()
-    }
-
-    private fun showPopup() {
-        // Set the popup to visible
-        binding!!.playBarBackground.visibility = View.VISIBLE
-
-        // Create an animation to make the popup appear
-        val slideUp = TranslateAnimation(0f, 0f, 1000f, 0f) // Slide from bottom
-        slideUp.duration = 500
-        slideUp.fillAfter = true // Keeps the position after animation
-
-        // You can add fade-in effect as well
-        val fadeIn = AlphaAnimation(0f, 1f)
-        fadeIn.duration = 500
-
-        // Combine the animations
-        slideUp.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-                binding!!.playBarBackground.startAnimation(fadeIn) // Start fade-in when slide-up starts
-            }
-
-            override fun onAnimationEnd(animation: Animation?) {
-                // You can add any logic after the animation ends
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {
-                // Not needed here
-            }
-        })
-
-        // Start the slide-up animation
-        binding!!.playBarBackground.startAnimation(slideUp)
-    }
-
-    // Method to close the popup (can be triggered by a button)
-    fun closePopup() {
-        // Fade-out animation
-        val fadeOut = AlphaAnimation(1f, 0f)
-        fadeOut.duration = 500
-        fadeOut.fillAfter = true // Ensures it stays hidden after the animation
-
-        fadeOut.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-                // You can add any logic before the animation starts
-            }
-
-            override fun onAnimationEnd(animation: Animation?) {
-                binding!!.playBarBackground.visibility = View.GONE // Hide after animation ends
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {
-                // Not needed here
-            }
-        })
-
-        binding!!.playBarBackground.startAnimation(fadeOut) // Start fade-out animation
-    }
-
     fun openSearch(view: View?) {
         startActivity(Intent(this, SearchActivity::class.java))
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        RequestPermission()
-    ) { isGranted: Boolean? -> }
+    private val requestPermissionLauncher = registerForActivityResult(RequestPermission()) { _: Boolean? -> }
 
     private fun askNotificationPermission() {
         // This is only necessary for API level >= 33 (TIRAMISU)

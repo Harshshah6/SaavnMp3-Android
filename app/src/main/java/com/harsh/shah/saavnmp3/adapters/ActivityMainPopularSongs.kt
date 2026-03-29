@@ -14,6 +14,7 @@ import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 
 class ActivityMainPopularSongs(private val data: MutableList<AlbumItem?>) :
@@ -37,29 +38,26 @@ class ActivityMainPopularSongs(private val data: MutableList<AlbumItem?>) :
             return
         }
 
-        (holder.itemView.findViewById<View?>(R.id.albumTitle) as TextView).text =
-            data.get(position)!!.albumTitle()
-        (holder.itemView.findViewById<View?>(R.id.albumSubTitle) as TextView).text = data.get(
-            position
-        )!!.albumSubTitle()
+        (holder.itemView.findViewById<View?>(R.id.albumTitle) as TextView).text = data[position]!!.albumTitle()
+        (holder.itemView.findViewById<View?>(R.id.albumSubTitle) as TextView).text = data[position]!!.albumSubTitle()
 
-        holder.itemView.findViewById<View?>(R.id.albumTitle).isSelected = true
-        holder.itemView.findViewById<View?>(R.id.albumSubTitle).isSelected = true
+        holder.itemView.findViewById<View>(R.id.albumTitle).isSelected = true
+        holder.itemView.findViewById<View>(R.id.albumSubTitle).isSelected = true
 
         val coverImage = holder.itemView.findViewById<ImageView?>(R.id.coverImage)
-        Picasso.get().load(Uri.parse(data.get(position)!!.albumCover)).into(coverImage)
+        Picasso.get().load(data[position]!!.albumCover?.toUri()).into(coverImage)
 
-        holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->
+        holder.itemView.setOnClickListener { v: View? ->
             MusicPlayerManager.trackQueue?.clear()
             Log.d(
                 "AdapterDebug",
                 "Click at pos: " + position + ". Populating queue with " + data.size + " items."
             )
             for (i in data.indices) {
-                val id = data.get(i)!!.id
+                val id = data[i]!!.id
                 Log.d(
                     "AdapterDebug",
-                    "Queue[" + i + "]: " + id + " - " + data.get(i)!!.albumTitle()
+                    "Queue[" + i + "]: " + id + " - " + data[i]!!.albumTitle()
                 )
                 MusicPlayerManager.trackQueue?.add(id)
             }
@@ -67,10 +65,10 @@ class ActivityMainPopularSongs(private val data: MutableList<AlbumItem?>) :
             v!!.context.startActivity(
                 Intent(v.context, MusicOverviewActivity::class.java).putExtra(
                     "id",
-                    data.get(position)!!.id
+                    data[position]!!.id
                 )
             )
-        })
+        }
     }
 
     override fun getItemCount(): Int {
@@ -78,8 +76,7 @@ class ActivityMainPopularSongs(private val data: MutableList<AlbumItem?>) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (data.get(position)!!.albumTitle() == "<shimmer>") return 1
-        else return 0
+        return if (data[position]!!.albumTitle() == "<shimmer>") 1 else 0
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

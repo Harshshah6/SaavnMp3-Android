@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.harsh.shah.saavnmp3.R
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 class BottomSheetItemView : LinearLayout {
     private var ID: String? = ""
@@ -43,7 +44,7 @@ class BottomSheetItemView : LinearLayout {
         this.titleTextView?.text = string
         if (!imageUrl.isBlank()) {
             this.iconImageView?.let {
-                Picasso.get().load(Uri.parse(imageUrl)).into(it)
+                Picasso.get().load(imageUrl.toUri()).into(it)
             }
         }
         ID = id
@@ -91,8 +92,8 @@ class BottomSheetItemView : LinearLayout {
     }
 
     val titleTextView: TextView?
-        get() = findViewById<TextView?>(R.id.text)
+        get() = findViewById(R.id.text)
 
     val iconImageView: ImageView?
-        get() = findViewById<ImageView?>(R.id.icon)
+        get() = findViewById(R.id.icon)
 }

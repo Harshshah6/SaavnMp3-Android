@@ -15,6 +15,7 @@ import com.harsh.shah.saavnmp3.adapters.ActivityMainArtistsItemAdapter.ActivityM
 import com.harsh.shah.saavnmp3.model.BasicDataRecord
 import com.harsh.shah.saavnmp3.records.ArtistsSearch
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 class ActivityMainArtistsItemAdapter(private val data: MutableList<ArtistsSearch.Data.Results?>) :
     RecyclerView.Adapter<ActivityMainArtistsItemAdapterViewHolder?>() {
@@ -40,15 +41,13 @@ class ActivityMainArtistsItemAdapter(private val data: MutableList<ArtistsSearch
             return
         }
 
-        holder.itemView.findViewById<View?>(R.id.artist_name).isSelected = true
-        (holder.itemView.findViewById<View?>(R.id.artist_name) as TextView).text = data.get(
-            position
-        )!!.name()
+        holder.itemView.findViewById<View>(R.id.artist_name).isSelected = true
+        (holder.itemView.findViewById<View?>(R.id.artist_name) as TextView).text = data[position]!!.name()
         val imageView = holder.itemView.findViewById<ImageView?>(R.id.artist_img)
         val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (url.isNotEmpty()) {
-            Picasso.get().load(Uri.parse(url)).into(imageView)
+            Picasso.get().load(url.toUri()).into(imageView)
         }
 
         holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->

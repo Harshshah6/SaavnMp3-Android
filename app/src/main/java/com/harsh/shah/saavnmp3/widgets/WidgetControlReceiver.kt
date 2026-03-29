@@ -8,9 +8,7 @@ import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 
 class WidgetControlReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent) {
-        val action = intent.action
-
-        if (action == null) return
+        val action = intent.action ?: return
 
         when (action) {
             "ACTION_TOGGLE_PLAY" -> {

@@ -24,6 +24,7 @@ import com.harsh.shah.saavnmp3.records.SongResponse
 import com.harsh.shah.saavnmp3.records.SongSearch
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
+import androidx.core.content.edit
 
 /**
  * Drop-in replacement for your old SharedPreferenceManager that uses Room.
@@ -69,36 +70,30 @@ class SharedPreferenceManager private constructor(context: Context) {
         abstract fun keyValueDao(): KeyValueDao
     }
 
-    private val db: AppDatabase
-    private val dao: KeyValueDao
-    private val gson: Gson
+    // IMPORTANT: allowMainThreadQueries is enabled here for drop-in sync compatibility.
+    // Recommended: remove allowMainThreadQueries() and perform DB operations off the UI thread.
+    private val db: AppDatabase = databaseBuilder<AppDatabase>(
+        context.applicationContext,
+        AppDatabase::class.java,
+        "saavn_cache.db"
+    )
+        .allowMainThreadQueries()
+        .build()
+    private val dao: KeyValueDao = db.keyValueDao()
+    private val gson: Gson = Gson()
 
     val sharedPreferences: SharedPreferences?
         // keep a small in-memory SharedPreferences reference only used during migration/clear
         get() =// we keep this method to preserve your API; it's no longer the primary store
             null
 
-    init {
-        // IMPORTANT: allowMainThreadQueries is enabled here for drop-in sync compatibility.
-        // Recommended: remove allowMainThreadQueries() and perform DB operations off the UI thread.
-        db = databaseBuilder<AppDatabase>(
-            context.applicationContext,
-            AppDatabase::class.java,
-            "saavn_cache.db"
-        )
-            .allowMainThreadQueries()
-            .build()
-        dao = db.keyValueDao()
-        gson = Gson()
-    }
-
     // ---------- Internal helpers to map keys ----------
     private fun keyForSearch(query: String): String {
-        return "search://" + query
+        return "search://$query"
     }
 
     private fun keyForArtistData(artistId: String): String {
-        return "artistData://" + artistId
+        return "artistData://$artistId"
     }
 
     private fun now(): Long {
@@ -125,7 +120,7 @@ class SharedPreferenceManager private constructor(context: Context) {
     var homeSongsRecommended: SongSearch?
         get() {
             val json = getJson("home_songs_recommended")
-            return if (json == null || json.isEmpty()) null else gson.fromJson<SongSearch?>(
+            return if (json.isNullOrEmpty()) null else gson.fromJson(
                 json,
                 SongSearch::class.java
             )
@@ -138,7 +133,7 @@ class SharedPreferenceManager private constructor(context: Context) {
     var homeArtistsRecommended: ArtistsSearch?
         get() {
             val json = getJson("home_artists_recommended")
-            return if (json == null || json.isEmpty()) null else gson.fromJson<ArtistsSearch?>(
+            return if (json.isNullOrEmpty()) null else gson.fromJson(
                 json,
                 ArtistsSearch::class.java
             )
@@ -151,7 +146,7 @@ class SharedPreferenceManager private constructor(context: Context) {
     var homeAlbumsRecommended: AlbumsSearch?
         get() {
             val json = getJson("home_albums_recommended")
-            return if (json == null || json.isEmpty()) null else gson.fromJson<AlbumsSearch?>(
+            return if (json.isNullOrEmpty()) null else gson.fromJson(
                 json,
                 AlbumsSearch::class.java
             )
@@ -164,7 +159,7 @@ class SharedPreferenceManager private constructor(context: Context) {
     var homePlaylistRecommended: PlaylistsSearch?
         get() {
             val json = getJson("home_playlists_recommended")
-            return if (json == null || json.isEmpty()) null else gson.fromJson<PlaylistsSearch?>(
+            return if (json.isNullOrEmpty()) null else gson.fromJson(
                 json,
                 PlaylistsSearch::class.java
             )
@@ -183,7 +178,7 @@ class SharedPreferenceManager private constructor(context: Context) {
     fun getSongResponseById(id: String?): SongResponse? {
         if (id == null) return null
         val json = getJson(id)
-        return if (json == null || json.isEmpty()) null else gson.fromJson<SongResponse?>(
+        return if (json.isNullOrEmpty()) null else gson.fromJson(
             json,
             SongResponse::class.java
         )
@@ -203,7 +198,7 @@ class SharedPreferenceManager private constructor(context: Context) {
     fun getAlbumResponseById(id: String?): AlbumSearch? {
         if (id == null) return null
         val json = getJson(id)
-        return if (json == null || json.isEmpty()) null else gson.fromJson<AlbumSearch?>(
+        return if (json.isNullOrEmpty()) null else gson.fromJson(
             json,
             AlbumSearch::class.java
         )
@@ -218,7 +213,7 @@ class SharedPreferenceManager private constructor(context: Context) {
     fun getPlaylistResponseById(id: String?): PlaylistSearch? {
         if (id == null) return null
         val json = getJson(id)
-        return if (json == null || json.isEmpty()) null else gson.fromJson<PlaylistSearch?>(
+        return if (json.isNullOrEmpty()) null else gson.fromJson(
             json,
             PlaylistSearch::class.java
         )
@@ -227,12 +222,12 @@ class SharedPreferenceManager private constructor(context: Context) {
     var trackQuality: String?
         get() {
             val json = getJson("track_quality")
-            if (json == null || json.isEmpty()) return "320kbps"
+            if (json.isNullOrEmpty()) return "320kbps"
             // stored as JSON string
-            try {
-                return gson.fromJson<String?>(json, String::class.java)
+            return try {
+                gson.fromJson(json, String::class.java)
             } catch (e: Exception) {
-                return "320kbps"
+                "320kbps"
             }
         }
         // track quality
@@ -245,7 +240,7 @@ class SharedPreferenceManager private constructor(context: Context) {
     var savedLibrariesData: SavedLibraries?
         get() {
             val json = getJson("saved_libraries")
-            return if (json == null || json.isEmpty()) null else gson.fromJson<SavedLibraries?>(
+            return if (json.isNullOrEmpty()) null else gson.fromJson(
                 json,
                 SavedLibraries::class.java
             )
@@ -259,11 +254,11 @@ class SharedPreferenceManager private constructor(context: Context) {
     fun addLibraryToSavedLibraries(library: Library?) {
         if (library == null) return
         var savedLibraries = this.savedLibrariesData
-        if (savedLibraries == null) savedLibraries = SavedLibraries(ArrayList<Library?>())
+        if (savedLibraries == null) savedLibraries = SavedLibraries(ArrayList())
         // make defensive copy of list if needed; assuming lists() returns modifiable list
         var list = savedLibraries.lists
         if (list == null) {
-            list = ArrayList<Library?>()
+            list = ArrayList()
             // if SavedLibraries has a setter, ideally set here; we assume lists() returns modifiable list
         }
         list.add(library)
@@ -272,10 +267,8 @@ class SharedPreferenceManager private constructor(context: Context) {
     }
 
     fun removeLibraryFromSavedLibraries(index: Int) {
-        val savedLibraries = this.savedLibrariesData
-        if (savedLibraries == null) return
-        val list = savedLibraries.lists
-        if (list == null) return
+        val savedLibraries = this.savedLibrariesData ?: return
+        val list = savedLibraries.lists ?: return
         if (index < 0 || index >= list.size) return
         list.removeAt(index)
         this.savedLibrariesData = savedLibraries
@@ -290,11 +283,11 @@ class SharedPreferenceManager private constructor(context: Context) {
     fun getSavedLibraryDataById(id: String?): Library? {
         if (id == null) return null
         val json = getJson(id)
-        if (json == null || json.isEmpty()) return null
-        try {
-            return gson.fromJson<Library?>(json, Library::class.java)
+        if (json.isNullOrEmpty()) return null
+        return try {
+            gson.fromJson(json, Library::class.java)
         } catch (e: Exception) {
-            return null
+            null
         }
     }
 
@@ -307,7 +300,7 @@ class SharedPreferenceManager private constructor(context: Context) {
     fun getSearchResult(query: String?): GlobalSearch? {
         if (query == null) return null
         val json = getJson(keyForSearch(query))
-        return if (json == null || json.isEmpty()) null else gson.fromJson<GlobalSearch?>(
+        return if (json.isNullOrEmpty()) null else gson.fromJson(
             json,
             GlobalSearch::class.java
         )
@@ -322,7 +315,7 @@ class SharedPreferenceManager private constructor(context: Context) {
     fun getArtistData(artistId: String?): ArtistSearch? {
         if (artistId == null) return null
         val json = getJson(keyForArtistData(artistId))
-        return if (json == null || json.isEmpty()) null else gson.fromJson<ArtistSearch?>(
+        return if (json.isNullOrEmpty()) null else gson.fromJson(
             json,
             ArtistSearch::class.java
         )
@@ -343,24 +336,18 @@ class SharedPreferenceManager private constructor(context: Context) {
         val all = prefs.all
         now()
         if (all == null) {
-            if (onComplete != null) onComplete.run()
+            onComplete?.run()
             return
         }
         for (entry in all.entries) {
             val key: String = entry.key!!
-            val value: Any? = entry.value
-            if (value == null) continue
-            val json: String?
+            val value: Any = entry.value ?: continue
             // In your previous manager, values were JSON strings for complex objects.
             // But there may be primitives (boolean, int, etc.). Serialize everything with Gson for consistency.
-            if (value is String) {
-                json = value
-            } else {
-                json = gson.toJson(value)
-            }
+            val json: String? = value as? String ?: gson.toJson(value)
             putJson(key, json)
         }
-        if (onComplete != null) onComplete.run()
+        onComplete?.run()
     }
 
     /**
@@ -371,8 +358,8 @@ class SharedPreferenceManager private constructor(context: Context) {
         // This is synchronous operation on prefs but cheap; run it directly
         val prefs = context.applicationContext
             .getSharedPreferences(OLD_PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().clear().apply()
-        if (onComplete != null) onComplete.run()
+        prefs.edit { clear() }
+        onComplete?.run()
     }
 
     companion object {

@@ -11,6 +11,7 @@ import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.databinding.ActivityArtistProfileViewTopSongsItemBinding
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 class ActivityArtistProfileTopSongsAdapter(private val data: MutableList<Song?>) :
     RecyclerView.Adapter<ActivityArtistProfileTopSongsAdapter.ViewHolder?>() {
@@ -37,21 +38,21 @@ class ActivityArtistProfileTopSongsAdapter(private val data: MutableList<Song?>)
 
         itemView.position.text = (position + 1).toString()
         itemView.coverTitle.text = data.get(position)!!.name()
-        itemView.coverPlayed.text = String.format("%s | %s", data.get(position)!!.year, data.get(position)!!.label)
+        itemView.coverPlayed.text = String.format("%s | %s", data[position]!!.year, data[position]!!.label)
         val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (url.isNotEmpty()) {
-            Picasso.get().load(Uri.parse(url)).into(itemView.coverImage)
+            Picasso.get().load(url.toUri()).into(itemView.coverImage)
         }
 
-        holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
+        holder.itemView.setOnClickListener { view: View? ->
             view!!.context.startActivity(
                 Intent(
                     view.context,
                     MusicOverviewActivity::class.java
-                ).putExtra("id", data.get(position)!!.id)
+                ).putExtra("id", data[position]!!.id)
             )
-        })
+        }
     }
 
     override fun getItemCount(): Int {

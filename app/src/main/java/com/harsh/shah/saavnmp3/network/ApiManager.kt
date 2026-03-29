@@ -6,15 +6,11 @@ import com.harsh.shah.saavnmp3.network.utility.RequestNetwork
 import com.harsh.shah.saavnmp3.network.utility.RequestNetworkController
 
 class ApiManager(context: Context?) {
-    private val requestNetwork: RequestNetwork
-
-    init {
-        requestNetwork = RequestNetwork(context)
-    }
+    private val requestNetwork: RequestNetwork = RequestNetwork(context)
 
     fun globalSearch(text: String?, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("query", Uri.encode(text))
+        queryMap["query"] = Uri.encode(text)
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
@@ -29,9 +25,9 @@ class ApiManager(context: Context?) {
         listener: RequestNetwork.RequestListener
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("query", Uri.encode(query))
-        if (page != null) queryMap.put("page", page)
-        if (limit != null) queryMap.put("limit", limit)
+        queryMap["query"] = Uri.encode(query)
+        if (page != null) queryMap["page"] = page
+        if (limit != null) queryMap["limit"] = limit
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
@@ -46,9 +42,9 @@ class ApiManager(context: Context?) {
         listener: RequestNetwork.RequestListener
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("query", Uri.encode(query))
-        if (page != null) queryMap.put("page", page)
-        if (limit != null) queryMap.put("limit", limit)
+        queryMap["query"] = Uri.encode(query)
+        if (page != null) queryMap["page"] = page
+        if (limit != null) queryMap["limit"] = limit
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
@@ -63,9 +59,9 @@ class ApiManager(context: Context?) {
         listener: RequestNetwork.RequestListener
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("query", Uri.encode(query))
-        if (page != null) queryMap.put("page", page)
-        if (limit != null) queryMap.put("limit", limit)
+        queryMap["query"] = Uri.encode(query)
+        if (page != null) queryMap["page"] = page
+        if (limit != null) queryMap["limit"] = limit
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
@@ -80,9 +76,9 @@ class ApiManager(context: Context?) {
         listener: RequestNetwork.RequestListener
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("query", Uri.encode(query))
-        if (page != null) queryMap.put("page", page)
-        if (limit != null) queryMap.put("limit", limit)
+        queryMap["query"] = Uri.encode(query)
+        if (page != null) queryMap["page"] = page
+        if (limit != null) queryMap["limit"] = limit
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
@@ -94,7 +90,7 @@ class ApiManager(context: Context?) {
 
     fun retrieveSongsByIds(ids: String, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("ids", ids)
+        queryMap["ids"] = ids
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
@@ -106,7 +102,7 @@ class ApiManager(context: Context?) {
 
     fun retrieveSongByLink(link: String, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("link", link)
+        queryMap["link"] = link
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
@@ -118,11 +114,11 @@ class ApiManager(context: Context?) {
 
     fun retrieveSongById(id: String, lyrics: Boolean?, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("lyrics", lyrics)
+        queryMap["lyrics"] = lyrics
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
-            SONGS_URL + "/" + id,
+            "$SONGS_URL/$id",
             "",
             listener
         )
@@ -130,7 +126,7 @@ class ApiManager(context: Context?) {
 
     fun retrieveLyricsById(id: String, listener: RequestNetwork.RequestListener?) {
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.GET, SONGS_URL + "/" + id + "/lyrics", "",
+            RequestNetworkController.GET, "$SONGS_URL/$id/lyrics", "",
             listener
         )
     }
@@ -141,17 +137,17 @@ class ApiManager(context: Context?) {
         listener: RequestNetwork.RequestListener?
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("limit", limit)
+        queryMap["limit"] = limit
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.GET, SONGS_URL + "/" + id + "/suggestions", "",
+            RequestNetworkController.GET, "$SONGS_URL/$id/suggestions", "",
             listener
         )
     }
 
     fun retrieveAlbumById(id: String, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("id", id)
+        queryMap["id"] = id
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
@@ -163,7 +159,7 @@ class ApiManager(context: Context?) {
 
     fun retrieveAlbumByLink(link: String, listener: RequestNetwork.RequestListener?) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("link", link)
+        queryMap["link"] = link
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
@@ -178,13 +174,13 @@ class ApiManager(context: Context?) {
         sortBy: String?, sortOrder: String?, listener: RequestNetwork.RequestListener?
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("id", id)
+        queryMap["id"] = id
 
-        if (page != null) queryMap.put("page", page)
-        if (songCount != null) queryMap.put("songCount", songCount)
-        if (albumCount != null) queryMap.put("albumCount", albumCount)
-        if (sortBy != null) queryMap.put("sortBy", sortBy)
-        if (sortOrder != null) queryMap.put("sortOrder", sortOrder)
+        if (page != null) queryMap["page"] = page
+        if (songCount != null) queryMap["songCount"] = songCount
+        if (albumCount != null) queryMap["albumCount"] = albumCount
+        if (sortBy != null) queryMap["sortBy"] = sortBy
+        if (sortOrder != null) queryMap["sortOrder"] = sortOrder
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
@@ -200,12 +196,12 @@ class ApiManager(context: Context?) {
         sortBy: String?, sortOrder: String?, listener: RequestNetwork.RequestListener?
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("link", link)
+        queryMap["link"] = link
 
-        if (page != null) queryMap.put("page", page)
-        if (songCount != null) queryMap.put("songCount", songCount)
-        if (albumCount != null) queryMap.put("albumCount", albumCount)
-        if (sortBy != null) queryMap.put("sortBy", sortBy)
+        if (page != null) queryMap["page"] = page
+        if (songCount != null) queryMap["songCount"] = songCount
+        if (albumCount != null) queryMap["albumCount"] = albumCount
+        if (sortBy != null) queryMap["sortBy"] = sortBy
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
@@ -222,16 +218,16 @@ class ApiManager(context: Context?) {
     ) {
         val queryMap = HashMap<String?, Any?>()
 
-        if (page != null) queryMap.put("page", page)
-        if (songCount != null) queryMap.put("songCount", songCount)
-        if (albumCount != null) queryMap.put("albumCount", albumCount)
-        if (sortBy != null) queryMap.put("sortBy", sortBy.name)
-        if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name)
+        if (page != null) queryMap["page"] = page
+        if (songCount != null) queryMap["songCount"] = songCount
+        if (albumCount != null) queryMap["albumCount"] = albumCount
+        if (sortBy != null) queryMap["sortBy"] = sortBy.name
+        if (sortOrder != null) queryMap["sortOrder"] = sortOrder.name
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
-            ARTISTS_URL + "/" + id,
+            "$ARTISTS_URL/$id",
             "",
             listener
         )
@@ -242,12 +238,12 @@ class ApiManager(context: Context?) {
         listener: RequestNetwork.RequestListener?
     ) {
         val queryMap = HashMap<String?, Any?>()
-        if (page != null) queryMap.put("page", page)
-        if (sortBy != null) queryMap.put("sortBy", sortBy.name)
-        if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name)
+        if (page != null) queryMap["page"] = page
+        if (sortBy != null) queryMap["sortBy"] = sortBy.name
+        if (sortOrder != null) queryMap["sortOrder"] = sortOrder.name
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.GET, ARTISTS_URL + "/" + id + "/songs", "",
+            RequestNetworkController.GET, "$ARTISTS_URL/$id/songs", "",
             listener
         )
     }
@@ -257,13 +253,13 @@ class ApiManager(context: Context?) {
         listener: RequestNetwork.RequestListener?
     ) {
         val queryMap = HashMap<String?, Any?>()
-        if (page != null) queryMap.put("page", page)
-        if (sortBy != null) queryMap.put("sortBy", sortBy.name)
-        if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name)
+        if (page != null) queryMap["page"] = page
+        if (sortBy != null) queryMap["sortBy"] = sortBy.name
+        if (sortOrder != null) queryMap["sortOrder"] = sortOrder.name
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
-            RequestNetworkController.GET, ARTISTS_URL + "/" + id + "/albums", "",
+            RequestNetworkController.GET, "$ARTISTS_URL/$id/albums", "",
             listener
         )
     }
@@ -273,9 +269,9 @@ class ApiManager(context: Context?) {
         listener: RequestNetwork.RequestListener?
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("id", id)
-        if (page != null) queryMap.put("page", page)
-        if (limit != null) queryMap.put("limit", limit)
+        queryMap["id"] = id
+        if (page != null) queryMap["page"] = page
+        if (limit != null) queryMap["limit"] = limit
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
@@ -291,9 +287,9 @@ class ApiManager(context: Context?) {
         listener: RequestNetwork.RequestListener?
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("link", link)
-        if (page != null) queryMap.put("page", page)
-        if (limit != null) queryMap.put("limit", limit)
+        queryMap["link"] = link
+        if (page != null) queryMap["page"] = page
+        if (limit != null) queryMap["limit"] = limit
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
@@ -313,9 +309,9 @@ class ApiManager(context: Context?) {
         requestListener: RequestNetwork.RequestListener?
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("page", if (page == -1) 0 else page)
-        if (sortBy != null) queryMap.put("sortBy", sortBy.name)
-        if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name)
+        queryMap["page"] = if (page == -1) 0 else page
+        if (sortBy != null) queryMap["sortBy"] = sortBy.name
+        if (sortOrder != null) queryMap["sortOrder"] = sortOrder.name
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
@@ -333,9 +329,9 @@ class ApiManager(context: Context?) {
         requestListener: RequestNetwork.RequestListener?
     ) {
         val queryMap = HashMap<String?, Any?>()
-        queryMap.put("page", if (page == -1) 0 else page)
-        if (sortBy != null) queryMap.put("sortBy", sortBy.name)
-        if (sortOrder != null) queryMap.put("sortOrder", sortOrder.name)
+        queryMap["page"] = if (page == -1) 0 else page
+        if (sortBy != null) queryMap["sortBy"] = sortBy.name
+        if (sortOrder != null) queryMap["sortOrder"] = sortOrder.name
 
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(

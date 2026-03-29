@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.google.gson.Gson
 import com.harsh.shah.saavnmp3.adapters.ActivityArtistProfileTopAlbumsAdapter
 import com.harsh.shah.saavnmp3.adapters.ActivityArtistProfileTopSongsAdapter
@@ -29,18 +28,6 @@ import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.squareup.picasso.Picasso
 
-/**
- * The `ArtistProfileActivity` class displays the profile information of an artist,
- * including their name, image, top songs, top albums, and singles.
- * It fetches the artist's data from a remote API and handles network connectivity changes.
- * 
- * 
- * 
- * This activity uses a collapsing toolbar layout to provide a visually appealing
- * header that expands and collapses as the user scrolls.
- * It also utilizes Shimmer effect as placeholder while data is loading.
- * 
- */
 class ArtistProfileActivity : AppCompatActivity() {
     private val TAG = "ArtistProfileActivity"
     var binding: ActivityArtistProfileBinding? = null
@@ -54,18 +41,17 @@ class ArtistProfileActivity : AppCompatActivity() {
         if (supportActionBar != null) supportActionBar!!.setDisplayShowTitleEnabled(false)
         binding!!.collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent))
 
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         window.statusBarColor = Color.TRANSPARENT
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
 
         //        binding.collapsingToolbarLayout.setTitle("Artist Name");
-        binding!!.collapsingToolbarAppbarlayout.addOnOffsetChangedListener(OnOffsetChangedListener { appBarLayout: AppBarLayout?, verticalOffset: Int ->
-            if (verticalOffset == 0) {
-            } else {
-            }
-        })
+        binding!!.collapsingToolbarAppbarlayout.addOnOffsetChangedListener { _: AppBarLayout?, verticalOffset: Int ->
+//            if (verticalOffset == 0) {} else {}
+        }
 
         binding!!.topSongsRecyclerview.setLayoutManager(LinearLayoutManager(this))
         binding!!.topAlbumsRecyclerview.setLayoutManager(LinearLayoutManager(this))
@@ -73,17 +59,19 @@ class ArtistProfileActivity : AppCompatActivity() {
 
         binding!!.topSongsSeeMore.setOnClickListener { v: View? ->
             startActivity(
-                Intent(this@ArtistProfileActivity, SeeMoreActivity::class.java)
-                    .putExtra("id", artistId)
-                    .putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_SONGS.name)
+                Intent(this@ArtistProfileActivity, SeeMoreActivity::class.java).putExtra(
+                        "id",
+                        artistId
+                    ).putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_SONGS.name)
                     .putExtra("artist_name", binding!!.artistName.text.toString())
             )
         }
-        binding!!.topAlbumsSeeMore.setOnClickListener { v: View? ->
+        binding!!.topAlbumsSeeMore.setOnClickListener {
             startActivity(
-                Intent(this@ArtistProfileActivity, SeeMoreActivity::class.java)
-                    .putExtra("id", artistId)
-                    .putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_ALBUMS.name)
+                Intent(this@ArtistProfileActivity, SeeMoreActivity::class.java).putExtra(
+                        "id",
+                        artistId
+                    ).putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_ALBUMS.name)
                     .putExtra("artist_name", binding!!.artistName.text.toString())
             )
         }
@@ -116,21 +104,15 @@ class ArtistProfileActivity : AppCompatActivity() {
                     SharedPreferenceManager.getInstance(this@ArtistProfileActivity)
 
                 override fun onResponse(
-                    tag: String?,
-                    response: String?,
-                    responseHeaders: HashMap<String?, Any?>?
+                    tag: String?, response: String?, responseHeaders: HashMap<String?, Any?>?
                 ) {
                     try {
-                        artistSearch =
-                            Gson().fromJson<ArtistSearch>(response, ArtistSearch::class.java)
+                        artistSearch = Gson().fromJson(response, ArtistSearch::class.java)
                         Log.i(TAG, "onResponse: $response")
                         val id = artistSearch?.data?.id
                         if (id != null) {
                             sharedPreferenceManager.setArtistData(id, artistSearch)
-                            Log.i(
-                                TAG,
-                                "onResponse: " + sharedPreferenceManager.getArtistData(id)
-                            )
+                            Log.i(TAG, "onResponse: " + sharedPreferenceManager.getArtistData(id))
                         }
                         display()
                     } catch (e: Exception) {
@@ -171,8 +153,7 @@ class ArtistProfileActivity : AppCompatActivity() {
         if (artistSearch?.success == true && artistSearch?.data != null) {
             val data = artistSearch!!.data!!
             if (!data.image.isNullOrEmpty()) {
-                Picasso.get()
-                    .load((data.image[data.image.size - 1]?.url ?: "").toUri())
+                Picasso.get().load((data.image[data.image.size - 1]?.url ?: "").toUri())
                     .into(binding!!.artistImg)
             }
             binding!!.artistName.text = data.name()
@@ -201,17 +182,7 @@ class ArtistProfileActivity : AppCompatActivity() {
         for (i in 0..10) {
             shimmerDataAlbum.add(
                 AlbumsSearch.Data.Results(
-                    "<shimmer>",
-                    null,
-                    null,
-                    null,
-                    0,
-                    null,
-                    0,
-                    null,
-                    false,
-                    null,
-                    null
+                    "<shimmer>", null, null, null, 0, null, 0, null, false, null, null
                 )
             )
         }
@@ -251,8 +222,7 @@ class ArtistProfileActivity : AppCompatActivity() {
     companion object {
         private val shimmerData: MutableList<Song?>
             get() {
-                val shimmerData: MutableList<Song?> =
-                    ArrayList<Song?>()
+                val shimmerData: MutableList<Song?> = ArrayList()
                 for (i in 0..10) {
                     shimmerData.add(
                         Song(
@@ -273,12 +243,12 @@ class ArtistProfileActivity : AppCompatActivity() {
                             "",
                             Album("", "", ""),
                             SongResponse.Artists(
-                                ArrayList<SongResponse.Artist?>(),
-                                ArrayList<SongResponse.Artist?>(),
-                                ArrayList<SongResponse.Artist?>()
+                                ArrayList(),
+                                ArrayList(),
+                                ArrayList()
                             ),
-                            ArrayList<SongResponse.Image?>(),
-                            ArrayList<DownloadUrl?>()
+                            ArrayList(),
+                            ArrayList()
                         )
                     )
                 }

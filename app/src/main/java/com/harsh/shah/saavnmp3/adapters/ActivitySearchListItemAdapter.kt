@@ -1,7 +1,6 @@
 ﻿package com.harsh.shah.saavnmp3.adapters
 
 import android.content.Intent
-import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -17,6 +16,7 @@ import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.harsh.shah.saavnmp3.model.BasicDataRecord
 import com.harsh.shah.saavnmp3.model.SearchListItem
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem>) :
     RecyclerView.Adapter<ActivitySearchListItemAdapter.ViewHolder?>() {
@@ -40,18 +40,18 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
             return
         }
 
-        holder.itemView.findViewById<View?>(R.id.title).isSelected = true
-        holder.itemView.findViewById<View?>(R.id.artist).isSelected = true
+        holder.itemView.findViewById<View>(R.id.title).isSelected = true
+        holder.itemView.findViewById<View>(R.id.artist).isSelected = true
 
-        val item = data.get(position)
+        val item = data[position]
 
         (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = item.title()
         (holder.itemView.findViewById<View?>(R.id.artist) as TextView).text = item.subtitle()
 
-        Picasso.get().load(Uri.parse(item.coverImage))
+        Picasso.get().load(item.coverImage?.toUri())
             .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?))
 
-        holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
+        holder.itemView.setOnClickListener {
             val intent = Intent()
             intent.putExtra("id", item.id)
             when (item.type) {
@@ -85,7 +85,7 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
                 else -> {}
             }
             holder.itemView.context.startActivity(intent)
-        })
+        }
     }
 
     override fun getItemCount(): Int {
@@ -93,8 +93,7 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (data.get(position).id == "<shimmer>") return 1
-        else return 0
+        return if (data[position].id == "<shimmer>") 1 else 0
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

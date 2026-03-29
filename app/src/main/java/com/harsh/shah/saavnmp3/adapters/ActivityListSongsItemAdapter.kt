@@ -13,6 +13,7 @@ import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 
 class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
@@ -37,10 +38,10 @@ class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
             return
         }
 
-        val song = data.get(position)
+        val song = data[position]
 
-        holder.itemView.findViewById<View?>(R.id.title).isSelected = true
-        holder.itemView.findViewById<View?>(R.id.artist).isSelected = true
+        holder.itemView.findViewById<View>(R.id.title).isSelected = true
+        holder.itemView.findViewById<View>(R.id.artist).isSelected = true
 
         (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = song.name()
         val artistsNames = StringBuilder()
@@ -56,11 +57,11 @@ class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
         val images = song.image
         val imgUrl = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (imgUrl.isNotEmpty()) {
-            Picasso.get().load(Uri.parse(imgUrl))
+            Picasso.get().load(imgUrl.toUri())
                 .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?))
         }
 
-        holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
+        holder.itemView.setOnClickListener { view: View? ->
             MusicPlayerManager.trackQueue?.clear()
             for (i in data.indices) {
                 val id = data[i].id
@@ -75,7 +76,7 @@ class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
                     song.id
                 )
             )
-        })
+        }
     }
 
     override fun getItemCount(): Int {
@@ -83,8 +84,7 @@ class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (data.get(position).id == "<shimmer>") return 1
-        else return 0
+        return if (data[position].id == "<shimmer>") 1 else 0
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

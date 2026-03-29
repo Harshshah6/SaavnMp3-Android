@@ -10,7 +10,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import android.widget.TextView.OnEditorActionListener
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
@@ -29,6 +28,7 @@ import com.harsh.shah.saavnmp3.records.GlobalSearch.Data.TopQuery
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.util.Locale
+import androidx.core.net.toUri
 
 class SearchActivity : AppCompatActivity() {
     var binding: ActivitySearchBinding? = null
@@ -48,22 +48,22 @@ class SearchActivity : AppCompatActivity() {
 
         binding!!.edittext.requestFocus()
 
-        binding!!.chipGroup.setOnCheckedStateChangeListener(ChipGroup.OnCheckedStateChangeListener { group: ChipGroup?, checkedIds: MutableList<Int?>? ->
-            Log.i("SearchActivity", "checkedIds: " + checkedIds)
+        binding!!.chipGroup.setOnCheckedStateChangeListener { _: ChipGroup?, checkedIds: MutableList<Int?>? ->
+            Log.i("SearchActivity", "checkedIds: $checkedIds")
             if (globalSearch != null) {
                 if (globalSearch!!.success) {
                     refreshData()
                 }
             }
-        })
+        }
 
-        binding!!.edittext.setOnEditorActionListener(OnEditorActionListener { textView: TextView?, i: Int, keyEvent: KeyEvent? ->
+        binding!!.edittext.setOnEditorActionListener { textView: TextView?, _: Int, _: KeyEvent? ->
             showData(textView!!.text.toString())
             Log.i(TAG, "onCreate: " + textView.text.toString())
             binding!!.edittext.clearFocus()
             hideKeyboard(binding!!.edittext)
             true
-        })
+        }
 
         // Show/hide clear icon based on text input
         binding!!.edittext.addTextChangedListener(object : TextWatcher {
@@ -95,18 +95,16 @@ class SearchActivity : AppCompatActivity() {
         })
 
         // Clear input when clear icon is clicked
-        binding!!.clearIcon.setOnClickListener(View.OnClickListener { v: View? ->
+        binding!!.clearIcon.setOnClickListener {
             binding!!.edittext.setText("")
-        })
+        }
 
         //showData("");
     }
 
     private fun hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
-        if (inputMethodManager != null) {
-            inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-        }
+        inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun showData(query: String) {
@@ -114,9 +112,9 @@ class SearchActivity : AppCompatActivity() {
         showShimmerData()
 
         if ((query.startsWith("http") || query.startsWith("www")) && query.contains("jiosaavn.com")) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(query))
+            val intent = Intent(Intent.ACTION_VIEW, query.toUri())
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.data = Uri.parse(query)
+            intent.data = query.toUri()
             startActivity(intent)
             return
         }
@@ -132,7 +130,7 @@ class SearchActivity : AppCompatActivity() {
                 responseHeaders: HashMap<String?, Any?>?
             ) {
                 if (query != currentQuery) return
-                globalSearch = Gson().fromJson<GlobalSearch?>(response, GlobalSearch::class.java)
+                globalSearch = Gson().fromJson(response, GlobalSearch::class.java)
                 if (globalSearch!!.success) {
                     sharedPreferenceManager.setSearchResultCache(query, globalSearch)
                     refreshData()
@@ -144,12 +142,12 @@ class SearchActivity : AppCompatActivity() {
                     ).show()
                     onFailed()
                 }
-                Log.i(TAG, "onResponse: " + response)
+                Log.i(TAG, "onResponse: $response")
             }
 
             override fun onErrorResponse(tag: String?, message: String?) {
                 if (query != currentQuery) return
-                Log.e(TAG, "onErrorResponse: " + message)
+                Log.e(TAG, "onErrorResponse: $message")
                 Toast.makeText(
                     this@SearchActivity,
                     "Opps, There was an error while searching",
@@ -170,7 +168,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun refreshData() {
-        val data: MutableList<SearchListItem?> = ArrayList<SearchListItem?>()
+        val data: MutableList<SearchListItem?> = ArrayList()
         val checkedChipId = binding!!.chipGroup.checkedChipId
         if (checkedChipId == R.id.chip_all) {
             globalSearch!!.data?.topQuery?.results?.forEach { item: TopQuery.Results? ->
@@ -277,7 +275,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showShimmerData() {
-        val data: MutableList<SearchListItem?> = ArrayList<SearchListItem?>()
+        val data: MutableList<SearchListItem?> = ArrayList()
         for (i in 0..10) {
             data.add(
                 SearchListItem(

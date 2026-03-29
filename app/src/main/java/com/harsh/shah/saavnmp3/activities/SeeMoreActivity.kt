@@ -104,7 +104,7 @@ class SeeMoreActivity : AppCompatActivity() {
                         }
                         val data = artistAllSongs.data ?: return
                         currentPage = 0
-                        totalItems = data.total ?: 0
+                        totalItems = data.total
                         activitySeeMoreListAdapter.addAll(data.songs ?: mutableListOf())
                     }
 
@@ -128,7 +128,7 @@ class SeeMoreActivity : AppCompatActivity() {
                     }
                     val data = artistAllAlbum.data ?: return
                     currentPage = 0
-                    totalItems = data.total ?: 0
+                    totalItems = data.total
                     activitySeeMoreAlbumListAdapter.addAll(data.albums ?: mutableListOf())
                 }
 

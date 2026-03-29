@@ -36,10 +36,10 @@ class ActivityDownloadManagerListAdapter(private val data: MutableList<Downloade
             return
         }
 
-        holder.itemView.findViewById<View?>(R.id.title).isSelected = true
-        holder.itemView.findViewById<View?>(R.id.artist).isSelected = true
+        holder.itemView.findViewById<View>(R.id.title).isSelected = true
+        holder.itemView.findViewById<View>(R.id.artist).isSelected = true
 
-        val item = data.get(position)
+        val item = data[position]
 
         (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = item.title
         (holder.itemView.findViewById<View?>(R.id.artist) as TextView).text = item.artist
@@ -48,9 +48,9 @@ class ActivityDownloadManagerListAdapter(private val data: MutableList<Downloade
             (holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView).setImageBitmap(item.coverImage)
         }
 
-        holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
+        holder.itemView.setOnClickListener { view: View? ->
             showDialog(item, view!!)
-        })
+        }
     }
 
     private fun showDialog(track: DownloadedTrack, view: View) {
@@ -65,7 +65,7 @@ class ActivityDownloadManagerListAdapter(private val data: MutableList<Downloade
         _binding.songYear.text = track.year
         _binding.bitrate.text = track.bitrate + " kbps"
         _binding.duration.text = track.trackLength + " Seconds"
-        if (track.trackUID == null || track.trackUID.isEmpty()) _binding.button.visibility = View.GONE
+        if (track.trackUID.isNullOrEmpty()) _binding.button.visibility = View.GONE
         _binding.button.setOnClickListener(View.OnClickListener { v: View? ->
             v!!.context.startActivity(
                 Intent(v.context, MusicOverviewActivity::class.java).putExtra(

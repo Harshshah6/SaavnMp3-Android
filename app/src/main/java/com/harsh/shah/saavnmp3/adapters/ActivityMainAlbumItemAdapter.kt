@@ -14,6 +14,7 @@ import com.harsh.shah.saavnmp3.activities.ListActivity
 import com.harsh.shah.saavnmp3.adapters.ActivityMainAlbumItemAdapter.ActivityMainAlbumItemAdapterViewHolder
 import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 class ActivityMainAlbumItemAdapter(private val data: MutableList<AlbumItem?>) :
     RecyclerView.Adapter<ActivityMainAlbumItemAdapterViewHolder?>() {
@@ -40,25 +41,23 @@ class ActivityMainAlbumItemAdapter(private val data: MutableList<AlbumItem?>) :
         }
 
         (holder.itemView.findViewById<View?>(R.id.albumTitle) as TextView).text =
-            data.get(position)!!.albumTitle()
-        (holder.itemView.findViewById<View?>(R.id.albumSubTitle) as TextView).text = data.get(
-            position
-        )!!.albumSubTitle()
+            data[position]!!.albumTitle()
+        (holder.itemView.findViewById<View?>(R.id.albumSubTitle) as TextView).text = data[position]!!.albumSubTitle()
 
-        holder.itemView.findViewById<View?>(R.id.albumTitle).isSelected = true
-        holder.itemView.findViewById<View?>(R.id.albumSubTitle).isSelected = true
+        holder.itemView.findViewById<View>(R.id.albumTitle).isSelected = true
+        holder.itemView.findViewById<View>(R.id.albumSubTitle).isSelected = true
 
         val coverImage = holder.itemView.findViewById<ImageView?>(R.id.coverImage)
-        Picasso.get().load(Uri.parse(data.get(position)!!.albumCover)).into(coverImage)
+        Picasso.get().load(data[position]!!.albumCover?.toUri()).into(coverImage)
 
-        holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->
+        holder.itemView.setOnClickListener { v: View? ->
             v!!.context.startActivity(
                 Intent(v.context, ListActivity::class.java)
-                    .putExtra("data", Gson().toJson(data.get(position)))
+                    .putExtra("data", Gson().toJson(data[position]))
                     .putExtra("type", "album")
-                    .putExtra("id", data.get(position)!!.id)
+                    .putExtra("id", data[position]!!.id)
             )
-        })
+        }
     }
 
     override fun getItemCount(): Int {
@@ -66,7 +65,7 @@ class ActivityMainAlbumItemAdapter(private val data: MutableList<AlbumItem?>) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (data.get(position)!!.albumTitle() == "<shimmer>") return 1
+        if (data[position]!!.albumTitle() == "<shimmer>") return 1
         else return 0
     }
 

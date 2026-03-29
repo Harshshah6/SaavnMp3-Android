@@ -32,9 +32,9 @@ object TrackDownloader {
         if (!musicDir.exists()) {
             return false
         }
-        val songFile = File(musicDir, title + ".m4a")
-        val songFile1 = File(musicDir, title + ".mp4")
-        val songFile2 = File(musicDir, title + ".mp3")
+        val songFile = File(musicDir, "$title.m4a")
+        val songFile1 = File(musicDir, "$title.mp4")
+        val songFile2 = File(musicDir, "$title.mp3")
         return songFile.exists() || songFile1.exists() || songFile2.exists()
     }
 
@@ -47,31 +47,21 @@ object TrackDownloader {
         if (!musicDir.exists()) {
             return data
         }
-        val files = musicDir.listFiles()
-        if (files == null) {
-            return data
-        }
+        val files = musicDir.listFiles() ?: return data
         for (file in files) {
             try {
                 val f = AudioFileIO.read(file)
                 val tag = f.getTag()
                 val audioHeader = f.getAudioHeader()
-                val title: String?
-                val artist: String?
-                val album: String?
-                val year: String?
-                val bitrate: String?
-                val trackLength: String?
                 var trackUID: String?
                 val uidFieldIdPrefix = "----:" + context.packageName + ":" // prefix for safety
                 val uidFieldId = uidFieldIdPrefix + "TrackUID"
-                title = if (tag != null) tag.getFirst(FieldKey.TITLE) else file.name
-                artist = if (tag != null) tag.getFirst(FieldKey.ARTIST) else ""
-                album = if (tag != null) tag.getFirst(FieldKey.ALBUM) else ""
-                year = if (tag != null) tag.getFirst(FieldKey.YEAR) else ""
-                bitrate = if (audioHeader != null) audioHeader.bitRate.toString() else "344"
-                trackLength =
-                    if (audioHeader != null) audioHeader.trackLength.toString() else "0"
+                val title: String? = if (tag != null) tag.getFirst(FieldKey.TITLE) else file.name
+                val artist: String? = if (tag != null) tag.getFirst(FieldKey.ARTIST) else ""
+                val album: String? = if (tag != null) tag.getFirst(FieldKey.ALBUM) else ""
+                val year: String? = if (tag != null) tag.getFirst(FieldKey.YEAR) else ""
+                val bitrate = if (audioHeader != null) audioHeader.bitRate.toString() else "344"
+                val trackLength = audioHeader?.trackLength?.toString() ?: "0"
 
                 trackUID = null
                 if (tag != null) {
@@ -83,9 +73,9 @@ object TrackDownloader {
                                 val m = field.javaClass.getMethod("getContent")
                                 val `val` = m.invoke(field)
                                 if (`val` != null) trackUID = `val`.toString()
-                            } catch (ignored: NoSuchMethodException) {
+                            } catch (_: NoSuchMethodException) {
                             }
-                        } catch (ignored: Exception) {
+                        } catch (_: Exception) {
                         }
                     } else {
                         val it = tag.fields
@@ -96,7 +86,7 @@ object TrackDownloader {
                                 try {
                                     trackUID = fField.toString()
                                     break
-                                } catch (ignored: Exception) {
+                                } catch (_: Exception) {
                                 }
                             }
                         }
@@ -140,7 +130,7 @@ object TrackDownloader {
             Handler(Looper.getMainLooper()).post(Runnable { listener.onStarted() })
             Log.d(TAG, "⬇️ Downloading and embedding metadata...")
             try {
-                val tempFile = File(context.cacheDir, title + ".mp4")
+                val tempFile = File(context.cacheDir, "$title.mp4")
                 URL(audioUrl).openStream().use { `in` ->
                     FileOutputStream(tempFile).use { out ->
                         val buffer = ByteArray(4096)
@@ -218,7 +208,7 @@ object TrackDownloader {
                     context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, newUri))
                 }
 
-                Log.d(TAG, "✅ Downloaded and tagged: " + title)
+                Log.d(TAG, "✅ Downloaded and tagged: $title")
             } catch (e: Exception) {
                 Log.e(TAG, "Error: " + e.message)
                 Handler(Looper.getMainLooper()).post(Runnable { listener.onError(e.message) })

@@ -12,6 +12,7 @@ import com.harsh.shah.saavnmp3.databinding.ActivityListSongItemBinding
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.squareup.picasso.Picasso
+import androidx.core.net.toUri
 
 class UserCreatedSongsListAdapter(private val data: MutableList<Library.Songs?>) :
     RecyclerView.Adapter<UserCreatedSongsListAdapter.ViewHolder?>() {
@@ -29,30 +30,26 @@ class UserCreatedSongsListAdapter(private val data: MutableList<Library.Songs?>)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.title.text = data.get(position)!!.title
-        holder.binding.artist.text = data.get(position)!!.description
-        val imageUrl = data.get(position)?.image
+        holder.binding.title.text = data[position]!!.title
+        holder.binding.artist.text = data[position]!!.description
+        val imageUrl = data[position]?.image
         if (imageUrl?.isNotBlank() == true) Picasso.get()
-            .load(Uri.parse(imageUrl)).into(holder.binding.coverImage)
+            .load(imageUrl.toUri()).into(holder.binding.coverImage)
 
-        holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
-            if (MusicPlayerManager.trackQueue?.contains(data.get(position)?.id) == true) {
+        holder.itemView.setOnClickListener { view: View? ->
+            if (MusicPlayerManager.trackQueue?.contains(data[position]?.id) == true) {
                 MusicPlayerManager.track_position = holder.getBindingAdapterPosition()
             }
             holder.itemView.context.startActivity(
                 Intent(
                     view!!.context,
                     MusicOverviewActivity::class.java
-                ).putExtra("id", data.get(position)!!.id)
+                ).putExtra("id", data[position]!!.id)
             )
-        })
+        }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var binding: ActivityListSongItemBinding
-
-        init {
-            binding = ActivityListSongItemBinding.bind(itemView)
-        }
+        var binding: ActivityListSongItemBinding = ActivityListSongItemBinding.bind(itemView)
     }
 }

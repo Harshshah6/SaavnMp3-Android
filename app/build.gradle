@@ -13,8 +13,8 @@ android {
         applicationId "com.harsh.shah.saavnmp3"
         minSdk 23
         targetSdk 36
-        versionCode 9
-        versionName "1.0.15"
+        versionCode 10
+        versionName '1.0.16'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //Universal APK Supporting All ABIs

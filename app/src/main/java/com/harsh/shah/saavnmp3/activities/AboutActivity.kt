@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.activities
+package com.harsh.shah.saavnmp3.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.google.gson.Gson
+import org.json.JSONObject
+import com.harsh.shah.saavnmp3.utils.UpdateUtil
 import com.harsh.shah.saavnmp3.BuildConfig
 import com.harsh.shah.saavnmp3.databinding.ActivityAboutBinding
 import com.harsh.shah.saavnmp3.model.aboutus.Contributors
@@ -25,6 +27,10 @@ class AboutActivity : AppCompatActivity() {
         binding!!.toolbar.setNavigationOnClickListener { _: android.view.View? -> finish() }
 
         binding!!.versionTxt.titleTextView?.text = BuildConfig.VERSION_NAME
+        binding!!.versionTxt.setOnClickListener {
+            Toast.makeText(this@AboutActivity, "Checking for updates...", Toast.LENGTH_SHORT).show()
+            UpdateUtil.checkForUpdates(this@AboutActivity, true)
+        }
 
         binding!!.email.setOnClickListener {
             openUrl(

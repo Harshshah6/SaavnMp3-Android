@@ -785,6 +785,12 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             prepareMediaPLayer()
         }
 
+        fetchLyricsForCurrentSong(song)
+    }
+
+    private fun fetchLyricsForCurrentSong(song: SongResponse.Song) {
+        val wasVisible = binding!!.lyricsRecycler.isVisible
+
         binding!!.lyricsIcon.visibility = View.GONE
         binding!!.lyricsIcon.setColorFilter(resources.getColor(R.color.textSec, null))
         
@@ -822,6 +828,12 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                                 rv.adapter = lyricsAdapter
                                 currentLyricsRecyclerView = rv
                                 binding!!.lyricsIcon.visibility = View.VISIBLE
+
+                                if (wasVisible) {
+                                    binding!!.lyricsIcon.setColorFilter(resources.getColor(R.color.textMain, null))
+                                    rv.visibility = View.VISIBLE
+                                    binding!!.coverImageCard.visibility = View.GONE
+                                }
                             }
                         }
                     } else {
@@ -915,12 +927,20 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
     private fun updateTrackInfo() {
         mHandler.removeCallbacks(mUpdateTimeTask)
-        if (binding!!.title.text
-                .toString() != MusicPlayerManager.MUSIC_TITLE
-        ) binding!!.title.text = MusicPlayerManager.MUSIC_TITLE
-        if (binding!!.description.text
-                .toString() != MusicPlayerManager.MUSIC_DESCRIPTION
-        ) binding!!.description.text = MusicPlayerManager.MUSIC_DESCRIPTION
+        
+        val currentTitle = binding!!.title.text.toString()
+        if (currentTitle != MusicPlayerManager.MUSIC_TITLE) {
+            binding!!.title.text = MusicPlayerManager.MUSIC_TITLE
+            
+            val currentTrackData = MusicPlayerManager.CURRENT_TRACK?.data?.getOrNull(0)
+            if (currentTrackData != null && currentTitle.isNotEmpty()) {
+                fetchLyricsForCurrentSong(currentTrackData)
+            }
+        }
+        
+        if (binding!!.description.text.toString() != MusicPlayerManager.MUSIC_DESCRIPTION) {
+            binding!!.description.text = MusicPlayerManager.MUSIC_DESCRIPTION
+        }
         Picasso.get().load(MusicPlayerManager.IMAGE_URL?.toUri())
             .into(binding!!.coverImage)
         val p = MusicPlayerManager.player ?: return

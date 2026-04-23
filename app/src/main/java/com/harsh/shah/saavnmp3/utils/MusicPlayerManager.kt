@@ -343,6 +343,7 @@ object MusicPlayerManager {
             override fun onResponse(tag: String?, response: String?, responseHeaders: HashMap<String?, Any?>?) {
                 val songResponse = Gson().fromJson(response, SongResponse::class.java)
                 if (songResponse.success && !songResponse.data.isNullOrEmpty()) {
+                    CURRENT_TRACK = songResponse
                     val firstSong = songResponse.data[0] ?: return
                     MUSIC_TITLE = firstSong.name()
                     MUSIC_DESCRIPTION = "${MusicOverviewActivity.convertPlayCount(firstSong.playCount ?: 0)} plays | ${firstSong.year} | ${firstSong.copyright}"

@@ -49,6 +49,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.Calendar
 import androidx.core.net.toUri
+import com.harsh.shah.saavnmp3.utils.UpdateUtil
 
 class MainActivity : AppCompatActivity() {
     private var requestStoragePermission: ActivityResultLauncher<Array<String>>? = null
@@ -248,6 +249,8 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
             requestStoragePermission()
         }
+
+        UpdateUtil.checkForUpdates(this)
     }
 
     private fun requestStoragePermission() {

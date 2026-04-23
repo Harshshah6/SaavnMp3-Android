@@ -1,5 +1,5 @@
 [versions]
-agp = "9.1.0"
+agp = "9.2.0"
 compiler = "5.0.5"
 core = "1.18.0"
 gson = "2.13.2"

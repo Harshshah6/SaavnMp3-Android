@@ -1,8 +1,10 @@
 package com.harsh.shah.saavnmp3.services
 
+import android.app.Notification
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
@@ -34,6 +36,16 @@ class MusicService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val notification = MusicPlayerManager.latestNotification
+
+        if (notification != null) {
+            try {
+                startForeground(1, notification)
+            } catch (e: Exception) {
+                Log.e("MusicService", "Error starting foreground", e)
+            }
+        }
+
         if (intent == null || intent.extras == null) return START_STICKY
 
         val actionName = intent.extras!!.getString("action", "")

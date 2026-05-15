@@ -57,6 +57,7 @@ object MusicPlayerManager {
     var player: ExoPlayer? = null
     var musicService: com.harsh.shah.saavnmp3.services.MusicService? = null
     private var mediaSession: MediaSessionCompat? = null
+    var latestNotification: android.app.Notification? = null
 
     var TRACK_QUALITY: String? = "320kbps"
     var isTrackDownloaded: Boolean = false
@@ -207,7 +208,7 @@ object MusicPlayerManager {
         return if (lastUrl.startsWith("http:")) lastUrl.replace("http:", "https:") else lastUrl
     }
 
-    fun showNotification(playPauseButton: Int = if (player?.isPlaying == true) R.drawable.baseline_pause_24 else R.drawable.play_arrow_24px) {
+    fun showNotification(playPauseButton: Int = if (player?.playWhenReady == true) R.drawable.baseline_pause_24 else R.drawable.play_arrow_24px) {
         val ctx = appContext ?: return
         if (MUSIC_ID.isNullOrEmpty() || MUSIC_TITLE.isNullOrEmpty() || IMAGE_URL.isNullOrEmpty()) return
 
@@ -289,11 +290,13 @@ object MusicPlayerManager {
 
     private fun showBasicNotification(builder: NotificationCompat.Builder, isPlaying: Boolean) {
         val notification = builder.build()
+        latestNotification = notification
         if (isPlaying) {
             try {
+                val intent = Intent(appContext, com.harsh.shah.saavnmp3.services.MusicService::class.java)
                 androidx.core.content.ContextCompat.startForegroundService(
                     appContext!!,
-                    Intent(appContext, com.harsh.shah.saavnmp3.services.MusicService::class.java)
+                    intent
                 )
                 musicService?.startForeground(1, notification)
             } catch (e: Exception) {
@@ -331,7 +334,7 @@ object MusicPlayerManager {
         val mediaItem = MediaItem.Builder().setUri(finalUrl).setMediaId(SONG_URL ?: "").build()
         isTrackDownloaded = false
         p.setMediaItem(mediaItem)
-        p.playWhenReady = false
+        p.playWhenReady = true
         p.prepare()
         showNotification()
         updateWidget()

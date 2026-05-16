@@ -1064,17 +1064,17 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     }
 
     override fun playClicked() {
-        Log.i(TAG, "playClicked called from service")
-        runOnUiThread {
-            // Retrieve application class to toggle playback
-            MusicPlayerManager.togglePlayPause()
-
-            if (MusicPlayerManager.player?.isPlaying == true) {
-                binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
-            } else {
-                binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
-            }
-        }
+//        Log.i(TAG, "playClicked called from service")
+//        runOnUiThread {
+//            // Retrieve application class to toggle playback
+//            MusicPlayerManager.togglePlayPause()
+//
+//            if (MusicPlayerManager.player?.isPlaying == true) {
+//                binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
+//            } else {
+//                binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
+//            }
+//        }
     }
 
     override fun onProgressChanged(progress: Int) {

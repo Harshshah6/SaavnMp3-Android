@@ -360,7 +360,7 @@ class ApiManager(context: Context?) {
     }
 
     companion object {
-        private const val BASE_URL = "https://meloapi.vercel.app/api/"
+        private const val BASE_URL = "https://melotune.lulli.qzz.io/api/"
         private val SEARCH_URL: String = BASE_URL + "search"
         private const val SONGS = "/songs"
         private const val ALBUMS = "/albums"

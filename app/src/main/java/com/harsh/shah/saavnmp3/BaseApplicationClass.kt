@@ -16,9 +16,7 @@ open class BaseApplicationClass : Application() {
         sharedPreferenceManager = SharedPreferenceManager.getInstance(this)
         MusicPlayerManager.init(this)
 
-        sharedPreferenceManager!!.migrateFromOldPrefs(
-            this,
-            Runnable { sharedPreferenceManager!!.clearOldPrefsAsync(this, null) })
+        sharedPreferenceManager!!.migrateFromOldPrefs(this) { sharedPreferenceManager!!.clearOldPrefsAsync(this, null) }
     }
 
     companion object {

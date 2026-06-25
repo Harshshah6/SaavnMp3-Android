@@ -340,6 +340,43 @@ object MusicPlayerManager {
         updateWidget()
     }
 
+    fun playNext(trackId: String?) {
+        if (trackId.isNullOrEmpty()) return
+        val queue = trackQueue ?: ArrayList()
+        queue.remove(trackId)
+        
+        val insertPos = if (track_position == -1) 0 else track_position + 1
+        if (insertPos >= queue.size) {
+            queue.add(trackId)
+        } else {
+            queue.add(insertPos, trackId)
+        }
+        trackQueue = queue
+        
+        if (track_position == -1) {
+            track_position = 0
+            MUSIC_ID = trackId
+            playTrack()
+        }
+        updateWidget()
+    }
+
+    fun addToQueue(trackId: String?) {
+        if (trackId.isNullOrEmpty()) return
+        val queue = trackQueue ?: ArrayList()
+        if (!queue.contains(trackId)) {
+            queue.add(trackId)
+        }
+        trackQueue = queue
+        
+        if (track_position == -1) {
+            track_position = 0
+            MUSIC_ID = trackId
+            playTrack()
+        }
+        updateWidget()
+    }
+
     fun playTrack() {
         val ctx = BaseApplicationClass.currentActivity ?: appContext ?: return
         ApiManager(ctx).retrieveSongById(MUSIC_ID!!, null, object : RequestNetwork.RequestListener {

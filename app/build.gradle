@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace 'com.harsh.shah.saavnmp3'
-    compileSdk 36
+    compileSdk 37
 
     defaultConfig {
         applicationId "com.harsh.shah.saavnmp3"

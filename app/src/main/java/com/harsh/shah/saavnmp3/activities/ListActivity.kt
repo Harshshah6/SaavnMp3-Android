@@ -29,6 +29,7 @@ import com.harsh.shah.saavnmp3.records.PlaylistSearch
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
+import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
@@ -43,6 +44,7 @@ class ListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityListBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
+        MiniPlayerHelper.initMiniPlayer(this)
 
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
         binding!!.addMoreSongs.visibility = View.GONE
@@ -129,6 +131,12 @@ class ListActivity : AppCompatActivity() {
         ) {
             onUserCreatedFetch()
         }
+        MiniPlayerHelper.onActivityResume(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MiniPlayerHelper.onActivityPause(this)
     }
 
     private fun onMoreIconClicked() {

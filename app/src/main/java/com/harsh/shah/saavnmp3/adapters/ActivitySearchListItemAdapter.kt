@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.adapters
+package com.harsh.shah.saavnmp3.adapters
 
 import android.content.Intent
 import android.view.View
@@ -15,6 +15,7 @@ import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.harsh.shah.saavnmp3.model.BasicDataRecord
 import com.harsh.shah.saavnmp3.model.SearchListItem
+import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.squareup.picasso.Picasso
 import androidx.core.net.toUri
 
@@ -56,6 +57,20 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
             intent.putExtra("id", item.id)
             when (item.type) {
                 SearchListItem.Type.SONG -> {
+                    MusicPlayerManager.trackQueue?.clear()
+                    var clickIndex = 0
+                    var validIndex = 0
+                    for (i in data.indices) {
+                        val searchItem = data[i]
+                        if (searchItem.type == SearchListItem.Type.SONG && !searchItem.id.isNullOrEmpty() && searchItem.id != "<shimmer>") {
+                            MusicPlayerManager.trackQueue?.add(searchItem.id)
+                            if (i == position) {
+                                clickIndex = validIndex
+                            }
+                            validIndex++
+                        }
+                    }
+                    MusicPlayerManager.track_position = clickIndex
                     intent.setClass(holder.itemView.context, MusicOverviewActivity::class.java)
                 }
 

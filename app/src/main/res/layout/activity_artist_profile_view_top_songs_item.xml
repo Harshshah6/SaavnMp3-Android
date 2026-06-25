@@ -46,7 +46,7 @@
         android:textColor="@color/textMain"
         android:textSize="@dimen/_14ssp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/more"
         app:layout_constraintStart_toEndOf="@id/coverImage"
         app:layout_constraintTop_toTopOf="@id/coverImage" />
 
@@ -60,5 +60,19 @@
         app:layout_constraintEnd_toEndOf="@+id/coverTitle"
         app:layout_constraintStart_toStartOf="@id/coverTitle"
         app:layout_constraintTop_toBottomOf="@id/coverTitle" />
+
+    <ImageView
+        android:id="@+id/more"
+        android:layout_width="@dimen/_35sdp"
+        android:layout_height="@dimen/_35sdp"
+        android:src="@drawable/more_vert_24px"
+        android:padding="@dimen/_8sdp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:contentDescription="More options"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

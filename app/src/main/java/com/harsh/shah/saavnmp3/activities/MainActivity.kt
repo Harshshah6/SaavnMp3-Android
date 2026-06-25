@@ -49,6 +49,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.Calendar
 import androidx.core.net.toUri
+import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.UpdateUtil
 
 class MainActivity : AppCompatActivity() {
@@ -157,81 +158,11 @@ class MainActivity : AppCompatActivity() {
             binding!!.refreshLayout.isRefreshing = false
         }
 
-        binding!!.playBarPlayPauseIcon.setOnClickListener {
-            MusicPlayerManager.togglePlayPause()
-            // Allow state to settle before updating UI
-            Handler().postDelayed({
-                val p = MusicPlayerManager.player
-                if (p != null) {
-                    binding!!.playBarPlayPauseIcon
-                        .setImageResource(
-                            if (p.isPlaying)
-                                R.drawable.baseline_pause_24
-                            else
-                                R.drawable.play_arrow_24px
-                        )
-                }
-            }, 100)
-        }
-
-        binding!!.playBarBackground.setOnClickListener {
-            if (!MusicPlayerManager.MUSIC_ID.isNullOrBlank()) startActivity(
-                Intent(
-                    this,
-                    MusicOverviewActivity::class.java
-                ).putExtra("id", MusicPlayerManager.MUSIC_ID)
-            )
-        }
-
-        binding!!.playBarPrevIcon.setOnClickListener(View.OnClickListener {
-            try {
-                Log.i(TAG, "Play bar previous button clicked")
-                if (baseApplicationClass == null) {
-                    Log.e(TAG, "Application class is null")
-                    return@OnClickListener
-                }
-
-                // Add visual feedback
-                binding!!.playBarPrevIcon.alpha = 0.5f
-                binding!!.playBarPrevIcon.animate().alpha(1.0f).setDuration(200).start()
-
-                // Call the previous track method
-                MusicPlayerManager.prevTrack()
-
-                // UI update should happen via onResume/timer or observer,
-                // but for now we rely on the loop in showPlayBarData/onResume
-                updatePlaybarUi()
-            } catch (e: Exception) {
-                Log.e(TAG, "Error handling previous button click", e)
-            }
-        })
-
-        binding!!.playBarNextIcon.setOnClickListener(View.OnClickListener {
-            try {
-                Log.i(TAG, "Play bar next button clicked")
-                if (baseApplicationClass == null) {
-                    Log.e(TAG, "Application class is null")
-                    return@OnClickListener
-                }
-
-                // Add visual feedback
-                binding!!.playBarNextIcon.alpha = 0.5f
-                binding!!.playBarNextIcon.animate().alpha(1.0f).setDuration(200).start()
-
-                // Call the next track method
-                MusicPlayerManager.nextTrack()
-
-                updatePlaybarUi()
-            } catch (e: Exception) {
-                Log.e(TAG, "Error handling next button click", e)
-            }
-        })
+        MiniPlayerHelper.initMiniPlayer(this)
 
         showShimmerData()
-        showOfflineData()
-
-        // showData();
-        showPlayBarData()
+        //showOfflineData()
+        showData()
 
         showSavedLibrariesData()
 
@@ -339,65 +270,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    var handler: Handler = Handler()
-    var runnable: Runnable = Runnable { this.showPlayBarData() }
-
-    fun showPlayBarData() {
-        if (MusicPlayerManager.MUSIC_ID.isNullOrBlank()) binding!!.playBarBackground.visibility =
-            View.GONE
-        else binding!!.playBarBackground.visibility = View.VISIBLE
-
-        binding!!.playBarMusicTitle.text = MusicPlayerManager.MUSIC_TITLE
-        binding!!.playBarMusicDesc.text = MusicPlayerManager.MUSIC_DESCRIPTION
-        Picasso.get().load(MusicPlayerManager.IMAGE_URL?.toUri())
-            .into(binding!!.playBarCoverImage)
-        updatePlaybarUi()
-
-        val gradientDrawable = GradientDrawable()
-        gradientDrawable.setColor(MusicPlayerManager.IMAGE_BG_COLOR)
-        gradientDrawable.cornerRadius = 18f
-
-        binding!!.playBarBackground.background = gradientDrawable
-
-        binding!!.playBarMusicTitle.setTextColor(MusicPlayerManager.TEXT_ON_IMAGE_COLOR1)
-        binding!!.playBarMusicDesc.setTextColor(MusicPlayerManager.TEXT_ON_IMAGE_COLOR1)
-
-        binding!!.playBarPlayPauseIcon.imageTintList =
-            ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
-        binding!!.playBarPrevIcon.imageTintList =
-            ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
-        binding!!.playBarNextIcon.imageTintList =
-            ColorStateList.valueOf(MusicPlayerManager.TEXT_ON_IMAGE_COLOR)
-
-        OverScrollDecoratorHelper.setUpStaticOverScroll(
-            binding!!.getRoot(),
-            OverScrollDecoratorHelper.ORIENTATION_VERTICAL
-        )
-
-        handler.postDelayed(runnable, 1000)
-    }
-
-    private fun updatePlaybarUi() {
-        val p = MusicPlayerManager.player
-        if (p != null) {
-            binding!!.playBarPlayPauseIcon.setImageResource(
-                if (p.isPlaying)
-                    R.drawable.baseline_pause_24
-                else
-                    R.drawable.play_arrow_24px
-            )
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         NetworkChangeReceiver.registerReceiver(this, networkChangeReceiver)
         showSavedLibrariesData()
+        MiniPlayerHelper.onActivityResume(this)
     }
 
     override fun onPause() {
         super.onPause()
         NetworkChangeReceiver.unregisterReceiver(this, networkChangeReceiver)
+        MiniPlayerHelper.onActivityPause(this)
     }
 
     override fun onBackPressed() {
@@ -416,9 +299,19 @@ class MainActivity : AppCompatActivity() {
         albums.clear()
         playlists.clear()
 
+        val songSeeds = listOf("Hits", "Latest", "Romantic", "Chill", "Lo-Fi", "Dance", "Hindi", "Sad", "Love", "Workout", " ")
+        val artistSeeds = listOf("Arijit Singh", "Pritam", "Diljit Dosanjh", "Rahman", "Shreya Ghoshal", "Anirudh", "Sidhu Moose Wala", "Badshah", "Karan Aujla", "Vishal-Shekhar", " ")
+        val albumSeeds = listOf("Hits", "Latest", "New", "Sad", "Lofi", "Romantic", "Rock", "Pop", "Classic", "Party", " ")
+        val playlistSeeds = listOf("Hits", "Latest", "Trending", "Party", "Devotional", "Chill", "Love", "Sad", "Top", "Classic", " ")
+        
+        val songQuery = songSeeds.random()
+        val artistQuery = artistSeeds.random()
+        val albumQuery = albumSeeds.random()
+        val playlistQuery = playlistSeeds.random()
+
         val apiManager = ApiManager(this)
 
-        apiManager.searchSongs(" ", 0, 15, object : RequestNetwork.RequestListener {
+        apiManager.searchSongs(songQuery, 0, 15, object : RequestNetwork.RequestListener {
             override fun onResponse(
                 tag: String?,
                 response: String?,
@@ -463,7 +356,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        apiManager.searchArtists(" ", 0, 15, object : RequestNetwork.RequestListener {
+        apiManager.searchArtists(artistQuery, 0, 15, object : RequestNetwork.RequestListener {
             override fun onResponse(
                 tag: String?,
                 response: String?,
@@ -500,7 +393,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        apiManager.searchAlbums(" ", 0, 15, object : RequestNetwork.RequestListener {
+        apiManager.searchAlbums(albumQuery, 0, 15, object : RequestNetwork.RequestListener {
             override fun onResponse(
                 tag: String?,
                 response: String?,
@@ -546,9 +439,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // String.valueOf(Calendar.getInstance().get(Calendar.YEAR))
         apiManager.searchPlaylists(
-            Calendar.getInstance().get(Calendar.YEAR).toString(), null, null,
+            playlistQuery, null, null,
             object : RequestNetwork.RequestListener {
                 override fun onResponse(
                     tag: String?,

@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.activities
+package com.harsh.shah.saavnmp3.activities
 
 import android.os.Bundle
 import android.view.View
@@ -13,6 +13,7 @@ import com.harsh.shah.saavnmp3.network.ApiManager
 import com.harsh.shah.saavnmp3.network.utility.RequestNetwork
 import com.harsh.shah.saavnmp3.records.ArtistAllAlbum
 import com.harsh.shah.saavnmp3.records.ArtistAllSongs
+import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.paginate.Paginate
 
 class SeeMoreActivity : AppCompatActivity() {
@@ -25,6 +26,7 @@ class SeeMoreActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySeeMoreBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
+        MiniPlayerHelper.initMiniPlayer(this)
         
         binding!!.recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -195,6 +197,16 @@ class SeeMoreActivity : AppCompatActivity() {
                     }
                 })
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MiniPlayerHelper.onActivityResume(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MiniPlayerHelper.onActivityPause(this)
     }
 
     fun backPress(view: View?) {

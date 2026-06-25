@@ -55,6 +55,16 @@
             android:padding="@dimen/_10sdp"
             android:src="@drawable/more_vert_24px" />
 
+        <ImageView
+            android:id="@+id/queue_icon"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:padding="@dimen/_10sdp"
+            android:src="@drawable/ic_queue_music"
+            android:contentDescription="Queue"
+            android:focusable="true"
+            android:clickable="true" />
+
     </LinearLayout>
 
     <LinearLayout

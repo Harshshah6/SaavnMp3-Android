@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.activities
+package com.harsh.shah.saavnmp3.activities
 
 import android.content.Intent
 import android.graphics.Color
@@ -25,6 +25,7 @@ import com.harsh.shah.saavnmp3.records.SongResponse.Album
 import com.harsh.shah.saavnmp3.records.SongResponse.DownloadUrl
 import com.harsh.shah.saavnmp3.records.SongResponse.Lyrics
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
+import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.squareup.picasso.Picasso
 
@@ -36,6 +37,7 @@ class ArtistProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityArtistProfileBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
+        MiniPlayerHelper.initMiniPlayer(this)
 
         setSupportActionBar(binding!!.collapsingToolbar)
         if (supportActionBar != null) supportActionBar!!.setDisplayShowTitleEnabled(false)
@@ -84,10 +86,12 @@ class ArtistProfileActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        MiniPlayerHelper.onActivityResume(this)
     }
 
     override fun onPause() {
         super.onPause()
+        MiniPlayerHelper.onActivityPause(this)
     }
 
     private var artistId = "9999"

@@ -14,6 +14,7 @@ import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.squareup.picasso.Picasso
 import androidx.core.net.toUri
+import android.widget.Toast
 
 
 class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
@@ -59,6 +60,29 @@ class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
         if (imgUrl.isNotEmpty()) {
             Picasso.get().load(imgUrl.toUri())
                 .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?))
+        }
+
+        val moreIcon = holder.itemView.findViewById<ImageView>(R.id.more)
+        moreIcon.setOnClickListener { v ->
+            val popup = androidx.appcompat.widget.PopupMenu(v.context, v)
+            popup.menu.add("Play Next")
+            popup.menu.add("Add to Queue")
+            popup.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.title) {
+                    "Play Next" -> {
+                        MusicPlayerManager.playNext(song.id)
+                        Toast.makeText(v.context, "Song will play next", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    "Add to Queue" -> {
+                        MusicPlayerManager.addToQueue(song.id)
+                        Toast.makeText(v.context, "Song added to queue", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
         }
 
         holder.itemView.setOnClickListener { view: View? ->

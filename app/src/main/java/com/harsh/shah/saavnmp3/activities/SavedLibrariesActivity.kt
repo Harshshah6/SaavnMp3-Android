@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.activities
+package com.harsh.shah.saavnmp3.activities
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -16,6 +16,7 @@ import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
+import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -27,6 +28,7 @@ class SavedLibrariesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySavedLibrariesBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
+        MiniPlayerHelper.initMiniPlayer(this)
 
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
         OverScrollDecoratorHelper.setUpOverScroll(
@@ -108,6 +110,12 @@ class SavedLibrariesActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         showData()
+        MiniPlayerHelper.onActivityResume(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MiniPlayerHelper.onActivityPause(this)
     }
 
     fun backPress(view: View?) {

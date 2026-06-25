@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
+    android:padding="@dimen/_12sdp">
+
+    <!-- Header bar indicator -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_4sdp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/_12sdp"
+        app:cardBackgroundColor="@color/textSec"
+        app:cardCornerRadius="999dp"
+        app:strokeWidth="0dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Music Queue"
+        android:fontFamily="@font/avenir_next_bold"
+        android:textColor="@color/textMain"
+        android:textSize="@dimen/_18ssp"
+        android:layout_marginBottom="@dimen/_8sdp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Now Playing"
+        android:textColor="@color/green"
+        android:textSize="@dimen/_12ssp"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/_4sdp" />
+
+    <!-- Now Playing Item -->
+    <LinearLayout
+        android:id="@+id/now_playing_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/_4sdp"
+        android:background="@drawable/play_bar_background"
+        android:layout_marginBottom="@dimen/_12sdp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="@dimen/_35sdp"
+            android:layout_height="@dimen/_35sdp"
+            app:cardCornerRadius="@dimen/_6sdp"
+            app:strokeWidth="0dp">
+            <ImageView
+                android:id="@+id/now_playing_cover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/textSec"
+                android:contentDescription="Cover" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/_8sdp">
+            <TextView
+                android:id="@+id/now_playing_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Song Title"
+                android:textStyle="bold"
+                android:textColor="@color/textMain"
+                android:textSize="@dimen/_13ssp"
+                android:singleLine="true"
+                android:ellipsize="marquee" />
+            <TextView
+                android:id="@+id/now_playing_artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Artist"
+                android:textColor="@color/textSec"
+                android:textSize="@dimen/_11ssp"
+                android:singleLine="true"
+                android:ellipsize="marquee" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/next_up_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Next Up"
+        android:textColor="@color/textMain"
+        android:textSize="@dimen/_12ssp"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/_4sdp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/queue_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            tools:listitem="@layout/activity_list_song_item" />
+
+        <ProgressBar
+            android:id="@+id/queue_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/queue_empty_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="No upcoming songs in queue"
+            android:textColor="@color/textSec"
+            android:textSize="@dimen/_14ssp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+</LinearLayout>

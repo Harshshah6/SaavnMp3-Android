@@ -15,9 +15,11 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.ListAdapter
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
@@ -187,6 +189,10 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         binding!!.coverImageCard.setOnClickListener {
             if (currentLyricsList.isNullOrEmpty()) return@setOnClickListener
             toggleLyrics()
+        }
+
+        binding!!.queueIcon?.setOnClickListener {
+            com.harsh.shah.saavnmp3.utils.MiniPlayerHelper.showQueueBottomSheet(this)
         }
 
         if ((MusicPlayerManager.trackQueue?.size ?: 0) <= 1) binding!!.shuffleIcon.visibility = View.INVISIBLE
@@ -847,6 +853,8 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
         }
     }
+
+
 
     fun backPress(view: View?) {
         finish()

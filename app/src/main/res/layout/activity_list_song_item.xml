@@ -65,11 +65,16 @@
             </LinearLayout>
 
             <ImageView
-                android:visibility="invisible"
+                android:id="@+id/more"
+                android:visibility="visible"
                 android:layout_width="@dimen/_40sdp"
                 android:layout_height="@dimen/_40sdp"
                 android:src="@drawable/more_vert_24px"
-                android:padding="@dimen/_10sdp" />
+                android:padding="@dimen/_10sdp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:contentDescription="More options" />
 
         </LinearLayout>
 

@@ -25,6 +25,7 @@ import com.harsh.shah.saavnmp3.network.ApiManager
 import com.harsh.shah.saavnmp3.network.utility.RequestNetwork
 import com.harsh.shah.saavnmp3.records.GlobalSearch
 import com.harsh.shah.saavnmp3.records.GlobalSearch.Data.TopQuery
+import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.util.Locale
@@ -42,6 +43,7 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
+        MiniPlayerHelper.initMiniPlayer(this)
 
         OverScrollDecoratorHelper.setUpOverScroll(binding!!.hscrollview)
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
@@ -288,6 +290,16 @@ class SearchActivity : AppCompatActivity() {
             )
         }
         binding!!.recyclerView.setAdapter(ActivitySearchListItemAdapter(data.filterNotNull().toMutableList()))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MiniPlayerHelper.onActivityResume(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MiniPlayerHelper.onActivityPause(this)
     }
 
     fun backPress(view: View?) {

@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.activities
+package com.harsh.shah.saavnmp3.activities
 
 import android.content.Context
 import android.content.DialogInterface
@@ -13,6 +13,7 @@ import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.databinding.ActivitySettingsBinding
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch.OnCheckChangeListener
+import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import androidx.core.content.edit
 
 class SettingsActivity : AppCompatActivity() {
@@ -22,6 +23,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
+        MiniPlayerHelper.initMiniPlayer(this)
         val settingsSharedPrefManager = SettingsSharedPrefManager(this)
         val sharedPreferenceManager: SharedPreferenceManager =
             SharedPreferenceManager.getInstance(this)
@@ -75,6 +77,16 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding!!.themeChipGroup.check(if (settingsSharedPrefManager.theme == "dark") R.id.dark else if (settingsSharedPrefManager.theme == "light") R.id.light else R.id.system)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MiniPlayerHelper.onActivityResume(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MiniPlayerHelper.onActivityPause(this)
     }
 
     fun backPress(view: View?) {

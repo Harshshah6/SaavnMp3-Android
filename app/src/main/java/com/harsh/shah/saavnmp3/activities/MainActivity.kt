@@ -299,10 +299,10 @@ class MainActivity : AppCompatActivity() {
         albums.clear()
         playlists.clear()
 
-        val songSeeds = listOf("Hits", "Latest", "Romantic", "Chill", "Lo-Fi", "Dance", "Hindi", "Sad", "Love", "Workout", " ")
-        val artistSeeds = listOf("Arijit Singh", "Pritam", "Diljit Dosanjh", "Rahman", "Shreya Ghoshal", "Anirudh", "Sidhu Moose Wala", "Badshah", "Karan Aujla", "Vishal-Shekhar", " ")
-        val albumSeeds = listOf("Hits", "Latest", "New", "Sad", "Lofi", "Romantic", "Rock", "Pop", "Classic", "Party", " ")
-        val playlistSeeds = listOf("Hits", "Latest", "Trending", "Party", "Devotional", "Chill", "Love", "Sad", "Top", "Classic", " ")
+        val songSeeds = listOf("2023","2024","2025","2026","Hits", "Latest", "Romantic", "Chill", "Lo-Fi", "Dance", "Hindi", "Sad", "Love", "Workout", " ")
+        val artistSeeds = listOf("2023","2024","2025","2026", " ")
+        val albumSeeds = listOf("2023","2024","2025","2026","Hits", "Latest", "New", "Sad", "Lo-Fi", "Romantic", "Rock", "Pop", "Classic", "Party", " ")
+        val playlistSeeds = listOf("2023","2024","2025","2026","Hits", "Latest", "Trending", "Party", "Devotional", "Chill", "Love", "Sad", "Top", "Classic", " ")
         
         val songQuery = songSeeds.random()
         val artistQuery = artistSeeds.random()

@@ -1,17 +1,28 @@
 # SaavnMp3 / Melotune
 
-A clean, ad-free Android music streaming app powered by the unofficial JioSaavn API. Inspired by Spotify’s minimal interface, this app enables users to search, stream, and enjoy music seamlessly — all without login or tracking.
+Melotune is a lightweight, privacy-focused Android music streaming app built with Kotlin. It offers an ad-free listening experience, a modern Spotify-inspired interface, and seamless playback without requiring an account.
 
-![GitHub repo size](https://img.shields.io/github/repo-size/Harshshah6/SaavnMp3-Android)
-![GitHub watchers](https://img.shields.io/github/watchers/Harshshah6/SaavnMp3-Android)
-![GitHub Repo stars](https://img.shields.io/github/stars/Harshshah6/SaavnMp3-Android)
+<div style="display:flex; gap:10px;">
 
-[![Download APK](https://img.shields.io/badge/Download_APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Harshshah6/SaavnMp3-Android/releases/latest)
-[![Get it at IzzyOnDroid](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/com.harsh.shah.saavnmp3&style=for-the-badge)](https://apt.izzysoft.de/packages/com.harsh.shah.saavnmp3)
+![GitHub repo size](https://img.shields.io/github/repo-size/Harshshah6/SaavnMp3-Android?style=)
+![GitHub Repo stars](https://img.shields.io/github/stars/Harshshah6/SaavnMp3-Android?style=)
+[![GitHub release](https://img.shields.io/github/v/release/Harshshah6/SaavnMp3-Android?style=)](https://github.com/Harshshah6/SaavnMp3-Android/releases)
+[![Get it at IzzyOnDroid](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/com.harsh.shah.saavnmp3&style=)](https://apt.izzysoft.de/packages/com.harsh.shah.saavnmp3)
+
+</div>
+
+
+<div style="display:flex; gap:10px;">
+
+![GitHub Downloads](https://img.shields.io/github/downloads/Harshshah6/SaavnMp3-Android/total?style=&label=Release%20Downloads)
+[![IzzyOnDroid Downloads](https://img.shields.io/badge/dynamic/json?url=https://dlstats.izzyondroid.org/iod-stats-collector/stats/basic/yearly/rolling.json&query=$.['com.harsh.shah.saavnmp3']&label=IzzyOnDroid%20Downloads&style=)](https://apt.izzysoft.de/packages/com.harsh.shah.saavnmp3)
+
+</div>
+
+
 <!-- 
 [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.me/HarshShah06)  -->
 <!-- [![Donate with UPI](https://img.shields.io/badge/Donate_with_UPI-3DDC84?style=for-the-badge&logo=googlepay&logoColor=black)](upi://pay?pa=harshsandeep23@oksbi&pn=HarshShah&cu=INR) -->
-
 
 
 ## Features
@@ -30,22 +41,14 @@ A clean, ad-free Android music streaming app powered by the unofficial JioSaavn 
 
 ## Screenshots
 
-<p align="center">
-  <img src="docs/home.jpg" alt="Home Screen" width="250"/>
-  <img src="docs/artist.jpg" alt="Artist Screen" width="250"/>
-  <img src="docs/album.jpg" alt="Album Screen" width="250"/>
-  <img src="docs/search.png" alt="Search Screen" width="250"/>
-  <img src="docs/music.jpg" alt="Player Screen" width="250"/>
-  <img src="docs/settings.jpg" alt="Settings Screen" width="250"/>
-  <br>
-  <img src="docs/notification.jpg" alt="Notification" width="500"/>
-  <br>
-  <img src="docs/widget_light.jpg" alt="Light Widget" width="250"/>
-  <img src="docs/widget_night.jpg" alt="Dark Widget" width="250"/>
-  <br>
-  <img src="docs/logo_light.png" alt="Light Logo" width="250"/>
-  <img src="docs/logo_night.png" alt="Dark Logo" width="250"/>
-</p>
+<div align="center" style="">
+  <img style="border:2px solid #333; border-radius:12px;" src="docs/home.jpg" alt="Home Screen" width="250"/>
+  <img style="border:2px solid #333; border-radius:12px;" src="docs/artist.jpg" alt="Artist Screen" width="250"/>
+  <img style="border:2px solid #333; border-radius:12px;" src="docs/album.jpg" alt="Album Screen" width="250"/>
+  <img style="border:2px solid #333; border-radius:12px;" src="docs/search.png" alt="Search Screen" width="250"/>
+  <img style="border:2px solid #333; border-radius:12px;" src="docs/music.jpg" alt="Player Screen" width="250"/>
+  <img style="border:2px solid #333; border-radius:12px;" src="docs/settings.jpg" alt="Settings Screen" width="250"/>
+</div>
 
 ## Getting Started
 
@@ -55,6 +58,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 * Android Studio (latest version recommended)
 * Java 17+
+* Kotlin 2.4.0
 * An Android device or emulator
 
 ### Installation
@@ -68,7 +72,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 ## Built With
 
-*   [Java 17](https://openjdk.org/projects/jdk/17/) - The programming language used.
+*   [Java 17](https://openjdk.org/projects/jdk/17/) & [Kotlin 2.4.0](https://kotlinlang.org/docs/whatsnew24.html) - The programming language used.
 *   [saavn.sumit.co](https://github.com/sumitkolhe/jiosaavn-api) - The unofficial JioSaavn API.
 *   [Glide](https://github.com/bumptech/glide) - An image loading and caching library.
 *   [Picasso](https://github.com/square/picasso) - A powerful image downloading and caching library.
@@ -81,11 +85,11 @@ Follow these instructions to get a copy of the project up and running on your lo
 *   [JAudioTagger](https://github.com/RouHim/jaudiotagger) - A Java library for reading and writing audio metadata.
 
 ## Star History
-<a href="https://star-history.com/#harshshah6/SaavnMp3-Android&Date">
+<a href="https://www.star-history.com/?repos=harshshah6%2FSaavnMp3-Android&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=harshshah6/SaavnMp3-Android&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=harshshah6/SaavnMp3-Android&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=harshshah6/SaavnMp3-Android&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=harshshah6/SaavnMp3-Android&type=date&theme=dark&legend=top-left&sealed_token=TnLJLQULG0pZ0ArZCpyK9vygQTzTn5T5MVEYjIA8G3a5ZWmhLqfAUT-QhCWo5MpS2eFbYABtgTcM4Tlmw_aN-fOif42bR9HEn4E9tNORkcuFoy4HRPJDMQ" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=harshshah6/SaavnMp3-Android&type=date&legend=top-left&sealed_token=TnLJLQULG0pZ0ArZCpyK9vygQTzTn5T5MVEYjIA8G3a5ZWmhLqfAUT-QhCWo5MpS2eFbYABtgTcM4Tlmw_aN-fOif42bR9HEn4E9tNORkcuFoy4HRPJDMQ" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=harshshah6/SaavnMp3-Android&type=date&legend=top-left&sealed_token=TnLJLQULG0pZ0ArZCpyK9vygQTzTn5T5MVEYjIA8G3a5ZWmhLqfAUT-QhCWo5MpS2eFbYABtgTcM4Tlmw_aN-fOif42bR9HEn4E9tNORkcuFoy4HRPJDMQ" />
  </picture>
 </a>
 

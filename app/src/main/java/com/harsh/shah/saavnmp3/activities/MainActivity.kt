@@ -51,6 +51,7 @@ import java.util.Calendar
 import androidx.core.net.toUri
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.UpdateUtil
+import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 
 class MainActivity : AppCompatActivity() {
     private var requestStoragePermission: ActivityResultLauncher<Array<String>>? = null
@@ -134,6 +135,12 @@ class MainActivity : AppCompatActivity() {
                 false
             )
         )
+
+        // Snap helpers — smooth magnetic scroll on all horizontal lists
+        binding!!.popularSongsRecyclerView.attachSnapHelper()
+        binding!!.popularArtistsRecyclerView.attachSnapHelper()
+        binding!!.popularAlbumsRecyclerView.attachSnapHelper()
+        binding!!.savedRecyclerView.attachSnapHelper()
 
         OverScrollDecoratorHelper.setUpOverScroll(
             binding!!.popularSongsRecyclerView,

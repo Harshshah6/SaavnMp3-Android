@@ -38,6 +38,24 @@
             android:layout_weight="1" />
 
         <ImageView
+            android:contentDescription="import library"
+            android:id="@+id/importLibrary"
+            android:layout_width="@dimen/_35sdp"
+            android:layout_height="@dimen/_35sdp"
+            android:src="@drawable/ic_import"
+            android:padding="@dimen/_4sdp"
+            tools:ignore="HardcodedText" />
+
+        <ImageView
+            android:contentDescription="export library"
+            android:id="@+id/exportLibrary"
+            android:layout_width="@dimen/_35sdp"
+            android:layout_height="@dimen/_35sdp"
+            android:src="@drawable/ic_export"
+            android:padding="@dimen/_4sdp"
+            tools:ignore="HardcodedText" />
+
+        <ImageView
             android:contentDescription="add new library"
             android:id="@+id/addNewLibrary"
             android:layout_width="@dimen/_35sdp"

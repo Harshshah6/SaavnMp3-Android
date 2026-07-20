@@ -1,7 +1,6 @@
-﻿package com.harsh.shah.saavnmp3.adapters
+package com.harsh.shah.saavnmp3.adapters
 
 import android.content.Intent
-import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -15,6 +14,8 @@ import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
 import com.squareup.picasso.Picasso
 import androidx.core.net.toUri
+import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
+import android.widget.Toast
 
 class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
     RecyclerView.Adapter<SavedLibrariesAdapter.ViewHolder>() {
@@ -28,21 +29,54 @@ class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.title.text = data[position]!!.name
-        holder.artist.text = data[position]!!.description
-        Picasso.get().load(data[position]!!.image?.toUri()).into(holder.coverImage)
+        val library = data[position]!!
+        holder.title.text = library.name
+        holder.artist.text = library.description
+
+        // Use first song's image if library cover is blank
+        val coverUrl = library.image?.takeIf { it.isNotBlank() }
+            ?: library.songs?.firstOrNull { it?.image?.isNotBlank() == true }?.image
+        if (!coverUrl.isNullOrBlank()) {
+            Picasso.get().load(coverUrl.toUri()).into(holder.coverImage)
+        }
+
+        // 3-dots more menu
+        val moreIcon = holder.itemView.findViewById<ImageView>(R.id.more)
+        moreIcon?.setOnClickListener { v ->
+            val popup = androidx.appcompat.widget.PopupMenu(v.context, v)
+            popup.menu.add("Play All")
+            popup.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.title) {
+                    "Play All" -> {
+                        val songIds = library.songs?.mapNotNull { it?.id } ?: emptyList()
+                        if (songIds.isNotEmpty()) {
+                            MusicPlayerManager.trackQueue = ArrayList(songIds)
+                            MusicPlayerManager.track_position = 0
+                            val intent = Intent(v.context, com.harsh.shah.saavnmp3.activities.MusicOverviewActivity::class.java)
+                                .putExtra("id", songIds[0])
+                            v.context.startActivity(intent)
+                        } else {
+                            Toast.makeText(v.context, "No songs in this library", Toast.LENGTH_SHORT).show()
+                        }
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
+        }
 
         holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->
             val albumItem = AlbumItem(
-                data[position]!!.name,
-                data[position]!!.description,
-                data[position]!!.image,
-                data[position]!!.id
+                library.name,
+                library.description,
+                coverUrl,
+                library.id
             )
-            if (data[position]!!.isCreatedByUser) {
+            if (library.isCreatedByUser) {
                 v!!.context.startActivity(
                     Intent(v.context, ListActivity::class.java)
-                        .putExtra("id", data[position]!!.id)
+                        .putExtra("id", library.id)
                         .putExtra("data", Gson().toJson(albumItem))
                         .putExtra("type", "playlist")
                         .putExtra("createdByUser", true)
@@ -52,8 +86,8 @@ class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
             v!!.context.startActivity(
                 Intent(v.context, ListActivity::class.java)
                     .putExtra("data", Gson().toJson(albumItem))
-                    .putExtra("type", if (data[position]!!.isAlbum) "album" else "playlist")
-                    .putExtra("id", data[position]!!.id)
+                    .putExtra("type", if (library.isAlbum) "album" else "playlist")
+                    .putExtra("id", library.id)
             )
         })
     }

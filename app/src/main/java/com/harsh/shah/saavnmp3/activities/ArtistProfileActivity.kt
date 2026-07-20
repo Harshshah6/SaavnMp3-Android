@@ -27,6 +27,7 @@ import com.harsh.shah.saavnmp3.records.SongResponse.Lyrics
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
+import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 import com.squareup.picasso.Picasso
 
 class ArtistProfileActivity : AppCompatActivity() {
@@ -58,6 +59,9 @@ class ArtistProfileActivity : AppCompatActivity() {
         binding!!.topSongsRecyclerview.setLayoutManager(LinearLayoutManager(this))
         binding!!.topAlbumsRecyclerview.setLayoutManager(LinearLayoutManager(this))
         binding!!.topSinglesRecyclerview.setLayoutManager(LinearLayoutManager(this))
+        binding!!.topSongsRecyclerview.attachSnapHelper()
+        binding!!.topAlbumsRecyclerview.attachSnapHelper()
+        binding!!.topSinglesRecyclerview.attachSnapHelper()
 
         binding!!.topSongsSeeMore.setOnClickListener { v: View? ->
             startActivity(

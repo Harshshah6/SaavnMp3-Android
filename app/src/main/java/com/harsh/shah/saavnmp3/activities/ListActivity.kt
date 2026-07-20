@@ -32,6 +32,7 @@ import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
+import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 import com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
 import com.squareup.picasso.Picasso
 
@@ -47,6 +48,7 @@ class ListActivity : AppCompatActivity() {
         MiniPlayerHelper.initMiniPlayer(this)
 
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
+        binding!!.recyclerView.attachSnapHelper()
         binding!!.addMoreSongs.visibility = View.GONE
 
         Log.i("ListActivity", "onCreate: reached ListActivity")

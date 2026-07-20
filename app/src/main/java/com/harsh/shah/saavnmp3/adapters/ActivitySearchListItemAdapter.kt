@@ -47,7 +47,60 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
         val item = data[position]
 
         (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = item.title()
-        (holder.itemView.findViewById<View?>(R.id.artist) as TextView).text = item.subtitle()
+        
+        val typePrefix = when (item.type) {
+            SearchListItem.Type.SONG -> "Song"
+            SearchListItem.Type.ALBUM -> "Album"
+            SearchListItem.Type.PLAYLIST -> "Playlist"
+            SearchListItem.Type.ARTIST -> "Artist"
+            else -> ""
+        }
+        val formattedSubtitle = if (typePrefix.isNotEmpty() && !item.subtitle().isNullOrEmpty()) {
+            "$typePrefix • ${item.subtitle()}"
+        } else if (typePrefix.isNotEmpty()) {
+            typePrefix
+        } else {
+            item.subtitle()
+        }
+        (holder.itemView.findViewById<View?>(R.id.artist) as TextView).text = formattedSubtitle
+
+        val coverCard = holder.itemView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.coverCard)
+        if (coverCard != null) {
+            val radiusRes = if (item.type == SearchListItem.Type.ARTIST) {
+                com.intuit.sdp.R.dimen._20sdp
+            } else {
+                com.intuit.sdp.R.dimen._4sdp
+            }
+            coverCard.radius = coverCard.context.resources.getDimension(radiusRes)
+        }
+
+        val moreIcon = holder.itemView.findViewById<ImageView>(R.id.more)
+        if (item.type == SearchListItem.Type.SONG) {
+            moreIcon.visibility = View.VISIBLE
+            moreIcon.setOnClickListener { v ->
+                val popup = androidx.appcompat.widget.PopupMenu(v.context, v)
+                popup.menu.add("Play Next")
+                popup.menu.add("Add to Queue")
+                popup.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.title) {
+                        "Play Next" -> {
+                            MusicPlayerManager.playNext(item.id)
+                            android.widget.Toast.makeText(v.context, "Song will play next", android.widget.Toast.LENGTH_SHORT).show()
+                            true
+                        }
+                        "Add to Queue" -> {
+                            MusicPlayerManager.addToQueue(item.id)
+                            android.widget.Toast.makeText(v.context, "Song added to queue", android.widget.Toast.LENGTH_SHORT).show()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                popup.show()
+            }
+        } else {
+            moreIcon.visibility = View.GONE
+        }
 
         Picasso.get().load(item.coverImage?.toUri())
             .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?))

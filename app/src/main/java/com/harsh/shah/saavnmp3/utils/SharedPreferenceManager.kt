@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.utils
+package com.harsh.shah.saavnmp3.utils
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -101,11 +101,11 @@ class SharedPreferenceManager private constructor(context: Context) {
     }
 
     // ---------- Generic put/get/remove helpers (synchronous) ----------
-    private fun putJson(key: String, json: String?) {
+    internal fun putJson(key: String, json: String?) {
         dao.upsert(KeyValue(key, json, now()))
     }
 
-    private fun getJson(key: String?): String? {
+    internal fun getJson(key: String?): String? {
         return dao.getJson(key)
     }
 

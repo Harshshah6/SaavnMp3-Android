@@ -27,6 +27,7 @@ import com.harsh.shah.saavnmp3.records.GlobalSearch
 import com.harsh.shah.saavnmp3.records.GlobalSearch.Data.TopQuery
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
+import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.util.Locale
 import androidx.core.net.toUri
@@ -47,6 +48,7 @@ class SearchActivity : AppCompatActivity() {
 
         OverScrollDecoratorHelper.setUpOverScroll(binding!!.hscrollview)
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
+        binding!!.recyclerView.attachSnapHelper()
 
         binding!!.edittext.requestFocus()
 
@@ -205,7 +207,10 @@ class SearchActivity : AppCompatActivity() {
         } else {
             throw IllegalStateException("Unexpected value: " + binding!!.chipGroup.checkedChipId)
         }
-        if (!data.isEmpty()) binding!!.recyclerView.setAdapter(ActivitySearchListItemAdapter(data.filterNotNull().toMutableList()))
+        if (!data.isEmpty()) {
+            val uniqueData = data.filterNotNull().distinctBy { it.id }.toMutableList()
+            binding!!.recyclerView.setAdapter(ActivitySearchListItemAdapter(uniqueData))
+        }
     }
 
     private fun addSongsData(data: MutableList<SearchListItem?>) {

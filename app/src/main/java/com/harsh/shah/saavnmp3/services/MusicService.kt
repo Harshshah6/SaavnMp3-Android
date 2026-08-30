@@ -1,6 +1,7 @@
 package com.harsh.shah.saavnmp3.services
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
@@ -89,6 +90,24 @@ class MusicService : Service() {
         }
 
         return START_STICKY
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        val prefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val playInBackground = prefs.getBoolean("play_in_background", true)
+        if (!playInBackground) {
+            Log.d("MusicService", "onTaskRemoved: stopping playback (play in background is disabled)")
+            try {
+                MusicPlayerManager.player?.pause()
+                MusicPlayerManager.player?.stop()
+            } catch (e: Exception) {
+                Log.e("MusicService", "Error stopping player on task removed", e)
+            }
+            MusicPlayerManager.cancelNotification()
+            stopForeground(true)
+            stopSelf()
+        }
     }
 
     fun setCallback(actionPlaying: ActionPlaying?) {

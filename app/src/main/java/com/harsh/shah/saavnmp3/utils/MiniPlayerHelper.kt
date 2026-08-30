@@ -137,6 +137,19 @@ object MiniPlayerHelper {
         prevIcon?.imageTintList = tintList
         nextIcon?.imageTintList = tintList
         activity.findViewById<ImageView>(R.id.play_bar_queue_icon)?.imageTintList = tintList
+
+        // Update the thin progress bar at the bottom of the mini-player
+        val progressBar = activity.findViewById<android.widget.ProgressBar>(R.id.play_bar_progress)
+        if (progressBar != null) {
+            val p = MusicPlayerManager.player
+            if (p != null && p.duration > 0) {
+                progressBar.progress = ((p.currentPosition.toFloat() / p.duration) * 1000).toInt()
+            } else {
+                progressBar.progress = 0
+            }
+            // Tint the progress bar to match the current album colour
+            progressBar.progressTintList = tintList
+        }
     }
 
     fun showQueueBottomSheet(activity: AppCompatActivity) {
@@ -213,8 +226,19 @@ object MiniPlayerHelper {
                                         }
                                         Toast.makeText(activity, "Removed from queue", Toast.LENGTH_SHORT).show()
                                     }
+                                },
+                                onOrderChanged = { fromItem, toItem ->
+                                    // fromItem / toItem are indices within the adapter's songList (upcoming only)
+                                    // Map back to absolute positions in the full queue
+                                    val absoluteFrom = pos + 1 + fromItem
+                                    val absoluteTo   = pos + 1 + toItem
+                                    if (absoluteFrom in queue.indices && absoluteTo in queue.indices) {
+                                        val id = queue.removeAt(absoluteFrom)
+                                        queue.add(absoluteTo, id)
+                                    }
                                 }
                             )
+                            adapter.attachDragHelper(queueRecyclerView)
                             queueRecyclerView.adapter = adapter
                         } else {
                             queueProgressBar.visibility = View.GONE

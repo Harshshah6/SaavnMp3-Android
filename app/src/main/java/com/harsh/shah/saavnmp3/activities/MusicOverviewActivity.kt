@@ -191,6 +191,56 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             toggleLyrics()
         }
 
+        // Swipe left → next track, swipe right → previous track on the album-art area
+        val swipeGestureDetector = android.view.GestureDetector(
+            this,
+            object : android.view.GestureDetector.SimpleOnGestureListener() {
+                private val SWIPE_THRESHOLD = 80
+                private val SWIPE_VELOCITY_THRESHOLD = 100
+
+                override fun onFling(
+                    e1: android.view.MotionEvent?,
+                    e2: android.view.MotionEvent,
+                    velocityX: Float,
+                    velocityY: Float
+                ): Boolean {
+                    val diffX = e2.x - (e1?.x ?: e2.x)
+                    val diffY = e2.y - (e1?.y ?: e2.y)
+                    if (kotlin.math.abs(diffX) > kotlin.math.abs(diffY) &&
+                        kotlin.math.abs(diffX) > SWIPE_THRESHOLD &&
+                        kotlin.math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD
+                    ) {
+                        if (diffX < 0) {
+                            // Swipe left → next
+                            binding!!.nextIcon.alpha = 0.5f
+                            binding!!.nextIcon.animate().alpha(1.0f).setDuration(200).start()
+                            MusicPlayerManager.nextTrack()
+                        } else {
+                            // Swipe right → previous
+                            binding!!.prevIcon.alpha = 0.5f
+                            binding!!.prevIcon.animate().alpha(1.0f).setDuration(200).start()
+                            MusicPlayerManager.prevTrack()
+                        }
+                        return true
+                    }
+                    return false
+                }
+
+                // Pass through taps so the lyrics toggle still works
+                override fun onSingleTapConfirmed(e: android.view.MotionEvent): Boolean {
+                    if (currentLyricsList.isNullOrEmpty()) return false
+                    toggleLyrics()
+                    return true
+                }
+            }
+        )
+        binding!!.coverArtFrame?.setOnTouchListener { v, event ->
+            // Let the GestureDetector consume the event; return false so children
+            // (coverImageCard / lyricsRecycler) still receive their own touch events.
+            swipeGestureDetector.onTouchEvent(event)
+            false
+        }
+
         binding!!.queueIcon?.setOnClickListener {
             com.harsh.shah.saavnmp3.utils.MiniPlayerHelper.showQueueBottomSheet(this)
         }

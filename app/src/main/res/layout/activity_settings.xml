@@ -162,6 +162,31 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Playback"
+                android:paddingHorizontal="@dimen/_12sdp"
+                android:paddingVertical="@dimen/_4sdp"
+                android:textColor="@color/textMain"
+                android:textStyle="bold"
+                android:textSize="@dimen/_14sdp" />
+
+            <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                android:id="@+id/play_in_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:textHead="Play in background"
+                app:textOff="Music stops when you remove the app from recents."
+                app:textOn="Music continues to play when app is cleared from recents."
+                app:checked="true" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.2dp"
+                android:layout_marginVertical="@dimen/_8sdp"
+                android:background="@color/textSec" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Theme"
                 android:paddingHorizontal="@dimen/_12sdp"
                 android:paddingVertical="@dimen/_4sdp"

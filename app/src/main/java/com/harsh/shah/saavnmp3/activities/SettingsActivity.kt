@@ -48,11 +48,17 @@ class SettingsActivity : AppCompatActivity() {
                 settingsSharedPrefManager.explicit = isChecked
             }
         })
+        binding!!.playInBackground?.setOnCheckChangeListener(object : OnCheckChangeListener {
+            override fun onCheckChanged(isChecked: Boolean) {
+                settingsSharedPrefManager.playInBackground = isChecked
+            }
+        })
 
         binding!!.downloadOverCellular.setChecked(settingsSharedPrefManager.downloadOverCellular)
         binding!!.highQualityTrack.setChecked(settingsSharedPrefManager.highQualityTrack)
         binding!!.storeInCache.setChecked(settingsSharedPrefManager.storeInCache)
         binding!!.explicit.setChecked(settingsSharedPrefManager.explicit)
+        binding!!.playInBackground?.setChecked(settingsSharedPrefManager.playInBackground)
 
         binding!!.themeChipGroup.setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
             settingsSharedPrefManager.theme =
@@ -118,6 +124,12 @@ class SettingsActivity : AppCompatActivity() {
             get() = sharedPreferences.getBoolean("explicit", true)
             set(value) {
                 sharedPreferences.edit { putBoolean("explicit", value) }
+            }
+
+        var playInBackground: Boolean
+            get() = sharedPreferences.getBoolean("play_in_background", true)
+            set(value) {
+                sharedPreferences.edit { putBoolean("play_in_background", value) }
             }
 
         var theme: String?

@@ -27,28 +27,31 @@ Melotune is a lightweight, privacy-focused Android music streaming app built wit
 
 ## Features
 
-- **Ad-Free Experience**: Enjoy music without interruptions.
-- **Background Playback**: Keep the music going while using other apps.
-- **Up-to-Date Music Library**: Access the latest tracks as they are released.
-- **Comprehensive Search**: Find music by track, artist, album, or playlist.
-- **Privacy-Focused**: No user data is collected or tracked.
-- **Modern UI**: A clean and intuitive interface inspired by Spotify.
-- **Auto-Updating Version**: The app version is always displayed and up-to-date.
-- **Seamless Playback**: Auto-plays the next song in the queue.
-- **Flexible Network Support**: Supports both HTTP and HTTPS for music streaming.
-- **Robust Error Handling**: Gracefully handles network and other errors.
-- **And much more...**
+- **Ad-Free Experience**: Enjoy high-fidelity music streaming without any interruptions.
+- **Queue Management**: View upcoming tracks, remove songs, and **drag-and-drop to reorder** the playback queue on the fly.
+- **Smart Mini-Player**: Persistent mini-player across all screens featuring a live, colour-adaptive progress bar.
+- **Player Gestures**: Swipe left or right on album art to smoothly skip to next or previous tracks.
+- **Synchronized Lyrics**: Built-in dynamic LRC lyrics display with real-time tracking and tap-to-toggle view.
+- **Search with History**: Instant global search with recent query chips, category filters (Songs, Albums, Playlists, Artists), and auto-suggestions.
+- **Background Playback Settings**: Configurable toggle to keep playing or stop playback when the app is removed from recents.
+- **Library & Playlists**: Create personalized playlists with full JSON **Export & Import** backup support.
+- **High-Quality Audio & Downloads**: Stream and download tracks with embedded metadata and album art.
+- **Modern Dark/Light UI**: Sleek, Spotify-inspired interface with dynamic color extraction, shimmer loaders, and smooth animations.
+- **Privacy-First**: No account required, no telemetry, and zero tracking.
 
 ## Screenshots
 
-<div align="center" style="">
-  <img style="border:2px solid #333; border-radius:12px;" src="docs/home.jpg" alt="Home Screen" width="250"/>
-  <img style="border:2px solid #333; border-radius:12px;" src="docs/artist.jpg" alt="Artist Screen" width="250"/>
-  <img style="border:2px solid #333; border-radius:12px;" src="docs/album.jpg" alt="Album Screen" width="250"/>
-  <img style="border:2px solid #333; border-radius:12px;" src="docs/search.png" alt="Search Screen" width="250"/>
-  <img style="border:2px solid #333; border-radius:12px;" src="docs/music.jpg" alt="Player Screen" width="250"/>
-  <img style="border:2px solid #333; border-radius:12px;" src="docs/settings.jpg" alt="Settings Screen" width="250"/>
+<div align="center">
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/home.png" alt="Home Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/music.png" alt="Player Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/music_queue.png" alt="Queue Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/search.png" alt="Search Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/artist.jpg" alt="Saved Libraries Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/notification.png" alt="Artist Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/album.png" alt="Album Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/settings.png" alt="Settings Screen" width="220"/>
 </div>
+
 
 ## Getting Started
 
@@ -84,14 +87,14 @@ Follow these instructions to get a copy of the project up and running on your lo
 *   [SSP](https://github.com/intuit/ssp) & [SDP](https://github.com/intuit/sdp) - Libraries for responsive UI dimensions.
 *   [JAudioTagger](https://github.com/RouHim/jaudiotagger) - A Java library for reading and writing audio metadata.
 
-## Star History
+<!-- ## Star History
 <a href="https://www.star-history.com/?repos=harshshah6%2FSaavnMp3-Android&type=date&legend=top-left">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=harshshah6/SaavnMp3-Android&type=date&theme=dark&legend=top-left&sealed_token=TnLJLQULG0pZ0ArZCpyK9vygQTzTn5T5MVEYjIA8G3a5ZWmhLqfAUT-QhCWo5MpS2eFbYABtgTcM4Tlmw_aN-fOif42bR9HEn4E9tNORkcuFoy4HRPJDMQ" />
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=harshshah6/SaavnMp3-Android&type=date&legend=top-left&sealed_token=TnLJLQULG0pZ0ArZCpyK9vygQTzTn5T5MVEYjIA8G3a5ZWmhLqfAUT-QhCWo5MpS2eFbYABtgTcM4Tlmw_aN-fOif42bR9HEn4E9tNORkcuFoy4HRPJDMQ" />
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=harshshah6/SaavnMp3-Android&type=date&legend=top-left&sealed_token=TnLJLQULG0pZ0ArZCpyK9vygQTzTn5T5MVEYjIA8G3a5ZWmhLqfAUT-QhCWo5MpS2eFbYABtgTcM4Tlmw_aN-fOif42bR9HEn4E9tNORkcuFoy4HRPJDMQ" />
  </picture>
-</a>
+</a> -->
 
 ## Contributing
 

@@ -1,5 +1,6 @@
 package com.harsh.shah.saavnmp3.activities
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,6 +16,7 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import com.harsh.shah.saavnmp3.R
@@ -40,6 +42,80 @@ class SearchActivity : AppCompatActivity() {
     private var searchRunnable: Runnable? = null
     private var currentQuery: String = ""
 
+    // ── Search history ────────────────────────────────────────────────────────
+    private val HISTORY_PREFS = "search_history"
+    private val HISTORY_KEY   = "queries"
+    private val MAX_HISTORY   = 8
+
+    private fun loadHistory(): ArrayDeque<String> {
+        val prefs = getSharedPreferences(HISTORY_PREFS, Context.MODE_PRIVATE)
+        val set   = prefs.getStringSet(HISTORY_KEY, emptySet()) ?: emptySet()
+        // The set is unordered – we store order as "0:query" prefixes
+        return set
+            .mapNotNull { entry ->
+                val idx = entry.indexOf(':')
+                if (idx < 0) null else Pair(entry.substring(0, idx).toIntOrNull() ?: 0, entry.substring(idx + 1))
+            }
+            .sortedByDescending { it.first }
+            .map { it.second }
+            .let { ArrayDeque(it) }
+    }
+
+    private fun saveHistory(history: ArrayDeque<String>) {
+        val prefs = getSharedPreferences(HISTORY_PREFS, Context.MODE_PRIVATE)
+        val set = history.mapIndexed { idx, q -> "${history.size - idx}:$q" }.toSet()
+        prefs.edit().putStringSet(HISTORY_KEY, set).apply()
+    }
+
+    private fun addToHistory(query: String) {
+        if (query.isBlank()) return
+        val history = loadHistory()
+        history.remove(query)          // de-dupe
+        history.addFirst(query)        // most recent first
+        while (history.size > MAX_HISTORY) history.removeLast()
+        saveHistory(history)
+    }
+
+    private fun clearHistory() {
+        saveHistory(ArrayDeque())
+    }
+
+    /** Rebuild history chips from SharedPreferences */
+    private fun refreshHistoryPanel() {
+        val history = loadHistory()
+        val chipGroup = binding!!.historyChipGroup
+        val container = binding!!.searchHistoryContainer
+        chipGroup?.removeAllViews()
+        if (history.isEmpty()) {
+            container?.visibility = View.GONE
+            return
+        }
+        history.forEach { query ->
+            val chip = Chip(this)
+            chip.text = query
+            chip.isCheckable = false
+            chip.setOnClickListener {
+                binding!!.edittext.setText(query)
+                binding!!.edittext.setSelection(query.length)
+                hideHistoryPanel()
+                showData(query)
+            }
+            chipGroup?.addView(chip)
+        }
+        // Only show if the edit field is currently empty and focused
+        val isEmpty = binding!!.edittext.text.isNullOrEmpty()
+        container?.visibility = if (isEmpty) View.VISIBLE else View.GONE
+    }
+
+    private fun showHistoryPanel() {
+        refreshHistoryPanel()
+    }
+
+    private fun hideHistoryPanel() {
+        binding!!.searchHistoryContainer?.visibility = View.GONE
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
@@ -52,6 +128,21 @@ class SearchActivity : AppCompatActivity() {
 
         binding!!.edittext.requestFocus()
 
+        // Show history when field is focused and empty
+        binding!!.edittext.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && binding!!.edittext.text.isNullOrEmpty()) {
+                showHistoryPanel()
+            } else if (!hasFocus) {
+                hideHistoryPanel()
+            }
+        }
+
+        // Clear all history
+        binding!!.clearHistoryBtn?.setOnClickListener {
+            clearHistory()
+            hideHistoryPanel()
+        }
+
         binding!!.chipGroup.setOnCheckedStateChangeListener { _: ChipGroup?, checkedIds: MutableList<Int?>? ->
             Log.i("SearchActivity", "checkedIds: $checkedIds")
             if (globalSearch != null) {
@@ -62,20 +153,24 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding!!.edittext.setOnEditorActionListener { textView: TextView?, _: Int, _: KeyEvent? ->
-            showData(textView!!.text.toString())
-            Log.i(TAG, "onCreate: " + textView.text.toString())
+            val q = textView!!.text.toString()
+            addToHistory(q)
+            showData(q)
+            Log.i(TAG, "onCreate: $q")
             binding!!.edittext.clearFocus()
             hideKeyboard(binding!!.edittext)
             true
         }
 
-        // Show/hide clear icon based on text input
+        // Show/hide clear icon and history panel based on text input
         binding!!.edittext.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {
                 if (s.toString().isEmpty()) {
                     binding!!.clearIcon.visibility = View.GONE
+                    showHistoryPanel()
                 } else {
                     binding!!.clearIcon.visibility = View.VISIBLE
+                    hideHistoryPanel()
                 }
 
                 searchRunnable?.let { searchHandler.removeCallbacks(it) }
@@ -91,11 +186,8 @@ class SearchActivity : AppCompatActivity() {
                 searchHandler.postDelayed(searchRunnable!!, 500)
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
         // Clear input when clear icon is clicked
@@ -103,7 +195,8 @@ class SearchActivity : AppCompatActivity() {
             binding!!.edittext.setText("")
         }
 
-        //showData("");
+        // Show history immediately if the field opens empty
+        if (binding!!.edittext.text.isNullOrEmpty()) showHistoryPanel()
     }
 
     private fun hideKeyboard(view: View) {
@@ -112,6 +205,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showData(query: String) {
+        addToHistory(query)
         currentQuery = query
         showShimmerData()
 

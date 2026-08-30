@@ -87,13 +87,20 @@ class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
 
         holder.itemView.setOnClickListener { view: View? ->
             MusicPlayerManager.trackQueue?.clear()
+            var clickIndex = 0
+            var validIndex = 0
+            val adapterPos = holder.bindingAdapterPosition
             for (i in data.indices) {
                 val id = data[i].id
-                if (id != null) {
+                if (id != null && id != "<shimmer>") {
                     MusicPlayerManager.trackQueue?.add(id)
+                    if (i == adapterPos) {
+                        clickIndex = validIndex
+                    }
+                    validIndex++
                 }
             }
-            MusicPlayerManager.track_position = holder.getBindingAdapterPosition()
+            MusicPlayerManager.track_position = clickIndex
             holder.itemView.context.startActivity(
                 Intent(view!!.context, MusicOverviewActivity::class.java).putExtra(
                     "id",

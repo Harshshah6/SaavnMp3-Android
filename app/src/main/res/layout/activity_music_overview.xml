@@ -79,6 +79,7 @@
         app:layout_constraintVertical_weight="1">
 
         <FrameLayout
+            android:id="@+id/coverArtFrame"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_200sdp"
             android:layout_gravity="center_horizontal">

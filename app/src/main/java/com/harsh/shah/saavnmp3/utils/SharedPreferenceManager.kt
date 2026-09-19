@@ -38,38 +38,39 @@ import androidx.core.content.edit
  * existing entries from SharedPreferences named "cache" into Room. After verifying, call
  * clearOldPrefsAsync(context, onComplete) to free space.
  */
+
+// ---------- Room single-table key/value entity & DAO & DB ----------
+@Entity(tableName = "key_value")
+internal class KeyValue(
+    @PrimaryKey var key: String,
+    @ColumnInfo(name = "json") var json: String?,
+    @ColumnInfo(name = "last_updated") var lastUpdated: Long
+)
+
+@Dao
+internal interface KeyValueDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun upsert(kv: KeyValue)
+
+    @Query("SELECT json FROM key_value WHERE key = :key LIMIT 1")
+    fun getJson(key: String?): String?
+
+    @Query("SELECT COUNT(*) > 0 FROM key_value WHERE key = :key")
+    fun exists(key: String?): Boolean
+
+    @Query("DELETE FROM key_value WHERE key = :key")
+    fun deleteByKey(key: String?)
+
+    @Query("SELECT * FROM key_value")
+    fun getAll(): List<KeyValue>
+}
+
+@Database(entities = [KeyValue::class], version = 1, exportSchema = false)
+internal abstract class AppDatabase : RoomDatabase() {
+    abstract fun keyValueDao(): KeyValueDao
+}
+
 class SharedPreferenceManager private constructor(context: Context) {
-    // ---------- Room single-table key/value entity & DAO & DB ----------
-    @Entity(tableName = "key_value")
-    internal class KeyValue(
-        @PrimaryKey var key: String,
-        @ColumnInfo(name = "json") var json: String?,
-        @ColumnInfo(name = "last_updated") var lastUpdated: Long
-    )
-
-    @Dao
-    internal interface KeyValueDao {
-        @Insert(onConflict = OnConflictStrategy.REPLACE)
-        fun upsert(kv: KeyValue)
-
-        @Query("SELECT json FROM key_value WHERE key = :key LIMIT 1")
-        fun getJson(key: String?): String?
-
-        @Query("SELECT COUNT(*) > 0 FROM key_value WHERE key = :key")
-        fun exists(key: String?): Boolean
-
-        @Query("DELETE FROM key_value WHERE key = :key")
-        fun deleteByKey(key: String?)
-
-        @Query("SELECT * FROM key_value")
-        fun getAll(): List<KeyValue>
-    }
-
-    @Database(entities = [KeyValue::class], version = 1, exportSchema = false)
-    internal abstract class AppDatabase : RoomDatabase() {
-        abstract fun keyValueDao(): KeyValueDao
-    }
-
     // IMPORTANT: allowMainThreadQueries is enabled here for drop-in sync compatibility.
     // Recommended: remove allowMainThreadQueries() and perform DB operations off the UI thread.
     private val db: AppDatabase = databaseBuilder<AppDatabase>(

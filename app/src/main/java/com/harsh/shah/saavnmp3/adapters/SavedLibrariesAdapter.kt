@@ -12,7 +12,7 @@ import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.ListActivity
 import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import androidx.core.net.toUri
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import android.widget.Toast
@@ -37,7 +37,7 @@ class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
         val coverUrl = library.image?.takeIf { it.isNotBlank() }
             ?: library.songs?.firstOrNull { it?.image?.isNotBlank() == true }?.image
         if (!coverUrl.isNullOrBlank()) {
-            Picasso.get().load(coverUrl.toUri()).into(holder.coverImage)
+            Glide.with(holder.coverImage!!).load(coverUrl).into(holder.coverImage!!)
         }
 
         // 3-dots more menu

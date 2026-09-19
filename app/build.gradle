@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id 'kotlin-kapt'
-//    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -13,8 +12,8 @@ android {
         applicationId "com.harsh.shah.saavnmp3"
         minSdk 23
         targetSdk 36
-        versionCode 13
-        versionName '1.0.19'
+        versionCode 14
+        versionName '1.0.20'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //Universal APK Supporting All ABIs
@@ -23,28 +22,10 @@ android {
         }
     }
 
-    flavorDimensions "firebase"
-
-    productFlavors {
-        prod {
-            dimension "firebase"
-//            applicationIdSuffix ".prod"
-//            versionNameSuffix "-prod"
-            buildConfigField "boolean", "USE_FIREBASE", "true"
-        }
-        nofirebase {
-            dimension "firebase"
-//            applicationIdSuffix ".nofirebase"
-//            versionNameSuffix "-nofirebase"
-            buildConfigField "boolean", "USE_FIREBASE", "false"
-        }
-    }
-
     dependenciesInfo {
         // Disables dependency metadata when building APKs (for IzzyOnDroid/F-Droid)
         includeInApk = false
     }
-
 
     signingConfigs {
         release {
@@ -58,11 +39,11 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -88,12 +69,6 @@ android {
     }
 }
 
-gradle.startParameter.taskNames.any { task ->
-    if (task.toLowerCase().contains("prod")) {
-        apply plugin: libs.plugins.google.gms.google.services.get().pluginId
-    }
-}
-
 dependencies {
 
     implementation libs.appcompat
@@ -105,10 +80,6 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
-
-    //ONLY FOR PROD FLAVOR BUILD
-    prodImplementation libs.firebase.analytics
-    prodImplementation libs.firebase.messaging
 
     //FOR LAYOUT DIMENSIONS
     implementation libs.ssp.android
@@ -129,10 +100,9 @@ dependencies {
     // MediaSessionCompat and related media classes
     implementation libs.media
 
-    //IMAGE LOADING LIBRARIES
+    //IMAGE LOADING LIBRARY
     implementation libs.glide
     kapt libs.compiler
-    implementation libs.picasso
 
     //IOS STYLE OVERSCROLL EFFECT
     implementation libs.overscroll.decor.android

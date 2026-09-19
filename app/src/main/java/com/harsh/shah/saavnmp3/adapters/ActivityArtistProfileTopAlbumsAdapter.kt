@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.adapters
+package com.harsh.shah.saavnmp3.adapters
 
 import android.content.Intent
 import android.net.Uri
@@ -12,7 +12,7 @@ import com.harsh.shah.saavnmp3.activities.ListActivity
 import com.harsh.shah.saavnmp3.databinding.ActivityArtistProfileViewTopSongsItemBinding
 import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.harsh.shah.saavnmp3.records.AlbumsSearch
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import androidx.core.net.toUri
 
 class ActivityArtistProfileTopAlbumsAdapter(private val data: MutableList<AlbumsSearch.Data.Results?>) :
@@ -44,7 +44,7 @@ class ActivityArtistProfileTopAlbumsAdapter(private val data: MutableList<Albums
         val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (url.isNotEmpty()) {
-            Picasso.get().load(url.toUri()).into(itemView.coverImage)
+            Glide.with(itemView.coverImage).load(url).into(itemView.coverImage)
         }
 
         holder.itemView.setOnClickListener(View.OnClickListener {

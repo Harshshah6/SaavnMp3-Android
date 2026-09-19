@@ -28,7 +28,7 @@ import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.harsh.shah.saavnmp3.utils.attachSnapHelper
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 
 class ArtistProfileActivity : AppCompatActivity() {
     private val TAG = "ArtistProfileActivity"
@@ -149,7 +149,7 @@ class ArtistProfileActivity : AppCompatActivity() {
         val artistItem = Gson().fromJson(artist, BasicDataRecord::class.java) ?: return
         artistId = artistItem.id ?: ""
 
-        Picasso.get().load(artistItem.image?.toUri()).into(binding!!.artistImg)
+        Glide.with(binding!!.artistImg).load(artistItem.image).into(binding!!.artistImg)
         binding!!.artistName.text = artistItem.title()
         binding!!.collapsingToolbarLayout.title = artistItem.title()
 
@@ -161,7 +161,7 @@ class ArtistProfileActivity : AppCompatActivity() {
         if (artistSearch?.success == true && artistSearch?.data != null) {
             val data = artistSearch!!.data!!
             if (!data.image.isNullOrEmpty()) {
-                Picasso.get().load((data.image[data.image.size - 1]?.url ?: "").toUri())
+                Glide.with(binding!!.artistImg).load(data.image[data.image.size - 1]?.url ?: "")
                     .into(binding!!.artistImg)
             }
             binding!!.artistName.text = data.name()

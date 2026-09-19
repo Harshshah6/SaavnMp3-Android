@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.utils.customview
+package com.harsh.shah.saavnmp3.utils.customview
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -10,7 +10,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.harsh.shah.saavnmp3.R
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import androidx.core.net.toUri
 
 class BottomSheetItemView : LinearLayout {
@@ -44,7 +44,7 @@ class BottomSheetItemView : LinearLayout {
         this.titleTextView?.text = string
         if (!imageUrl.isBlank()) {
             this.iconImageView?.let {
-                Picasso.get().load(imageUrl.toUri()).into(it)
+                Glide.with(it).load(imageUrl).into(it)
             }
         }
         ID = id

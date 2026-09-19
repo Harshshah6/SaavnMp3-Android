@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 
 class QueueSongsAdapter(
     val data: MutableList<Song>,
@@ -116,7 +116,7 @@ class QueueSongsAdapter(
         val images = song.image
         val imgUrl = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (imgUrl.isNotEmpty()) {
-            Picasso.get().load(imgUrl.toUri()).into(coverImage)
+            Glide.with(coverImage).load(imgUrl).into(coverImage)
         }
         
         // Use the "more" icon as the remove button

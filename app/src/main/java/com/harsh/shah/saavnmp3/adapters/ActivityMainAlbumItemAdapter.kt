@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.adapters
+package com.harsh.shah.saavnmp3.adapters
 
 import android.content.Intent
 import android.net.Uri
@@ -13,7 +13,7 @@ import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.ListActivity
 import com.harsh.shah.saavnmp3.adapters.ActivityMainAlbumItemAdapter.ActivityMainAlbumItemAdapterViewHolder
 import com.harsh.shah.saavnmp3.model.AlbumItem
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import androidx.core.net.toUri
 
 class ActivityMainAlbumItemAdapter(private val data: MutableList<AlbumItem?>) :
@@ -48,7 +48,7 @@ class ActivityMainAlbumItemAdapter(private val data: MutableList<AlbumItem?>) :
         holder.itemView.findViewById<View>(R.id.albumSubTitle).isSelected = true
 
         val coverImage = holder.itemView.findViewById<ImageView?>(R.id.coverImage)
-        Picasso.get().load(data[position]!!.albumCover?.toUri()).into(coverImage)
+        Glide.with(coverImage!!).load(data[position]!!.albumCover).into(coverImage)
 
         holder.itemView.setOnClickListener { v: View? ->
             v!!.context.startActivity(

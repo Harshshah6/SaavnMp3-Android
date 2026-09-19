@@ -12,7 +12,7 @@ import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.databinding.ActivityListSongItemBinding
 import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import androidx.core.net.toUri
 
 class UserCreatedSongsListAdapter(private val data: MutableList<Library.Songs?>) :
@@ -34,8 +34,8 @@ class UserCreatedSongsListAdapter(private val data: MutableList<Library.Songs?>)
         holder.binding.title.text = data[position]!!.title
         holder.binding.artist.text = data[position]!!.description
         val imageUrl = data[position]?.image
-        if (imageUrl?.isNotBlank() == true) Picasso.get()
-            .load(imageUrl.toUri()).into(holder.binding.coverImage)
+        if (imageUrl?.isNotBlank() == true) Glide.with(holder.binding.coverImage)
+            .load(imageUrl).into(holder.binding.coverImage)
 
         // Wire up the 3-dots menu
         val moreIcon = holder.itemView.findViewById<ImageView>(R.id.more)

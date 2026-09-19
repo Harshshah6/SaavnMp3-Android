@@ -49,7 +49,7 @@ import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.harsh.shah.saavnmp3.utils.TrackDownloader
 import com.harsh.shah.saavnmp3.utils.TrackDownloader.TrackDownloadListener
 import com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -488,7 +488,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 .inflate(layoutInflater)
             _binding.albumTitle.text = binding!!.title.text.toString()
             _binding.albumSubTitle.text = binding!!.description.text.toString()
-            Picasso.get().load(IMAGE_URL?.toUri()).into(_binding.coverImage)
+            Glide.with(_binding.coverImage).load(IMAGE_URL).into(_binding.coverImage)
             val linearLayout = _binding.main
 
             _binding.goToAlbum.setOnClickListener(View.OnClickListener {
@@ -824,7 +824,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         IMAGE_URL = if (!image.isNullOrEmpty()) image[image.size - 1]?.url ?: "" else ""
         SHARE_URL = song.url ?: ""
         if (IMAGE_URL!!.isNotEmpty()) {
-            Picasso.get().load(IMAGE_URL?.toUri()).into(binding!!.coverImage)
+            Glide.with(binding!!.coverImage).load(IMAGE_URL).into(binding!!.coverImage)
         }
         val downloadUrls = song.downloadUrl
 
@@ -999,7 +999,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         if (binding!!.description.text.toString() != MusicPlayerManager.MUSIC_DESCRIPTION) {
             binding!!.description.text = MusicPlayerManager.MUSIC_DESCRIPTION
         }
-        Picasso.get().load(MusicPlayerManager.IMAGE_URL?.toUri())
+        Glide.with(binding!!.coverImage).load(MusicPlayerManager.IMAGE_URL)
             .into(binding!!.coverImage)
         val p = MusicPlayerManager.player ?: return
         binding!!.seekbar.progress = ((p.currentPosition.toFloat() / p.duration) * 100).toInt()

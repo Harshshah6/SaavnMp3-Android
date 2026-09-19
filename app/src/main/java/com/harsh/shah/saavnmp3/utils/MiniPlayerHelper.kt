@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.Toast
 import com.google.gson.Gson
@@ -111,7 +111,7 @@ object MiniPlayerHelper {
         
         if (coverImage != null && !MusicPlayerManager.IMAGE_URL.isNullOrBlank()) {
             try {
-                Picasso.get().load(MusicPlayerManager.IMAGE_URL!!.toUri()).into(coverImage)
+                Glide.with(coverImage).load(MusicPlayerManager.IMAGE_URL).into(coverImage)
             } catch (e: Exception) {
                 Log.e("MiniPlayerHelper", "Error loading image: ${e.message}")
             }
@@ -169,7 +169,7 @@ object MiniPlayerHelper {
         nowPlayingArtist.text = MusicPlayerManager.MUSIC_DESCRIPTION
         if (!MusicPlayerManager.IMAGE_URL.isNullOrBlank()) {
             try {
-                Picasso.get().load(MusicPlayerManager.IMAGE_URL!!.toUri()).into(nowPlayingCover)
+                Glide.with(nowPlayingCover).load(MusicPlayerManager.IMAGE_URL).into(nowPlayingCover)
             } catch (e: Exception) {}
         }
 

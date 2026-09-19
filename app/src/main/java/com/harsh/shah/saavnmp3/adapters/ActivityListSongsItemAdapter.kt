@@ -12,7 +12,7 @@ import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import androidx.core.net.toUri
 import android.widget.Toast
 
@@ -58,8 +58,8 @@ class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
         val images = song.image
         val imgUrl = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (imgUrl.isNotEmpty()) {
-            Picasso.get().load(imgUrl.toUri())
-                .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?))
+            Glide.with(holder.itemView).load(imgUrl)
+                .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?)!!)
         }
 
         val moreIcon = holder.itemView.findViewById<ImageView>(R.id.more)

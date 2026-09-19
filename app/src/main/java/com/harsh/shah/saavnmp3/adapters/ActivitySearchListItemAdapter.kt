@@ -16,7 +16,7 @@ import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.harsh.shah.saavnmp3.model.BasicDataRecord
 import com.harsh.shah.saavnmp3.model.SearchListItem
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import androidx.core.net.toUri
 
 class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem>) :
@@ -102,8 +102,8 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
             moreIcon.visibility = View.GONE
         }
 
-        Picasso.get().load(item.coverImage?.toUri())
-            .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?))
+        Glide.with(holder.itemView).load(item.coverImage)
+            .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?)!!)
 
         holder.itemView.setOnClickListener {
             val intent = Intent()

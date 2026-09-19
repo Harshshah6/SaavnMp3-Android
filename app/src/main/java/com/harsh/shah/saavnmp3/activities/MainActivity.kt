@@ -41,7 +41,6 @@ import com.harsh.shah.saavnmp3.records.PlaylistsSearch
 import com.harsh.shah.saavnmp3.records.SongSearch
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
-import com.squareup.picasso.Picasso
 import com.yarolegovich.slidingrootnav.SlidingRootNav
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper

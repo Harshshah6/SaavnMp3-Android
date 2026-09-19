@@ -11,7 +11,7 @@ import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import androidx.core.net.toUri
 
 class ActivitySeeMoreListAdapter : RecyclerView.Adapter<ActivitySeeMoreListAdapter.ViewHolder?> {
@@ -56,7 +56,7 @@ class ActivitySeeMoreListAdapter : RecyclerView.Adapter<ActivitySeeMoreListAdapt
         val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (url.isNotEmpty()) {
-            Picasso.get().load(url.toUri()).into(coverImage)
+            Glide.with(coverImage!!).load(url).into(coverImage)
         }
 
         holder.itemView.setOnClickListener { view: View? ->

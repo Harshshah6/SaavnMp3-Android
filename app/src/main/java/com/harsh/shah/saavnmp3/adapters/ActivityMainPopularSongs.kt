@@ -13,7 +13,7 @@ import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.model.AlbumItem
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import androidx.core.net.toUri
 
 
@@ -45,7 +45,7 @@ class ActivityMainPopularSongs(private val data: MutableList<AlbumItem?>) :
         holder.itemView.findViewById<View>(R.id.albumSubTitle).isSelected = true
 
         val coverImage = holder.itemView.findViewById<ImageView?>(R.id.coverImage)
-        Picasso.get().load(data[position]!!.albumCover?.toUri()).into(coverImage)
+        Glide.with(coverImage!!).load(data[position]!!.albumCover).into(coverImage)
 
         holder.itemView.setOnClickListener { v: View? ->
             MusicPlayerManager.trackQueue?.clear()

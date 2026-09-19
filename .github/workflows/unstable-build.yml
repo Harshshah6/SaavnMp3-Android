@@ -31,10 +31,6 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: google-services.json
-        run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
-
       - name: Build signed release APK
         run: |
           ./gradlew assembleRelease \
@@ -44,18 +40,17 @@ jobs:
             -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }} \
             --no-daemon --warning-mode none -x lint -x test
 
-      - name: Prepare APKs
+      - name: Prepare APK
         run: |
           mkdir out
-          cp app/build/outputs/apk/prod/release/*.apk out/app-prod-unstable.apk || true
-          cp app/build/outputs/apk/nofirebase/release/*.apk out/app-nofirebase-unstable.apk || true
+          cp app/build/outputs/apk/release/*.apk out/app-unstable.apk || true
 
       - name: Create/Update Unstable Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: unstable
           name: Unstable Build (Pre-Release)
-          prerelease: true 
+          prerelease: true
           body: |
             ⚠️ This is an **unstable build**.
 

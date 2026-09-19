@@ -41,8 +41,9 @@ import com.harsh.shah.saavnmp3.network.utility.RequestNetwork
 import com.harsh.shah.saavnmp3.records.SongResponse
 import com.harsh.shah.saavnmp3.services.NotificationReceiver
 import com.harsh.shah.saavnmp3.widgets.WidgetPlayerProvider
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import java.io.File
 
 object MusicPlayerManager {
@@ -253,9 +254,11 @@ object MusicPlayerManager {
             .setContentIntent(contentIntent)
             .setOnlyAlertOnce(true)
 
-        try {
-            Picasso.get().load(IMAGE_URL).into(object : Target {
-                override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom?) {
+        Glide.with(ctx.applicationContext)
+            .asBitmap()
+            .load(IMAGE_URL)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap>?) {
                     try {
                         Palette.from(bitmap).generate { palette ->
                             val textSwatch = palette?.dominantSwatch
@@ -280,12 +283,11 @@ object MusicPlayerManager {
                         showBasicNotification(builder, playPauseButton != R.drawable.play_arrow_24px)
                     }
                 }
-                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) { showBasicNotification(builder, playPauseButton != R.drawable.play_arrow_24px) }
-                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+                override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {}
+                override fun onLoadFailed(errorDrawable: android.graphics.drawable.Drawable?) {
+                    showBasicNotification(builder, playPauseButton != R.drawable.play_arrow_24px)
+                }
             })
-        } catch (e: Exception) {
-            showBasicNotification(builder, playPauseButton != R.drawable.play_arrow_24px)
-        }
     }
 
     private fun showBasicNotification(builder: NotificationCompat.Builder, isPlaying: Boolean) {

@@ -31,10 +31,6 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: google-services.json
-        run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
-
       - name: Build signed release APK (skip lint/tests)
         run: |
           ./gradlew assembleRelease \
@@ -56,8 +52,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            app/build/outputs/apk/prod/release/*.apk
-            app/build/outputs/apk/nofirebase/release/*.apk
+            app/build/outputs/apk/release/*.apk
 
           body: ${{ steps.get_notes.outputs.notes }}
         env:

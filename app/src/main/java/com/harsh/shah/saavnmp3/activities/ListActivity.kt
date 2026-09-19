@@ -34,7 +34,7 @@ import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 import com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 
 class ListActivity : AppCompatActivity() {
     var binding: ActivityListBinding? = null
@@ -155,7 +155,7 @@ class ListActivity : AppCompatActivity() {
 
         _binding.albumTitle.text = binding!!.albumTitle.text.toString()
         _binding.albumSubTitle.text = binding!!.albumSubTitle.text.toString()
-        Picasso.get().load(albumItem!!.albumCover?.toUri()).into(_binding.coverImage)
+        Glide.with(_binding.coverImage).load(albumItem!!.albumCover).into(_binding.coverImage)
 
         val sharedPreferenceManager: SharedPreferenceManager =
             SharedPreferenceManager.getInstance(this@ListActivity)
@@ -213,7 +213,7 @@ class ListActivity : AppCompatActivity() {
 
         _binding.albumTitle.text = binding!!.albumTitle.text.toString()
         _binding.albumSubTitle.text = binding!!.albumSubTitle.text.toString()
-        Picasso.get().load(albumItem!!.albumCover?.toUri()).into(_binding.coverImage)
+        Glide.with(_binding.coverImage).load(albumItem!!.albumCover).into(_binding.coverImage)
 
         _binding.removeLibrary.setOnClickListener {
             bottomSheetDialog.dismiss()
@@ -318,8 +318,8 @@ class ListActivity : AppCompatActivity() {
         if (albumItem != null) {
             binding!!.albumTitle.text = albumItem!!.albumTitle()
             binding!!.albumSubTitle.text = albumItem!!.albumSubTitle()
-            if (albumItem!!.albumCover?.isNotBlank() == true) Picasso.get()
-                .load(albumItem!!.albumCover!!.toUri()).into(binding!!.albumCover)
+            if (albumItem!!.albumCover?.isNotBlank() == true) Glide.with(binding!!.albumCover)
+                .load(albumItem!!.albumCover!!).into(binding!!.albumCover)
         }
 
         val apiManager = ApiManager(this)
@@ -440,7 +440,7 @@ class ListActivity : AppCompatActivity() {
         if (library != null) {
             binding!!.albumTitle.text = library.name
             binding!!.albumSubTitle.text = library.description
-            Picasso.get().load(library.image?.toUri()).into(binding!!.albumCover)
+            Glide.with(binding!!.albumCover).load(library.image).into(binding!!.albumCover)
 
             val songs = library.songs ?: mutableListOf()
             binding!!.recyclerView.setAdapter(
@@ -461,8 +461,7 @@ class ListActivity : AppCompatActivity() {
         binding!!.albumSubTitle.text = data.description()
         val imageList = data.image
         if (!imageList.isNullOrEmpty()) {
-            Picasso.get()
-                .load((imageList[imageList.size - 1]?.url ?: "").toUri())
+            Glide.with(binding!!.albumCover).load(imageList[imageList.size - 1]?.url ?: "")
                 .into(binding!!.albumCover)
         }
         val songs = data.songs ?: mutableListOf()
@@ -507,8 +506,7 @@ class ListActivity : AppCompatActivity() {
         binding!!.albumSubTitle.text = data.description()
         val imageList = data.image
         if (!imageList.isNullOrEmpty()) {
-            Picasso.get()
-                .load((imageList[imageList.size - 1]?.url ?: "").toUri())
+            Glide.with(binding!!.albumCover).load(imageList[imageList.size - 1]?.url ?: "")
                 .into(binding!!.albumCover)
         }
         val songs = data.songs ?: mutableListOf()

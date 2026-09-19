@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.widgets
+package com.harsh.shah.saavnmp3.widgets
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -13,8 +13,9 @@ import android.widget.RemoteViews
 import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 
 class WidgetPlayerProvider : AppWidgetProvider() {
     override fun onUpdate(
@@ -82,17 +83,20 @@ class WidgetPlayerProvider : AppWidgetProvider() {
             // Album Art
             val imageUrl = MusicPlayerManager.IMAGE_URL
             if (!imageUrl.isNullOrEmpty()) {
-                Picasso.get().load(imageUrl).into(object : Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        views.setImageViewBitmap(R.id.widget_album_art, bitmap)
-                        appWidgetManager.updateAppWidget(appWidgetId, views)
-                    }
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        views.setImageViewResource(R.id.widget_album_art, R.mipmap.ic_launcher)
-                        appWidgetManager.updateAppWidget(appWidgetId, views)
-                    }
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-                })
+                Glide.with(context.applicationContext)
+                    .asBitmap()
+                    .load(imageUrl)
+                    .into(object : CustomTarget<Bitmap>() {
+                        override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap>?) {
+                            views.setImageViewBitmap(R.id.widget_album_art, bitmap)
+                            appWidgetManager.updateAppWidget(appWidgetId, views)
+                        }
+                        override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {}
+                        override fun onLoadFailed(errorDrawable: android.graphics.drawable.Drawable?) {
+                            views.setImageViewResource(R.id.widget_album_art, R.mipmap.ic_launcher)
+                            appWidgetManager.updateAppWidget(appWidgetId, views)
+                        }
+                    })
             } else {
                 views.setImageViewResource(R.id.widget_album_art, R.mipmap.ic_launcher)
             }

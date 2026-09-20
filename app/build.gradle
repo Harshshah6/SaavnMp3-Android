@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace 'com.harsh.shah.saavnmp3'
-    compileSdk 37
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.harsh.shah.saavnmp3"
         minSdk 23
-        targetSdk 36
+        targetSdk 34
         versionCode 14
         versionName '1.0.20'
 

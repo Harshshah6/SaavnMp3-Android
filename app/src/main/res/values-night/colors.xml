@@ -8,6 +8,10 @@
     <color name="dividerBackground">@color/divider_light</color>
     <color name="green">@color/spotify_dark_green</color>
 
+    <!-- Primary colors -->
+    <color name="spotify_green">#FF2D55</color>
+    <color name="spotify_black">#1C1C1E</color>
+
     <color name="activity_main_cta_button">@color/textMain</color>
 
     <color name="widget_transparent_75">#BF000000</color>

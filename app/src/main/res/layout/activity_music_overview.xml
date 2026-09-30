@@ -14,19 +14,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/_8sdp"
+        android:paddingVertical="@dimen/_8sdp"
+        android:gravity="center_vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
             android:onClick="backPress"
             android:padding="@dimen/_4sdp"
-            android:src="@drawable/round_keyboard_arrow_down_24" />
+            android:src="@drawable/round_keyboard_arrow_down_24"
+            android:contentDescription="Dismiss" />
 
         <View
             android:layout_width="0dp"
@@ -36,30 +40,33 @@
         <ImageView
             android:id="@+id/lyrics_icon"
             android:visibility="gone"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:padding="@dimen/_10sdp"
-            android:src="@drawable/baseline_lyrics_24" />
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/baseline_lyrics_24"
+            android:contentDescription="Lyrics" />
 
         <ImageView
             android:id="@+id/share_icon"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:padding="@dimen/_10sdp"
-            android:src="@drawable/share_24px" />
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/share_24px"
+            android:contentDescription="Share" />
 
         <ImageView
             android:id="@+id/more_icon"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:padding="@dimen/_10sdp"
-            android:src="@drawable/more_vert_24px" />
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/more_vert_24px"
+            android:contentDescription="More" />
 
         <ImageView
             android:id="@+id/queue_icon"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:padding="@dimen/_10sdp"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:padding="@dimen/_8sdp"
             android:src="@drawable/ic_queue_music"
             android:contentDescription="Queue"
             android:focusable="true"
@@ -71,7 +78,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
-        android:padding="@dimen/_8sdp"
+        android:paddingHorizontal="@dimen/_20sdp"
+        android:paddingVertical="@dimen/_12sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -81,22 +89,27 @@
         <FrameLayout
             android:id="@+id/coverArtFrame"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_200sdp"
-            android:layout_gravity="center_horizontal">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginVertical="@dimen/_12sdp">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/coverImageCard"
-                android:layout_width="@dimen/_200sdp"
-                android:layout_height="@dimen/_200sdp"
+                android:layout_width="@dimen/_260sdp"
+                android:layout_height="@dimen/_260sdp"
                 android:layout_gravity="center"
                 app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="@dimen/_24sdp"
+                app:cardElevation="@dimen/_16sdp"
                 app:strokeWidth="0dp">
 
                 <ImageView
                     android:id="@+id/coverImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/textSec" />
+                    android:background="@color/textSec"
+                    android:contentDescription="Album Art" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -111,44 +124,45 @@
                 android:paddingHorizontal="@dimen/_8sdp" />
         </FrameLayout>
 
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <TextView
-            android:id="@+id/title"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_8sdp"
-            android:ellipsize="marquee"
-            android:gravity="center"
-            android:scrollHorizontally="true"
-            android:singleLine="true"
-            android:text="loading..."
-            android:textSize="@dimen/_30ssp" />
+            android:orientation="vertical"
+            android:layout_marginVertical="@dimen/_8sdp">
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="marquee"
-            android:gravity="center"
-            android:scrollHorizontally="true"
-            android:singleLine="true"
-            android:text="loading......."
-            android:textColor="@color/textSec" />
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/avenir_next_bold"
+                android:ellipsize="marquee"
+                android:gravity="start"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:text="loading..."
+                android:textColor="@color/textMain"
+                android:textSize="@dimen/_20ssp" />
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/avenir_next_regular"
+                android:ellipsize="marquee"
+                android:gravity="start"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:text="loading......."
+                android:textColor="@color/textSec"
+                android:textSize="@dimen/_14ssp" />
+
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_8sdp">
+            android:layout_marginVertical="@dimen/_12sdp">
 
             <SeekBar
                 android:id="@+id/seekbar"
@@ -162,7 +176,10 @@
                 android:id="@+id/elapsedDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_8sdp"
+                android:layout_marginStart="@dimen/_4sdp"
+                android:fontFamily="@font/avenir_next_regular"
+                android:textColor="@color/textSec"
+                android:textSize="@dimen/_11ssp"
                 android:text="00:00"
                 app:layout_constraintStart_toStartOf="@+id/seekbar"
                 app:layout_constraintTop_toBottomOf="@id/seekbar" />
@@ -171,28 +188,26 @@
                 android:id="@+id/totalDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/_8sdp"
+                android:layout_marginEnd="@dimen/_4sdp"
+                android:fontFamily="@font/avenir_next_regular"
+                android:textColor="@color/textSec"
+                android:textSize="@dimen/_11ssp"
                 android:text="06:12"
                 app:layout_constraintEnd_toEndOf="@+id/seekbar"
                 app:layout_constraintTop_toBottomOf="@id/seekbar" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_8sdp">
+            android:layout_marginVertical="@dimen/_12sdp">
 
             <ImageView
                 android:id="@+id/shuffle_icon"
-                android:layout_width="@dimen/_35sdp"
-                android:layout_height="@dimen/_35sdp"
-                android:padding="@dimen/_8sdp"
+                android:layout_width="@dimen/_36sdp"
+                android:layout_height="@dimen/_36sdp"
+                android:padding="@dimen/_6sdp"
                 android:src="@drawable/shuffle_24px"
                 android:focusable="true"
                 android:clickable="true"
@@ -202,9 +217,9 @@
 
             <ImageView
                 android:id="@+id/repeat_icon"
-                android:layout_width="@dimen/_35sdp"
-                android:layout_height="@dimen/_35sdp"
-                android:padding="@dimen/_8sdp"
+                android:layout_width="@dimen/_36sdp"
+                android:layout_height="@dimen/_36sdp"
+                android:padding="@dimen/_6sdp"
                 android:src="@drawable/repeat_24px"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -212,9 +227,9 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/__play_pause_icon_bg"
-                android:layout_width="@dimen/_45sdp"
-                android:layout_height="@dimen/_45sdp"
-                android:elevation="@dimen/_5sdp"
+                android:layout_width="@dimen/_56sdp"
+                android:layout_height="@dimen/_56sdp"
+                android:elevation="@dimen/_6sdp"
                 app:cardBackgroundColor="@color/textMain"
                 app:cardCornerRadius="999dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -228,7 +243,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:focusable="true"
-                    android:padding="@dimen/_8sdp"
+                    android:padding="@dimen/_12sdp"
                     android:src="@drawable/play_arrow_24px"
                     android:clickable="true"
                     app:tint="@color/background" />
@@ -237,9 +252,9 @@
 
             <ImageView
                 android:id="@+id/prevIcon"
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
-                android:layout_marginEnd="@dimen/_8sdp"
+                android:layout_width="@dimen/_36sdp"
+                android:layout_height="@dimen/_36sdp"
+                android:layout_marginEnd="@dimen/_16sdp"
                 android:src="@drawable/skip_previous_24px"
                 app:layout_constraintBottom_toBottomOf="@id/__play_pause_icon_bg"
                 app:layout_constraintEnd_toStartOf="@id/__play_pause_icon_bg"
@@ -247,9 +262,9 @@
 
             <ImageView
                 android:id="@+id/nextIcon"
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
-                android:layout_marginStart="@dimen/_8sdp"
+                android:layout_width="@dimen/_36sdp"
+                android:layout_height="@dimen/_36sdp"
+                android:layout_marginStart="@dimen/_16sdp"
                 android:src="@drawable/skip_next_24px"
                 app:layout_constraintBottom_toBottomOf="@id/__play_pause_icon_bg"
                 app:layout_constraintStart_toEndOf="@id/__play_pause_icon_bg"
@@ -257,40 +272,26 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageView
-            android:visibility="invisible"
-            android:layout_width="@dimen/_35sdp"
-            android:layout_height="@dimen/_35sdp"
-            android:padding="@dimen/_8sdp"
-            android:src="@drawable/favorite_outline_24px"
-            app:tint="@color/textMain" />
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/_12sdp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="999dp">
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/_8sdp">
 
-            <View
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_2sdp"
-                android:background="@color/textSec" />
-        </androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/track_quality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/outline_button_background"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_3sdp"
+                android:fontFamily="@font/avenir_next_bold"
+                android:text="Lossless • 320kbps"
+                android:textColor="@color/textSec"
+                android:textSize="@dimen/_11ssp" />
 
-
-        <TextView
-            android:id="@+id/track_quality"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/_4sdp"
-            android:layout_marginBottom="@dimen/_8sdp"
-            android:text="320kbps"
-            android:textSize="@dimen/_14ssp"
-            android:textStyle="bold" />
-
+        </LinearLayout>
 
     </LinearLayout>
 

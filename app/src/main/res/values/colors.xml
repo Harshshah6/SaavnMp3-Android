@@ -9,37 +9,37 @@
     <color name="green">@color/spotify_light_green</color>
 
     <!-- Primary colors -->
-    <color name="spotify_green">#1DB954</color> <!-- Spotify Green -->
-    <color name="spotify_black">#191414</color> <!-- Spotify Black -->
+    <color name="spotify_green">#FF2D55</color> <!-- iOS Apple Music Pink/Red -->
+    <color name="spotify_black">#FFFFFF</color> <!-- iOS Light Card -->
 
     <!-- Secondary colors -->
-    <color name="spotify_dark_green">#1DB954</color>
-    <color name="spotify_light_green">#1ED760</color>
+    <color name="spotify_dark_green">#FF2D55</color>
+    <color name="spotify_light_green">#FF3B30</color>
 
     <color name="activity_main_cta_button">@color/textSec</color>
 
     <!-- Background colors -->
-    <color name="background_dark">#121212</color>
-    <color name="background_light">#FAF9F6</color>
+    <color name="background_dark">#000000</color>
+    <color name="background_light">#F2F2F7</color>
 
     <!-- Text colors -->
-    <color name="text_light">#FAF9F6</color>
-    <color name="text_dark">#191414</color>
-    <color name="text_secondary_light">#B3B3B3</color>
-    <color name="text_secondary_dark">#3D3D3D</color>
+    <color name="text_light">#FFFFFF</color>
+    <color name="text_dark">#000000</color>
+    <color name="text_secondary_light">#8E8E93</color>
+    <color name="text_secondary_dark">#8E8E93</color>
 
     <!-- Divider and accent colors -->
-    <color name="divider_light">#E6E6E6</color>
-    <color name="divider_dark">#333333</color>
+    <color name="divider_light">#C6C6C8</color>
+    <color name="divider_dark">#2C2C2E</color>
 
     <!-- Button colors -->
-    <color name="button_dark">#1DB954</color>
-    <color name="button_light">#1DB954</color>
-    <color name="light_blue_400">#FF29B6F6</color>
-    <color name="light_blue_600">#FF039BE5</color>
-    <color name="gray_400">#FFBDBDBD</color>
-    <color name="gray_600">#FF757575</color>
+    <color name="button_dark">#FF2D55</color>
+    <color name="button_light">#FF2D55</color>
+    <color name="light_blue_400">#FF5AC8FA</color>
+    <color name="light_blue_600">#FF007AFF</color>
+    <color name="gray_400">#FF8E8E93</color>
+    <color name="gray_600">#FF48484A</color>
 
-    <color name="widget_transparent_75">#BFFFFFFF</color>
+    <color name="widget_transparent_75">#BF000000</color>
 
 </resources>

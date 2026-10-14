@@ -18,6 +18,7 @@ import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
+import com.harsh.shah.saavnmp3.utils.ThemeManager
 import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -112,13 +113,13 @@ class SavedLibrariesActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeManager.applyTheme(this)
         super.onCreate(savedInstanceState)
         binding = ActivitySavedLibrariesBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
         MiniPlayerHelper.initMiniPlayer(this)
 
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
-        binding!!.recyclerView.attachSnapHelper()
         OverScrollDecoratorHelper.setUpOverScroll(
             binding!!.recyclerView,
             OverScrollDecoratorHelper.ORIENTATION_VERTICAL

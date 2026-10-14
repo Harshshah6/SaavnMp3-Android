@@ -1,39 +1,148 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme with Material 3 DayNight foundation -->
     <style name="Base.Theme.Melotune" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Edge-to-edge & system bar configuration (Light mode) -->
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:navigationBarColor">@color/background</item>
         <item name="android:windowLightNavigationBar">true</item>
 
-        <!-- Light theme colors -->
-        <item name="colorPrimary">@color/spotify_green</item>
-        <item name="colorPrimaryVariant">@color/spotify_light_green</item>
-        <item name="colorOnPrimary">@color/text_light</item>
+        <!-- Material 3 Surface hierarchy -->
+        <item name="android:colorBackground">@color/m3_surface_light</item>
+        <item name="colorOnBackground">@color/m3_on_surface_light</item>
+        <item name="colorSurface">@color/m3_surface_light</item>
+        <item name="colorOnSurface">@color/m3_on_surface_light</item>
+        <item name="colorSurfaceVariant">@color/m3_surface_variant_light</item>
+        <item name="colorOnSurfaceVariant">@color/m3_on_surface_variant_light</item>
+        <item name="colorSurfaceContainerLowest">@color/m3_surface_container_lowest_light</item>
+        <item name="colorSurfaceContainerLow">@color/m3_surface_container_low_light</item>
+        <item name="colorSurfaceContainer">@color/m3_surface_container_light</item>
+        <item name="colorSurfaceContainerHigh">@color/m3_surface_container_high_light</item>
+        <item name="colorSurfaceContainerHighest">@color/m3_surface_container_highest_light</item>
+        <item name="colorOutline">@color/m3_outline_light</item>
+        <item name="colorOutlineVariant">@color/m3_outline_variant_light</item>
 
-        <item name="android:colorBackground">@color/background_light</item>
-        <item name="colorOnBackground">@color/text_dark</item>
+        <!-- Default Emerald / Green Palette (Light) -->
+        <item name="colorPrimary">@color/emerald_primary_light</item>
+        <item name="colorOnPrimary">@color/emerald_on_primary_light</item>
+        <item name="colorPrimaryContainer">@color/emerald_primary_container_light</item>
+        <item name="colorOnPrimaryContainer">@color/emerald_on_primary_container_light</item>
+        <item name="colorSecondary">@color/emerald_secondary_light</item>
+        <item name="colorOnSecondary">@color/emerald_on_secondary_light</item>
+        <item name="colorSecondaryContainer">@color/emerald_secondary_container_light</item>
+        <item name="colorOnSecondaryContainer">@color/emerald_on_secondary_container_light</item>
+        <item name="colorTertiary">@color/emerald_tertiary_light</item>
+        <item name="colorOnTertiary">@color/emerald_on_tertiary_light</item>
+        <item name="colorTertiaryContainer">@color/emerald_tertiary_container_light</item>
+        <item name="colorOnTertiaryContainer">@color/emerald_on_tertiary_container_light</item>
 
-        <item name="colorSurface">#fff</item>
-        <item name="colorOnSurface">@color/text_dark</item>
-
-        <item name="colorAccent">@color/spotify_green</item>
-
-        <!-- Text colors -->
+        <!-- Text Colors -->
         <item name="android:textColor">@color/text_dark</item>
-        <item name="android:textColorSecondary">@color/text_secondary_light</item>
-
-        <!-- Divider -->
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
         <item name="android:divider">@color/divider_light</item>
 
+        <!-- Launcher Icons -->
         <item name="android:icon">@mipmap/ic_launcher</item>
         <item name="android:roundIcon" tools:ignore="NewApi">@mipmap/ic_launcher_round</item>
 
+        <!-- Material 3 Shape Tokens -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Melotune.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Melotune.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Melotune.Large</item>
+
+        <!-- Bottom Sheet style -->
+        <item name="bottomSheetDialogTheme">@style/MyBottomSheetDialogTheme</item>
     </style>
 
-    <style name="Theme.Melotune" parent="Base.Theme.Melotune" />
+    <!-- Default Theme -->
+    <style name="Theme.Melotune" parent="Theme.Melotune.Emerald" />
+
+    <!-- Palette Themes -->
+    <style name="Theme.Melotune.Emerald" parent="Base.Theme.Melotune">
+        <item name="colorPrimary">@color/emerald_primary_light</item>
+        <item name="colorOnPrimary">@color/emerald_on_primary_light</item>
+        <item name="colorPrimaryContainer">@color/emerald_primary_container_light</item>
+        <item name="colorOnPrimaryContainer">@color/emerald_on_primary_container_light</item>
+    </style>
+
+    <style name="Theme.Melotune.Ocean" parent="Base.Theme.Melotune">
+        <item name="colorPrimary">@color/ocean_primary_light</item>
+        <item name="colorOnPrimary">@color/ocean_on_primary_light</item>
+        <item name="colorPrimaryContainer">@color/ocean_primary_container_light</item>
+        <item name="colorOnPrimaryContainer">@color/ocean_on_primary_container_light</item>
+        <item name="colorSecondary">@color/ocean_secondary_light</item>
+        <item name="colorOnSecondary">@color/ocean_on_secondary_light</item>
+        <item name="colorSecondaryContainer">@color/ocean_secondary_container_light</item>
+        <item name="colorOnSecondaryContainer">@color/ocean_on_secondary_container_light</item>
+    </style>
+
+    <style name="Theme.Melotune.Purple" parent="Base.Theme.Melotune">
+        <item name="colorPrimary">@color/purple_primary_light</item>
+        <item name="colorOnPrimary">@color/purple_on_primary_light</item>
+        <item name="colorPrimaryContainer">@color/purple_primary_container_light</item>
+        <item name="colorOnPrimaryContainer">@color/purple_on_primary_container_light</item>
+        <item name="colorSecondary">@color/purple_secondary_light</item>
+        <item name="colorOnSecondary">@color/purple_on_secondary_light</item>
+        <item name="colorSecondaryContainer">@color/purple_secondary_container_light</item>
+        <item name="colorOnSecondaryContainer">@color/purple_on_secondary_container_light</item>
+    </style>
+
+    <style name="Theme.Melotune.Crimson" parent="Base.Theme.Melotune">
+        <item name="colorPrimary">@color/crimson_primary_light</item>
+        <item name="colorOnPrimary">@color/crimson_on_primary_light</item>
+        <item name="colorPrimaryContainer">@color/crimson_primary_container_light</item>
+        <item name="colorOnPrimaryContainer">@color/crimson_on_primary_container_light</item>
+        <item name="colorSecondary">@color/crimson_secondary_light</item>
+        <item name="colorOnSecondary">@color/crimson_on_secondary_light</item>
+        <item name="colorSecondaryContainer">@color/crimson_secondary_container_light</item>
+        <item name="colorOnSecondaryContainer">@color/crimson_on_secondary_container_light</item>
+    </style>
+
+    <style name="Theme.Melotune.Amber" parent="Base.Theme.Melotune">
+        <item name="colorPrimary">@color/amber_primary_light</item>
+        <item name="colorOnPrimary">@color/amber_on_primary_light</item>
+        <item name="colorPrimaryContainer">@color/amber_primary_container_light</item>
+        <item name="colorOnPrimaryContainer">@color/amber_on_primary_container_light</item>
+        <item name="colorSecondary">@color/amber_secondary_light</item>
+        <item name="colorOnSecondary">@color/amber_on_secondary_light</item>
+        <item name="colorSecondaryContainer">@color/amber_secondary_container_light</item>
+        <item name="colorOnSecondaryContainer">@color/amber_on_secondary_container_light</item>
+    </style>
+
+    <!-- AMOLED (Pure Black) Theme Overlay -->
+    <style name="ThemeOverlay.Melotune.Amoled" parent="">
+        <item name="android:colorBackground">#000000</item>
+        <item name="android:windowBackground">#000000</item>
+        <item name="colorSurface">#000000</item>
+        <item name="colorSurfaceContainerLowest">#000000</item>
+        <item name="colorSurfaceContainerLow">#0A0A0A</item>
+        <item name="colorSurfaceContainer">#121212</item>
+        <item name="colorSurfaceContainerHigh">#1A1A1A</item>
+        <item name="colorSurfaceContainerHighest">#262626</item>
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:navigationBarColor">#000000</item>
+    </style>
+
+    <!-- Material 3 Shape Styles -->
+    <style name="ShapeAppearance.Melotune.Small" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Melotune.Medium" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerSize">18dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Melotune.Large" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSize">24dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Melotune.ExtraLarge" parent="ShapeAppearance.Material3.Corner.ExtraLarge">
+        <item name="cornerSize">28dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Melotune.Full" parent="ShapeAppearance.Material3.Corner.Full">
+        <item name="cornerSize">50%</item>
+    </style>
 
     <style name="ShapeAppearanceOverlay.App.CornerSize100Percent" parent="">
         <item name="cornerSize">50%</item>

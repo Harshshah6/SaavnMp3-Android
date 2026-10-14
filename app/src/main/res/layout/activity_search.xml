@@ -7,62 +7,95 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".activities.SearchActivity"
-    android:background="@color/background">
+    android:background="?attr/colorSurface">
 
+    <!-- Material 3 Search Bar Header Container -->
     <LinearLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_8sdp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="horizontal"
-        android:padding="@dimen/_8sdp"
-        android:gravity="center_vertical">
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:layout_width="@dimen/_25sdp"
-            android:layout_height="@dimen/_25sdp"
-            android:src="@drawable/round_arrow_back_24"
-            android:onClick="backPress"
-            android:contentDescription="back" />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_38sdp"
+            app:cardCornerRadius="999dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/surfaceContainerHigh">
 
-        <EditText
-            android:id="@+id/edittext"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:importantForAutofill="no"
-            android:background="@android:color/transparent"
-            android:hint="@android:string/search_go"
-            android:inputType="text"
-            android:paddingVertical="@dimen/_4sdp"
-            android:paddingHorizontal="@dimen/_12sdp"
-            android:singleLine="true"
-            android:imeOptions="actionSearch" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/_8sdp">
 
-        <ImageView
-            android:id="@+id/clear_icon"
-            android:layout_width="@dimen/_25sdp"
-            android:layout_height="@dimen/_25sdp"
-            android:src="@drawable/baseline_clear_24"
-            android:contentDescription="clear"
-            android:visibility="gone"
-            android:padding="4dp" />
+                <ImageView
+                    android:layout_width="@dimen/_28sdp"
+                    android:layout_height="@dimen/_28sdp"
+                    android:padding="@dimen/_4sdp"
+                    android:src="@drawable/round_arrow_back_24"
+                    android:onClick="backPress"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/actionBarItemBackground"
+                    app:tint="@color/textMain"
+                    android:contentDescription="Back" />
+
+                <EditText
+                    android:id="@+id/edittext"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:importantForAutofill="no"
+                    android:background="@android:color/transparent"
+                    android:hint="Search songs, artists, albums..."
+                    android:textColorHint="@color/textSec"
+                    android:textColor="@color/textMain"
+                    android:inputType="text"
+                    android:fontFamily="@font/avenir_next_regular"
+                    android:paddingHorizontal="@dimen/_8sdp"
+                    android:singleLine="true"
+                    android:textSize="@dimen/_12ssp"
+                    android:imeOptions="actionSearch" />
+
+                <ImageView
+                    android:id="@+id/clear_icon"
+                    android:layout_width="@dimen/_28sdp"
+                    android:layout_height="@dimen/_28sdp"
+                    android:src="@drawable/baseline_clear_24"
+                    android:contentDescription="Clear"
+                    android:visibility="gone"
+                    android:padding="@dimen/_5sdp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/actionBarItemBackground"
+                    app:tint="@color/textSec" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/__divider"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
+        android:layout_height="0.6dp"
+        app:dividerColor="@color/dividerBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
+    <!-- Category Filter Chips -->
     <HorizontalScrollView
         android:id="@+id/hscrollview"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none"
         android:overScrollMode="never"
@@ -74,7 +107,7 @@
             android:id="@+id/chip_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/_12sdp"
+            android:paddingHorizontal="@dimen/_10sdp"
             android:paddingVertical="@dimen/_4sdp"
             app:checkedChip="@id/chip_all"
             app:singleSelection="true"
@@ -83,37 +116,47 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_all"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="All"
+                android:fontFamily="@font/avenir_next_regular"
                 android:checkable="true" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_song"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Songs"
+                android:fontFamily="@font/avenir_next_regular"
                 android:checkable="true" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_albums"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Albums"
+                android:fontFamily="@font/avenir_next_regular"
                 android:checkable="true" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_playlists"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Playlists"
+                android:fontFamily="@font/avenir_next_regular"
                 android:checkable="true" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_artists"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Artists"
+                android:fontFamily="@font/avenir_next_regular"
                 android:checkable="true" />
 
         </com.google.android.material.chip.ChipGroup>
@@ -143,7 +186,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Recent Searches"
-                android:textStyle="bold"
+                android:fontFamily="@font/avenir_next_bold"
                 android:textSize="@dimen/_13ssp"
                 android:textColor="@color/textMain" />
 
@@ -151,12 +194,14 @@
                 android:id="@+id/clear_history_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Clear"
+                android:text="Clear All"
+                android:fontFamily="@font/avenir_next_bold"
                 android:textSize="@dimen/_11ssp"
-                android:textColor="@color/textSec"
+                android:textColor="@color/green"
                 android:padding="@dimen/_4sdp"
                 android:clickable="true"
-                android:focusable="true" />
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
 
         </LinearLayout>
 
@@ -170,6 +215,7 @@
 
     </LinearLayout>
 
+    <!-- Search Results List -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -177,8 +223,7 @@
         app:layout_constraintTop_toBottomOf="@id/search_history_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/mini_player"
-        app:layout_constraintVertical_weight="1">
+        app:layout_constraintBottom_toTopOf="@+id/mini_player">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -191,12 +236,14 @@
                 android:layout_height="wrap_content"
                 android:overScrollMode="never"
                 android:scrollbars="none"
-                android:padding="@dimen/_8sdp" />
+                android:paddingHorizontal="@dimen/_6sdp"
+                android:paddingVertical="@dimen/_6sdp" />
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Floating Mini Player -->
     <include
         android:id="@+id/mini_player"
         layout="@layout/layout_mini_player"

@@ -1,15 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base Theme Mappings (Dark Mode) -->
+    <color name="background">#111413</color>
+    <color name="textMain">#E1E3DF</color>
+    <color name="textSec">#A2A7A3</color>
+    <color name="buttonBackground">#1ED760</color>
+    <color name="dividerBackground">#2A2F2C</color>
+    <color name="green">#1ED760</color>
 
-    <color name="background">@color/background_dark</color>
-    <color name="textMain">@color/text_light</color>
-    <color name="textSec">@color/text_secondary_light</color>
-    <color name="buttonBackground">@color/button_dark</color>
-    <color name="dividerBackground">@color/divider_light</color>
-    <color name="green">@color/spotify_dark_green</color>
+    <color name="activity_main_cta_button">#E1E3DF</color>
+    <color name="widget_transparent_75">#D9111413</color>
 
-    <color name="activity_main_cta_button">@color/textMain</color>
+    <!-- Material Widget Tokens (Dark) -->
+    <color name="widget_surface">#F21D201F</color>
+    <color name="widget_surface_card">#F2272A29</color>
+    <color name="widget_outline">#26FFFFFF</color>
+    <color name="widget_primary">#1ED760</color>
+    <color name="widget_on_primary">#003822</color>
+    <color name="widget_control_bg">#26FFFFFF</color>
+    <color name="widget_text_title">#E1E3DF</color>
+    <color name="widget_text_subtitle">#A2A7A3</color>
+    <color name="widget_progress_bg">#33FFFFFF</color>
+    <color name="widget_vinyl_bg">#0D0E0E</color>
+    <color name="widget_vinyl_groove">#1C1E1D</color>
 
-    <color name="widget_transparent_75">#BF000000</color>
+    <color name="spotify_green">#1ED760</color>
+    <color name="spotify_dark_green">#00875A</color>
+    <color name="spotify_light_green">#1ED760</color>
+    <color name="button_dark">#1ED760</color>
+    <color name="button_light">#1ED760</color>
 
+    <!-- Material 3 Dark Surface Hierarchy -->
+    <color name="m3_surface_dark">#111413</color>
+    <color name="m3_on_surface_dark">#E1E3DF</color>
+    <color name="m3_surface_variant_dark">#404944</color>
+    <color name="m3_on_surface_variant_dark">#C0C9C2</color>
+    <color name="m3_surface_container_lowest_dark">#0C0F0E</color>
+    <color name="m3_surface_container_low_dark">#191C1B</color>
+    <color name="m3_surface_container_dark">#1D201F</color>
+    <color name="m3_surface_container_high_dark">#272A29</color>
+    <color name="m3_surface_container_highest_dark">#323534</color>
+    <color name="m3_outline_dark">#8A938D</color>
+    <color name="m3_outline_variant_dark">#404944</color>
+
+    <!-- Emerald Palette (Dark) -->
+    <color name="emerald_primary_dark">#1ED760</color>
+    <color name="emerald_on_primary_dark">#003822</color>
+    <color name="emerald_primary_container_dark">#005234</color>
+    <color name="emerald_on_primary_container_dark">#97F7C7</color>
+    <color name="emerald_secondary_dark">#B3CCBC</color>
+    <color name="emerald_on_secondary_dark">#1F3529</color>
+    <color name="emerald_secondary_container_dark">#354B3F</color>
+    <color name="emerald_on_secondary_container_dark">#CEE9D8</color>
+    <color name="emerald_tertiary_dark">#A5CCDF</color>
+    <color name="emerald_on_tertiary_dark">#073544</color>
+    <color name="emerald_tertiary_container_dark">#244C5B</color>
+    <color name="emerald_on_tertiary_container_dark">#C1E8FC</color>
+
+    <!-- Ocean Palette (Dark) -->
+    <color name="ocean_primary_dark">#8ECEFF</color>
+    <color name="ocean_on_primary_dark">#003450</color>
+    <color name="ocean_primary_container_dark">#004B72</color>
+    <color name="ocean_on_primary_container_dark">#CBE6FF</color>
+    <color name="ocean_secondary_dark">#B8C8D9</color>
+    <color name="ocean_on_secondary_dark">#22323F</color>
+    <color name="ocean_secondary_container_dark">#394856</color>
+    <color name="ocean_on_secondary_container_dark">#D4E4F5</color>
+
+    <!-- Purple Palette (Dark) -->
+    <color name="purple_primary_dark">#D3BBFF</color>
+    <color name="purple_on_primary_dark">#3E008D</color>
+    <color name="purple_primary_container_dark">#5624A8</color>
+    <color name="purple_on_primary_container_dark">#EBDDFF</color>
+    <color name="purple_secondary_dark">#CBC2DB</color>
+    <color name="purple_on_secondary_dark">#332D41</color>
+    <color name="purple_secondary_container_dark">#4A4458</color>
+    <color name="purple_on_secondary_container_dark">#E8DEF8</color>
+
+    <!-- Crimson Palette (Dark) -->
+    <color name="crimson_primary_dark">#FFB2BE</color>
+    <color name="crimson_on_primary_dark">#650021</color>
+    <color name="crimson_primary_container_dark">#8E0032</color>
+    <color name="crimson_on_primary_container_dark">#FFD9DF</color>
+    <color name="crimson_secondary_dark">#E5BDC2</color>
+    <color name="crimson_on_secondary_dark">#43292E</color>
+    <color name="crimson_secondary_container_dark">#5B3F44</color>
+    <color name="crimson_on_secondary_container_dark">#FFD9DF</color>
+
+    <!-- Amber Palette (Dark) -->
+    <color name="amber_primary_dark">#FFBA38</color>
+    <color name="amber_on_primary_dark">#432C00</color>
+    <color name="amber_primary_container_dark">#604100</color>
+    <color name="amber_on_primary_container_dark">#FFDEAB</color>
+    <color name="amber_secondary_dark">#D9C4A1</color>
+    <color name="amber_on_secondary_dark">#3B2F14</color>
+    <color name="amber_secondary_container_dark">#534529</color>
+    <color name="amber_on_secondary_container_dark">#F6E0BB</color>
+
+    <!-- Material Surface Shortcuts -->
+    <color name="surfaceContainer">#1D201F</color>
+    <color name="surfaceContainerLow">#191C1B</color>
+    <color name="surfaceContainerHigh">#272A29</color>
+    <color name="surfaceContainerHighest">#323534</color>
 </resources>

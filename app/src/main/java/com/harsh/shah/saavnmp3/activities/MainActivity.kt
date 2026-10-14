@@ -49,6 +49,7 @@ import org.json.JSONObject
 import java.util.Calendar
 import androidx.core.net.toUri
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
+import com.harsh.shah.saavnmp3.utils.ThemeManager
 import com.harsh.shah.saavnmp3.utils.UpdateUtil
 import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 
@@ -77,10 +78,15 @@ class MainActivity : AppCompatActivity() {
 
     private var slidingRootNavBuilder: SlidingRootNav? = null
 
+    private var currentThemeConfig: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeManager.applyTheme(this)
         super.onCreate(savedInstanceState)
+        currentThemeConfig = ThemeManager.getThemeConfig(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
+        MiniPlayerHelper.initMiniPlayer(this)
 
         baseApplicationClass = applicationContext as BaseApplicationClass?
         BaseApplicationClass.currentActivity = this
@@ -281,6 +287,11 @@ class MainActivity : AppCompatActivity() {
         NetworkChangeReceiver.registerReceiver(this, networkChangeReceiver)
         showSavedLibrariesData()
         MiniPlayerHelper.onActivityResume(this)
+        val config = ThemeManager.getThemeConfig(this)
+        if (currentThemeConfig != null && currentThemeConfig != config) {
+            currentThemeConfig = config
+            recreate()
+        }
     }
 
     override fun onPause() {
@@ -305,10 +316,10 @@ class MainActivity : AppCompatActivity() {
         albums.clear()
         playlists.clear()
 
-        val songSeeds = listOf("2023","2024","2025","2026","Hits", "Latest", "Romantic", "Chill", "Lo-Fi", "Dance", "Hindi", "Sad", "Love", "Workout", " ")
-        val artistSeeds = listOf("2023","2024","2025","2026", " ")
-        val albumSeeds = listOf("2023","2024","2025","2026","Hits", "Latest", "New", "Sad", "Lo-Fi", "Romantic", "Rock", "Pop", "Classic", "Party", " ")
-        val playlistSeeds = listOf("2023","2024","2025","2026","Hits", "Latest", "Trending", "Party", "Devotional", "Chill", "Love", "Sad", "Top", "Classic", " ")
+        val songSeeds = listOf("2025","2026","Hits", "Latest", "Romantic", "Chill", "Lo-Fi", "Dance", "Hindi", "Sad", "Love", "Workout", " ")
+        val artistSeeds = listOf("2025","2026", " ")
+        val albumSeeds = listOf("2025","2026","Hits", "Latest", "New", "Sad", "Lo-Fi", "Romantic", "Rock", "Pop", "Classic", "Party", " ")
+        val playlistSeeds = listOf("2025","2026","Hits", "Latest", "Trending", "Party", "Devotional", "Chill", "Love", "Sad", "Top", "Classic", " ")
         
         val songQuery = songSeeds.random()
         val artistQuery = artistSeeds.random()

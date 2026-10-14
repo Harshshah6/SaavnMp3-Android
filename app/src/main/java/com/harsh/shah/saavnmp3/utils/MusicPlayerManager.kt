@@ -33,6 +33,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.palette.graphics.Palette
 import com.google.gson.Gson
+import com.harsh.shah.saavnmp3.widgets.WidgetCardProvider
+import com.harsh.shah.saavnmp3.widgets.WidgetVinylProvider
 import com.harsh.shah.saavnmp3.BaseApplicationClass
 import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
@@ -119,7 +121,6 @@ object MusicPlayerManager {
                 Log.i(TAG, "Player state changed to: ${getStateString(playbackState)}")
                 when (playbackState) {
                     Player.STATE_READY -> {
-                        player?.play()
                         updateWidget()
                     }
                     Player.STATE_ENDED -> {
@@ -129,6 +130,12 @@ object MusicPlayerManager {
                         updateWidget()
                     }
                 }
+            }
+
+            override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                Log.i(TAG, "Player playWhenReady changed to: $playWhenReady (reason: $reason)")
+                showNotification()
+                updateWidget()
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -182,6 +189,35 @@ object MusicPlayerManager {
         description?.let { MUSIC_DESCRIPTION = it }
         MUSIC_ID = id
         Log.i(TAG, "setMusicDetails: $MUSIC_TITLE - ID: $MUSIC_ID")
+
+        if (!image.isNullOrBlank()) {
+            val ctx = appContext ?: BaseApplicationClass.currentActivity
+            if (ctx != null) {
+                try {
+                    Glide.with(ctx.applicationContext)
+                        .asBitmap()
+                        .load(image)
+                        .into(object : CustomTarget<Bitmap>() {
+                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                Palette.from(resource).generate { palette ->
+                                    palette?.let {
+                                        val swatch = it.darkMutedSwatch ?: it.darkVibrantSwatch ?: it.dominantSwatch
+                                        swatch?.let { s ->
+                                            IMAGE_BG_COLOR = s.rgb
+                                            TEXT_ON_IMAGE_COLOR = s.titleTextColor
+                                            TEXT_ON_IMAGE_COLOR1 = s.bodyTextColor
+                                        }
+                                    }
+                                }
+                            }
+                            override fun onLoadCleared(placeholder: Drawable?) {}
+                        })
+                } catch (e: Exception) {
+                    Log.e(TAG, "Palette generation error: ${e.message}")
+                }
+            }
+        }
+
         updateWidget()
     }
 
@@ -190,8 +226,12 @@ object MusicPlayerManager {
         notificationManager?.cancel(1)
     }
 
-    private fun updateWidget() {
-        appContext?.let { WidgetPlayerProvider.updateAllWidgets(it) }
+    fun updateWidget() {
+        appContext?.let {
+            WidgetPlayerProvider.updateAllWidgets(it)
+            WidgetCardProvider.updateAllWidgets(it)
+            WidgetVinylProvider.updateAllWidgets(it)
+        }
     }
 
     fun getDownloadUrl(downloadUrlList: MutableList<SongResponse.DownloadUrl?>?): String {
@@ -209,7 +249,7 @@ object MusicPlayerManager {
         return if (lastUrl.startsWith("http:")) lastUrl.replace("http:", "https:") else lastUrl
     }
 
-    fun showNotification(playPauseButton: Int = if (player?.playWhenReady == true) R.drawable.baseline_pause_24 else R.drawable.play_arrow_24px) {
+    fun showNotification(playPauseButton: Int = if (isPlayerPlaying()) R.drawable.baseline_pause_24 else R.drawable.play_arrow_24px) {
         val ctx = appContext ?: return
         if (MUSIC_ID.isNullOrEmpty() || MUSIC_TITLE.isNullOrEmpty() || IMAGE_URL.isNullOrEmpty()) return
 
@@ -310,18 +350,28 @@ object MusicPlayerManager {
             val manager = appContext?.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             manager?.notify(1, notification)
         }
+        updateWidget()
+    }
+
+    fun isPlayerPlaying(): Boolean {
+        val p = player ?: return false
+        return p.playWhenReady && p.playbackState != Player.STATE_ENDED && p.playbackState != Player.STATE_IDLE
     }
 
     fun togglePlayPause() {
         val p = player ?: return
-        if (p.isPlaying) p.pause()
-        else if (p.playbackState == Player.STATE_IDLE) prepareMediaPlayer()
-        else p.play()
+        if (isPlayerPlaying()) {
+            p.pause()
+        } else {
+            if (p.playbackState == Player.STATE_IDLE) {
+                prepareMediaPlayer()
+            } else {
+                p.play()
+            }
+        }
 
-        Handler(Looper.getMainLooper()).postDelayed({ 
-            showNotification() 
-            updateWidget()
-        }, 100)
+        showNotification()
+        updateWidget()
     }
 
     fun prepareMediaPlayer() {

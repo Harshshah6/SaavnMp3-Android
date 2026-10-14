@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_card_background"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- Header & Song Details Row -->
+    <LinearLayout
+        android:id="@+id/card_top_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Album Art -->
+        <ImageView
+            android:id="@+id/widget_album_art"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:contentDescription="Album Art"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_launcher" />
+
+        <!-- Title & Details -->
+        <LinearLayout
+            android:id="@+id/text_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/widget_badge_bg"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp">
+
+                <TextView
+                    android:id="@+id/widget_badge_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/avenir_next_bold"
+                    android:letterSpacing="0.08"
+                    android:text="MELOTUNE"
+                    android:textColor="@color/widget_primary"
+                    android:textSize="9sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/widget_song_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="marquee"
+                android:fontFamily="@font/avenir_next_bold"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                android:text="Not Playing"
+                android:textColor="@color/widget_text_title"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/widget_artist_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/avenir_next_regular"
+                android:maxLines="1"
+                android:text="Melotune Music"
+                android:textColor="@color/widget_text_subtitle"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Progress Indicator -->
+    <LinearLayout
+        android:id="@+id/progress_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:id="@+id/widget_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3.5dp"
+            android:max="1000"
+            android:progress="0"
+            android:progressDrawable="@drawable/widget_progress_track" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/widget_time_elapsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:fontFamily="@font/avenir_next_regular"
+                android:text="0:00"
+                android:textColor="@color/widget_text_subtitle"
+                android:textSize="9.5sp" />
+
+            <TextView
+                android:id="@+id/widget_time_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:fontFamily="@font/avenir_next_regular"
+                android:text="0:00"
+                android:textColor="@color/widget_text_subtitle"
+                android:textSize="9.5sp" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!-- Playback Controls Row -->
+    <LinearLayout
+        android:id="@+id/controls_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <!-- Shuffle -->
+        <ImageView
+            android:id="@+id/button_shuffle"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="Shuffle"
+            android:focusable="true"
+            android:padding="6dp"
+            android:src="@drawable/shuffle_24px"
+            app:tint="@color/widget_text_subtitle" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <!-- Previous -->
+        <FrameLayout
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/widget_control_circle">
+
+            <ImageView
+                android:id="@+id/button_prev"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="Previous"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/skip_previous_24px"
+                app:tint="@color/widget_text_title" />
+        </FrameLayout>
+
+        <!-- Center Hero Play/Pause FAB -->
+        <FrameLayout
+            android:id="@+id/button_play_pause_container"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="14dp">
+
+            <ImageView
+                android:id="@+id/button_play_pause_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/widget_fab_play_pause" />
+
+            <ImageView
+                android:id="@+id/button_play_pause"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="Play/Pause"
+                android:focusable="true"
+                android:padding="11dp"
+                android:src="@drawable/play_arrow_24px" />
+        </FrameLayout>
+
+        <!-- Next -->
+        <FrameLayout
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/widget_control_circle">
+
+            <ImageView
+                android:id="@+id/button_next"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="Next"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/skip_next_24px"
+                app:tint="@color/widget_text_title" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <!-- Repeat -->
+        <ImageView
+            android:id="@+id/button_repeat"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="Repeat"
+            android:focusable="true"
+            android:padding="6dp"
+            android:src="@drawable/repeat_24px"
+            app:tint="@color/widget_text_subtitle" />
+
+    </LinearLayout>
+
+</LinearLayout>

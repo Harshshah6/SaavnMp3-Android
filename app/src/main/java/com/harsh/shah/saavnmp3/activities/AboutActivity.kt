@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.google.gson.Gson
 import org.json.JSONObject
+import com.harsh.shah.saavnmp3.utils.ThemeManager
 import com.harsh.shah.saavnmp3.utils.UpdateUtil
 import com.harsh.shah.saavnmp3.BuildConfig
 import com.harsh.shah.saavnmp3.databinding.ActivityAboutBinding
@@ -19,6 +20,7 @@ class AboutActivity : AppCompatActivity() {
     var binding: ActivityAboutBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeManager.applyTheme(this)
         super.onCreate(savedInstanceState)
         binding = ActivityAboutBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())

@@ -4,16 +4,18 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bottom_sheet_background"
-    android:paddingVertical="@dimen/_18sdp">
+    android:paddingTop="@dimen/_10sdp"
+    android:paddingBottom="@dimen/_16sdp">
 
+    <!-- Material 3 Drag Handle -->
     <View
         android:id="@+id/bar"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_2sdp"
+        android:layout_width="36dp"
+        android:layout_height="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@color/textSec"/>
+        android:background="@drawable/m3_bottom_sheet_drag_handle"/>
 
     <LinearLayout
         android:id="@+id/main"
@@ -23,55 +25,74 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bar"
-        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_10sdp"
         android:orientation="vertical">
 
-        <LinearLayout
+        <!-- Album Info Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/_8sdp"
-            android:gravity="center_vertical">
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
-                app:cardCornerRadius="@dimen/_8sdp"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:strokeWidth="0dp">
-
-                <ImageView
-                    android:id="@+id/coverImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/textSec"/>
-
-            </com.google.android.material.card.MaterialCardView>
+            android:layout_marginHorizontal="@dimen/_12sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/surfaceContainerHighest">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_8sdp"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:padding="@dimen/_8sdp"
+                android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/albumTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textSize="@dimen/_13ssp"/>
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="@dimen/_36sdp"
+                    android:layout_height="@dimen/_36sdp"
+                    app:cardCornerRadius="10dp"
+                    app:cardBackgroundColor="@color/surfaceContainerLow"
+                    app:strokeWidth="0dp">
 
-                <TextView
-                    android:id="@+id/albumSubTitle"
-                    android:layout_width="wrap_content"
+                    <ImageView
+                        android:id="@+id/coverImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:background="@color/surfaceContainerLow"
+                        android:contentDescription="Cover Art" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textSize="@dimen/_10ssp"
-                    android:textColor="@color/textSec"/>
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/albumTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/app_name"
+                        android:fontFamily="@font/avenir_next_bold"
+                        android:textColor="@color/textMain"
+                        android:textSize="@dimen/_13ssp"/>
+
+                    <TextView
+                        android:id="@+id/albumSubTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="@string/app_name"
+                        android:fontFamily="@font/avenir_next_regular"
+                        android:textSize="@dimen/_10ssp"
+                        android:textColor="@color/textSec"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
             android:id="@+id/add_to_library"
@@ -85,9 +106,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Artists"
-            android:textSize="@dimen/_14ssp"
-            android:paddingHorizontal="@dimen/_12sdp"
-            android:paddingVertical="@dimen/_4sdp"/>
+            android:fontFamily="@font/avenir_next_bold"
+            android:textColor="@color/green"
+            android:textSize="@dimen/_13ssp"
+            android:paddingHorizontal="@dimen/_14sdp"
+            android:paddingTop="@dimen/_8sdp"
+            android:paddingBottom="@dimen/_4sdp"/>
 
     </LinearLayout>
 

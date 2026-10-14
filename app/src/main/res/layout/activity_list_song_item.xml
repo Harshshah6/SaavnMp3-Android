@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <com.google.android.material.card.MaterialCardView xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/_2sdp"
+    android:layout_marginVertical="@dimen/_2sdp"
+    app:cardCornerRadius="14dp"
     app:cardBackgroundColor="@android:color/transparent"
+    app:cardElevation="0dp"
     app:strokeWidth="0dp"
     android:focusable="true"
     android:clickable="true"
@@ -13,73 +17,80 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/_8sdp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/_6sdp"
+        android:paddingVertical="@dimen/_6sdp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/coverCard"
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_40sdp"
-                app:cardBackgroundColor="@android:color/transparent">
-
-                <ImageView
-                    android:id="@+id/coverImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/textSec" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingHorizontal="@dimen/_8sdp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Song Name"
-                    android:singleLine="true"
-                    android:ellipsize="marquee"
-                    android:scrollHorizontally="true"
-                    android:textColor="@color/textMain"
-                    android:textSize="@dimen/_16ssp" />
-
-                <TextView
-                    android:id="@+id/artist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Artist Name"
-                    android:singleLine="true"
-                    android:ellipsize="marquee"
-                    android:scrollHorizontally="true"
-                    android:textColor="@color/textSec" />
-
-            </LinearLayout>
+        <!-- Squircle Cover Thumbnail -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/coverCard"
+            android:layout_width="@dimen/_38sdp"
+            android:layout_height="@dimen/_38sdp"
+            app:cardCornerRadius="12dp"
+            app:strokeWidth="0dp"
+            app:cardElevation="1dp"
+            app:cardBackgroundColor="@android:color/transparent">
 
             <ImageView
-                android:id="@+id/more"
-                android:visibility="visible"
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:src="@drawable/more_vert_24px"
-                android:padding="@dimen/_10sdp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                android:contentDescription="More options" />
+                android:id="@+id/coverImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="Song Cover" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Track Title & Artist -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Song Name"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:fontFamily="@font/avenir_next_bold"
+                android:textColor="@color/textMain"
+                android:textSize="@dimen/_13ssp" />
+
+            <TextView
+                android:id="@+id/artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:text="Artist Name"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:fontFamily="@font/avenir_next_regular"
+                android:textColor="@color/textSec"
+                android:textSize="@dimen/_10ssp" />
 
         </LinearLayout>
 
-    </LinearLayout>
+        <!-- 3-Dot More Options Action -->
+        <ImageView
+            android:id="@+id/more"
+            android:layout_width="@dimen/_32sdp"
+            android:layout_height="@dimen/_32sdp"
+            android:src="@drawable/more_vert_24px"
+            android:padding="@dimen/_6sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
+            app:tint="@color/textSec"
+            android:contentDescription="More Options" />
 
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

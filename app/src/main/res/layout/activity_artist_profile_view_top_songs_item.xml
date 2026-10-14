@@ -1,76 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/background"
+    android:background="@android:color/transparent"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    android:paddingVertical="@dimen/_8sdp"
-    android:paddingHorizontal="@dimen/_8sdp">
+    android:paddingVertical="@dimen/_6sdp"
+    android:paddingHorizontal="@dimen/_10sdp">
 
+    <!-- Rank Position Number -->
     <TextView
         android:id="@+id/position"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/_24sdp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:padding="@dimen/_6sdp"
-        android:text="xx"
-        android:textColor="@color/textMain"
+        android:text="1"
+        android:fontFamily="@font/avenir_next_bold"
+        android:textColor="@color/textSec"
         android:textSize="@dimen/_12ssp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/coverImage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/coverImage"
-        android:layout_width="@dimen/_30sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:layout_marginStart="@dimen/_4sdp"
-        android:background="@color/textSec"
-        android:contentDescription="Artist-Profile-Image"
-        app:layout_constraintBottom_toBottomOf="@id/position"
+    <!-- Cover Image Squircle -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/coverCard"
+        android:layout_width="@dimen/_36sdp"
+        android:layout_height="@dimen/_36sdp"
+        android:layout_marginStart="@dimen/_6sdp"
+        app:cardCornerRadius="10dp"
+        app:strokeWidth="0dp"
+        app:cardElevation="1dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/position"
-        app:layout_constraintTop_toTopOf="@id/position" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <ImageView
+            android:id="@+id/coverImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="Song Cover" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Song Title -->
     <TextView
         android:id="@+id/coverTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_6sdp"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_4sdp"
         android:singleLine="true"
-        android:text="a long song name will appear here"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:fontFamily="@font/avenir_next_bold"
+        android:text="Song Name"
         android:textColor="@color/textMain"
-        android:textSize="@dimen/_14ssp"
-        android:textStyle="bold"
+        android:textSize="@dimen/_13ssp"
         app:layout_constraintEnd_toStartOf="@+id/more"
-        app:layout_constraintStart_toEndOf="@id/coverImage"
-        app:layout_constraintTop_toTopOf="@id/coverImage" />
+        app:layout_constraintStart_toEndOf="@id/coverCard"
+        app:layout_constraintTop_toTopOf="@id/coverCard" />
 
+    <!-- Play Count -->
     <TextView
         android:id="@+id/coverPlayed"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="472,129,747"
+        android:text="0 plays"
+        android:fontFamily="@font/avenir_next_regular"
         android:textColor="@color/textSec"
+        android:textSize="@dimen/_10ssp"
         android:singleLine="true"
         app:layout_constraintEnd_toEndOf="@+id/coverTitle"
         app:layout_constraintStart_toStartOf="@id/coverTitle"
         app:layout_constraintTop_toBottomOf="@id/coverTitle" />
 
+    <!-- 3-Dot More Action -->
     <ImageView
         android:id="@+id/more"
-        android:layout_width="@dimen/_35sdp"
-        android:layout_height="@dimen/_35sdp"
+        android:layout_width="@dimen/_32sdp"
+        android:layout_height="@dimen/_32sdp"
         android:src="@drawable/more_vert_24px"
-        android:padding="@dimen/_8sdp"
+        android:padding="@dimen/_6sdp"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="?attr/selectableItemBackground"
-        android:contentDescription="More options"
+        android:background="?attr/actionBarItemBackground"
+        app:tint="@color/textSec"
+        android:contentDescription="More Options"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

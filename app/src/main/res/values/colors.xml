@@ -1,45 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base Theme Mappings (Light Mode) -->
+    <color name="background">#FCFDF7</color>
+    <color name="textMain">#191C1B</color>
+    <color name="textSec">#505552</color>
+    <color name="buttonBackground">#00875A</color>
+    <color name="dividerBackground">#C0C9C2</color>
+    <color name="green">#00875A</color>
 
-    <color name="background">@color/background_light</color>
-    <color name="textMain">@color/text_dark</color>
-    <color name="textSec">@color/text_secondary_dark</color>
-    <color name="buttonBackground">@color/button_light</color>
-    <color name="dividerBackground">@color/divider_dark</color>
-    <color name="green">@color/spotify_light_green</color>
+    <color name="activity_main_cta_button">#505552</color>
+    <color name="widget_transparent_75">#D9FFFFFF</color>
 
-    <!-- Primary colors -->
-    <color name="spotify_green">#1DB954</color> <!-- Spotify Green -->
-    <color name="spotify_black">#191414</color> <!-- Spotify Black -->
+    <!-- Material Widget Tokens (Light) -->
+    <color name="widget_surface">#EBF2EDEB</color>
+    <color name="widget_surface_card">#F7FAF8F5</color>
+    <color name="widget_outline">#1F000000</color>
+    <color name="widget_primary">#00875A</color>
+    <color name="widget_on_primary">#FFFFFF</color>
+    <color name="widget_control_bg">#14000000</color>
+    <color name="widget_text_title">#191C1B</color>
+    <color name="widget_text_subtitle">#505552</color>
+    <color name="widget_progress_bg">#20000000</color>
+    <color name="widget_vinyl_bg">#181919</color>
+    <color name="widget_vinyl_groove">#2A2B2C</color>
 
-    <!-- Secondary colors -->
-    <color name="spotify_dark_green">#1DB954</color>
+    <!-- Legacy Spotify compatibility -->
+    <color name="spotify_green">#00875A</color>
+    <color name="spotify_black">#191414</color>
+    <color name="spotify_dark_green">#006D47</color>
     <color name="spotify_light_green">#1ED760</color>
 
-    <color name="activity_main_cta_button">@color/textSec</color>
+    <color name="background_dark">#111413</color>
+    <color name="background_light">#FCFDF7</color>
 
-    <!-- Background colors -->
-    <color name="background_dark">#121212</color>
-    <color name="background_light">#FAF9F6</color>
-
-    <!-- Text colors -->
     <color name="text_light">#FAF9F6</color>
-    <color name="text_dark">#191414</color>
-    <color name="text_secondary_light">#B3B3B3</color>
-    <color name="text_secondary_dark">#3D3D3D</color>
+    <color name="text_dark">#191C1B</color>
+    <color name="text_secondary_light">#A2A7A3</color>
+    <color name="text_secondary_dark">#505552</color>
 
-    <!-- Divider and accent colors -->
-    <color name="divider_light">#E6E6E6</color>
-    <color name="divider_dark">#333333</color>
+    <color name="divider_light">#E0E5DF</color>
+    <color name="divider_dark">#2A2F2C</color>
 
-    <!-- Button colors -->
-    <color name="button_dark">#1DB954</color>
-    <color name="button_light">#1DB954</color>
+    <color name="button_dark">#1ED760</color>
+    <color name="button_light">#00875A</color>
+
+    <!-- Generic palette colors -->
     <color name="light_blue_400">#FF29B6F6</color>
     <color name="light_blue_600">#FF039BE5</color>
     <color name="gray_400">#FFBDBDBD</color>
     <color name="gray_600">#FF757575</color>
 
-    <color name="widget_transparent_75">#BFFFFFFF</color>
+    <!-- Material 3 Light Surface Hierarchy -->
+    <color name="m3_surface_light">#FCFDF7</color>
+    <color name="m3_on_surface_light">#191C1B</color>
+    <color name="m3_surface_variant_light">#DBE5DE</color>
+    <color name="m3_on_surface_variant_light">#404944</color>
+    <color name="m3_surface_container_lowest_light">#FFFFFF</color>
+    <color name="m3_surface_container_low_light">#F6F8F1</color>
+    <color name="m3_surface_container_light">#F0F3EC</color>
+    <color name="m3_surface_container_high_light">#EAEDE6</color>
+    <color name="m3_surface_container_highest_light">#E4E7E0</color>
+    <color name="m3_outline_light">#707973</color>
+    <color name="m3_outline_variant_light">#C0C9C2</color>
 
+    <!-- Emerald Palette (Default Material Green) -->
+    <color name="emerald_primary_light">#00875A</color>
+    <color name="emerald_on_primary_light">#FFFFFF</color>
+    <color name="emerald_primary_container_light">#97F7C7</color>
+    <color name="emerald_on_primary_container_light">#002113</color>
+    <color name="emerald_secondary_light">#4C6356</color>
+    <color name="emerald_on_secondary_light">#FFFFFF</color>
+    <color name="emerald_secondary_container_light">#CEE9D8</color>
+    <color name="emerald_on_secondary_container_light">#092015</color>
+    <color name="emerald_tertiary_light">#3E6374</color>
+    <color name="emerald_on_tertiary_light">#FFFFFF</color>
+    <color name="emerald_tertiary_container_light">#C1E8FC</color>
+    <color name="emerald_on_tertiary_container_light">#001F2A</color>
+
+    <!-- Ocean Palette (Blue) -->
+    <color name="ocean_primary_light">#006495</color>
+    <color name="ocean_on_primary_light">#FFFFFF</color>
+    <color name="ocean_primary_container_light">#CBE6FF</color>
+    <color name="ocean_on_primary_container_light">#001E30</color>
+    <color name="ocean_secondary_light">#50606E</color>
+    <color name="ocean_on_secondary_light">#FFFFFF</color>
+    <color name="ocean_secondary_container_light">#D4E4F5</color>
+    <color name="ocean_on_secondary_container_light">#0D1D2A</color>
+
+    <!-- Purple Palette (Sunset Violet) -->
+    <color name="purple_primary_light">#6E41C1</color>
+    <color name="purple_on_primary_light">#FFFFFF</color>
+    <color name="purple_primary_container_light">#EBDDFF</color>
+    <color name="purple_on_primary_container_light">#24005B</color>
+    <color name="purple_secondary_light">#625B71</color>
+    <color name="purple_on_secondary_light">#FFFFFF</color>
+    <color name="purple_secondary_container_light">#E8DEF8</color>
+    <color name="purple_on_secondary_container_light">#1E192B</color>
+
+    <!-- Crimson Palette (Rose) -->
+    <color name="crimson_primary_light">#B31B45</color>
+    <color name="crimson_on_primary_light">#FFFFFF</color>
+    <color name="crimson_primary_container_light">#FFD9DF</color>
+    <color name="crimson_on_primary_container_light">#3F0012</color>
+    <color name="crimson_secondary_light">#75565B</color>
+    <color name="crimson_on_secondary_light">#FFFFFF</color>
+    <color name="crimson_secondary_container_light">#FFD9DF</color>
+    <color name="crimson_on_secondary_container_light">#2C151A</color>
+
+    <!-- Amber Palette (Gold) -->
+    <color name="amber_primary_light">#7E5700</color>
+    <color name="amber_on_primary_light">#FFFFFF</color>
+    <color name="amber_primary_container_light">#FFDEAB</color>
+    <color name="amber_on_primary_container_light">#271900</color>
+    <color name="amber_secondary_light">#6C5C3F</color>
+    <color name="amber_on_secondary_light">#FFFFFF</color>
+    <color name="amber_secondary_container_light">#F6E0BB</color>
+    <color name="amber_on_secondary_container_light">#251A04</color>
+
+    <!-- Material Surface Shortcuts -->
+    <color name="surfaceContainer">#F0F3EC</color>
+    <color name="surfaceContainerLow">#F6F8F1</color>
+    <color name="surfaceContainerHigh">#EAEDE6</color>
+    <color name="surfaceContainerHighest">#E4E7E0</color>
 </resources>

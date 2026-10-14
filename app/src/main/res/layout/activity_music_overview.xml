@@ -6,27 +6,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/background"
+    android:background="?attr/colorSurface"
     tools:context=".activities.MusicOverviewActivity">
 
+    <!-- Top Action Bar -->
     <LinearLayout
         android:id="@+id/__toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_8sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
             android:clickable="true"
             android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
+            android:background="?attr/actionBarItemBackground"
             android:onClick="backPress"
-            android:padding="@dimen/_4sdp"
-            android:src="@drawable/round_keyboard_arrow_down_24" />
+            android:padding="@dimen/_6sdp"
+            android:src="@drawable/round_keyboard_arrow_down_24"
+            app:tint="@color/textMain"
+            android:contentDescription="Collapse Player" />
 
         <View
             android:layout_width="0dp"
@@ -36,67 +42,95 @@
         <ImageView
             android:id="@+id/lyrics_icon"
             android:visibility="gone"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:padding="@dimen/_10sdp"
-            android:src="@drawable/baseline_lyrics_24" />
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_7sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
+            android:src="@drawable/baseline_lyrics_24"
+            app:tint="@color/textMain"
+            android:contentDescription="Lyrics" />
 
         <ImageView
             android:id="@+id/share_icon"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:padding="@dimen/_10sdp"
-            android:src="@drawable/share_24px" />
-
-        <ImageView
-            android:id="@+id/more_icon"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:padding="@dimen/_10sdp"
-            android:src="@drawable/more_vert_24px" />
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_7sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
+            android:src="@drawable/share_24px"
+            app:tint="@color/textMain"
+            android:contentDescription="Share" />
 
         <ImageView
             android:id="@+id/queue_icon"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:padding="@dimen/_10sdp"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_7sdp"
             android:src="@drawable/ic_queue_music"
             android:contentDescription="Queue"
             android:focusable="true"
-            android:clickable="true" />
+            android:clickable="true"
+            android:background="?attr/actionBarItemBackground"
+            app:tint="@color/textMain" />
+
+        <ImageView
+            android:id="@+id/more_icon"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_7sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
+            android:src="@drawable/more_vert_24px"
+            app:tint="@color/textMain"
+            android:contentDescription="More Options" />
 
     </LinearLayout>
 
+    <!-- Main Content Area -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
-        android:padding="@dimen/_8sdp"
+        android:paddingHorizontal="@dimen/_16sdp"
+        android:paddingBottom="@dimen/_16sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/__toolbar"
-        app:layout_constraintVertical_weight="1">
+        app:layout_constraintTop_toBottomOf="@id/__toolbar">
 
+        <!-- Top Spacer -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.4" />
+
+        <!-- Hero Cover Art / Synced Lyrics Frame -->
         <FrameLayout
             android:id="@+id/coverArtFrame"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_200sdp"
+            android:layout_height="@dimen/_210sdp"
             android:layout_gravity="center_horizontal">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/coverImageCard"
-                android:layout_width="@dimen/_200sdp"
-                android:layout_height="@dimen/_200sdp"
+                android:layout_width="@dimen/_210sdp"
+                android:layout_height="@dimen/_210sdp"
                 android:layout_gravity="center"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:strokeWidth="0dp">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="6dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@android:color/transparent">
 
                 <ImageView
                     android:id="@+id/coverImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/textSec" />
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Album Art" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -106,54 +140,90 @@
                 android:layout_height="match_parent"
                 android:visibility="gone"
                 android:clipToPadding="false"
-                android:paddingTop="@dimen/_100sdp"
-                android:paddingBottom="@dimen/_100sdp"
+                android:paddingTop="@dimen/_90sdp"
+                android:paddingBottom="@dimen/_90sdp"
                 android:paddingHorizontal="@dimen/_8sdp" />
         </FrameLayout>
 
-
+        <!-- Middle Spacer -->
         <View
             android:layout_width="1dp"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="0.5" />
 
+        <!-- Song Title -->
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_8sdp"
             android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
             android:gravity="center"
             android:scrollHorizontally="true"
             android:singleLine="true"
-            android:text="loading..."
-            android:textSize="@dimen/_30ssp" />
+            android:fontFamily="@font/avenir_next_bold"
+            android:text="Song Title"
+            android:textColor="@color/textMain"
+            android:textSize="@dimen/_20ssp" />
 
+        <!-- Artist / Album Description -->
         <TextView
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_3sdp"
             android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
             android:gravity="center"
             android:scrollHorizontally="true"
             android:singleLine="true"
-            android:text="loading......."
-            android:textColor="@color/textSec" />
+            android:fontFamily="@font/avenir_next_regular"
+            android:text="Artist Name"
+            android:textColor="@color/textSec"
+            android:textSize="@dimen/_12ssp" />
 
+        <!-- Audio Quality Chip Badge -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_6sdp"
+            app:cardCornerRadius="999dp"
+            app:strokeWidth="0dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/surfaceContainerHighest">
+
+            <TextView
+                android:id="@+id/track_quality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/_8sdp"
+                android:paddingVertical="@dimen/_2sdp"
+                android:fontFamily="@font/avenir_next_bold"
+                android:text="320 KBPS"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="@dimen/_9ssp" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Spacer -->
         <View
             android:layout_width="1dp"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="0.4" />
 
+        <!-- Seekbar Progress Section -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_8sdp">
+            android:layout_marginTop="@dimen/_6sdp">
 
             <SeekBar
                 android:id="@+id/seekbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:progressTint="?attr/colorPrimary"
+                android:thumbTint="?attr/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -162,8 +232,12 @@
                 android:id="@+id/elapsedDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_8sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_2sdp"
                 android:text="00:00"
+                android:fontFamily="@font/avenir_next_regular"
+                android:textColor="@color/textSec"
+                android:textSize="@dimen/_10ssp"
                 app:layout_constraintStart_toStartOf="@+id/seekbar"
                 app:layout_constraintTop_toBottomOf="@id/seekbar" />
 
@@ -171,51 +245,70 @@
                 android:id="@+id/totalDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/_8sdp"
-                android:text="06:12"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:text="00:00"
+                android:fontFamily="@font/avenir_next_regular"
+                android:textColor="@color/textSec"
+                android:textSize="@dimen/_10ssp"
                 app:layout_constraintEnd_toEndOf="@+id/seekbar"
                 app:layout_constraintTop_toBottomOf="@id/seekbar" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- Spacer -->
         <View
             android:layout_width="1dp"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="0.3" />
 
+        <!-- Media Playback Controls -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_8sdp">
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_12sdp">
 
+            <!-- Shuffle Button -->
             <ImageView
                 android:id="@+id/shuffle_icon"
-                android:layout_width="@dimen/_35sdp"
-                android:layout_height="@dimen/_35sdp"
-                android:padding="@dimen/_8sdp"
+                android:layout_width="@dimen/_34sdp"
+                android:layout_height="@dimen/_34sdp"
+                android:padding="@dimen/_6sdp"
                 android:src="@drawable/shuffle_24px"
                 android:focusable="true"
                 android:clickable="true"
+                android:background="?attr/actionBarItemBackground"
+                app:tint="@color/textSec"
+                android:contentDescription="Shuffle"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- Skip Previous Button -->
             <ImageView
-                android:id="@+id/repeat_icon"
-                android:layout_width="@dimen/_35sdp"
-                android:layout_height="@dimen/_35sdp"
-                android:padding="@dimen/_8sdp"
-                android:src="@drawable/repeat_24px"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/prevIcon"
+                android:layout_width="@dimen/_36sdp"
+                android:layout_height="@dimen/_36sdp"
+                android:layout_marginEnd="@dimen/_12sdp"
+                android:padding="@dimen/_6sdp"
+                android:src="@drawable/skip_previous_24px"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/actionBarItemBackground"
+                app:tint="@color/textMain"
+                android:contentDescription="Previous Track"
+                app:layout_constraintBottom_toBottomOf="@id/__play_pause_icon_bg"
+                app:layout_constraintEnd_toStartOf="@id/__play_pause_icon_bg"
+                app:layout_constraintTop_toTopOf="@id/__play_pause_icon_bg" />
 
+            <!-- Large Center Play/Pause Floating Action Button -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/__play_pause_icon_bg"
-                android:layout_width="@dimen/_45sdp"
-                android:layout_height="@dimen/_45sdp"
-                android:elevation="@dimen/_5sdp"
-                app:cardBackgroundColor="@color/textMain"
+                android:layout_width="@dimen/_52sdp"
+                android:layout_height="@dimen/_52sdp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="?attr/colorPrimary"
                 app:cardCornerRadius="999dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -228,69 +321,48 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:focusable="true"
-                    android:padding="@dimen/_8sdp"
+                    android:padding="@dimen/_10sdp"
                     android:src="@drawable/play_arrow_24px"
                     android:clickable="true"
-                    app:tint="@color/background" />
+                    app:tint="?attr/colorOnPrimary"
+                    android:contentDescription="Play/Pause" />
 
             </com.google.android.material.card.MaterialCardView>
 
-            <ImageView
-                android:id="@+id/prevIcon"
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
-                android:layout_marginEnd="@dimen/_8sdp"
-                android:src="@drawable/skip_previous_24px"
-                app:layout_constraintBottom_toBottomOf="@id/__play_pause_icon_bg"
-                app:layout_constraintEnd_toStartOf="@id/__play_pause_icon_bg"
-                app:layout_constraintTop_toTopOf="@id/__play_pause_icon_bg" />
-
+            <!-- Skip Next Button -->
             <ImageView
                 android:id="@+id/nextIcon"
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
-                android:layout_marginStart="@dimen/_8sdp"
+                android:layout_width="@dimen/_36sdp"
+                android:layout_height="@dimen/_36sdp"
+                android:layout_marginStart="@dimen/_12sdp"
+                android:padding="@dimen/_6sdp"
                 android:src="@drawable/skip_next_24px"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/actionBarItemBackground"
+                app:tint="@color/textMain"
+                android:contentDescription="Next Track"
                 app:layout_constraintBottom_toBottomOf="@id/__play_pause_icon_bg"
                 app:layout_constraintStart_toEndOf="@id/__play_pause_icon_bg"
                 app:layout_constraintTop_toTopOf="@id/__play_pause_icon_bg" />
 
+            <!-- Repeat Button -->
+            <ImageView
+                android:id="@+id/repeat_icon"
+                android:layout_width="@dimen/_34sdp"
+                android:layout_height="@dimen/_34sdp"
+                android:padding="@dimen/_6sdp"
+                android:src="@drawable/repeat_24px"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/actionBarItemBackground"
+                app:tint="@color/textSec"
+                android:contentDescription="Repeat"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <ImageView
-            android:visibility="invisible"
-            android:layout_width="@dimen/_35sdp"
-            android:layout_height="@dimen/_35sdp"
-            android:padding="@dimen/_8sdp"
-            android:src="@drawable/favorite_outline_24px"
-            app:tint="@color/textMain" />
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/_12sdp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="999dp">
-
-            <View
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_2sdp"
-                android:background="@color/textSec" />
-        </androidx.cardview.widget.CardView>
-
-
-        <TextView
-            android:id="@+id/track_quality"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/_4sdp"
-            android:layout_marginBottom="@dimen/_8sdp"
-            android:text="320kbps"
-            android:textSize="@dimen/_14ssp"
-            android:textStyle="bold" />
-
 
     </LinearLayout>
 

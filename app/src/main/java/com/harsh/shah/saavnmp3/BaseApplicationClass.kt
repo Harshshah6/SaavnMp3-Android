@@ -14,6 +14,7 @@ open class BaseApplicationClass : Application() {
         super.onCreate()
 
         sharedPreferenceManager = SharedPreferenceManager.getInstance(this)
+        com.harsh.shah.saavnmp3.utils.ThemeManager.init(this)
         MusicPlayerManager.init(this)
 
         sharedPreferenceManager!!.migrateFromOldPrefs(this) { sharedPreferenceManager!!.clearOldPrefsAsync(this, null) }
@@ -24,15 +25,9 @@ open class BaseApplicationClass : Application() {
         var currentActivity: Activity? = null
 
         fun updateTheme() {
-            if (currentActivity == null) return
-            val settingsSharedPrefManager = SettingsSharedPrefManager(currentActivity!!)
-            val theme = settingsSharedPrefManager.theme
-            AppCompatDelegate.setDefaultNightMode(
-                when (theme) {
-                    "dark" -> AppCompatDelegate.MODE_NIGHT_YES
-                    "light" -> AppCompatDelegate.MODE_NIGHT_NO
-                    else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                }
+            val act = currentActivity ?: return
+            com.harsh.shah.saavnmp3.utils.ThemeManager.applyNightMode(
+                com.harsh.shah.saavnmp3.utils.ThemeManager.getThemeMode(act)
             )
         }
     }

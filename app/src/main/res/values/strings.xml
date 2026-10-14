@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Melotune</string>
     <string name="app_license">MIT License\n\nCopyright (c) 2024 Harsh S Shah\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.</string>
+
+    <!-- Widget Strings -->
+    <string name="widget_capsule_name">Melotune Capsule</string>
+    <string name="widget_capsule_desc">Compact Material 3 pill music player with album art &amp; playback controls</string>
+
+    <string name="widget_card_name">Melotune Deluxe Card</string>
+    <string name="widget_card_desc">Expanded Material 3 card with progress bar, duration, shuffle &amp; repeat</string>
+
+    <string name="widget_vinyl_name">Melotune Vinyl Record</string>
+    <string name="widget_vinyl_desc">Unique retro turntable vinyl disc player for your home screen</string>
 </resources>

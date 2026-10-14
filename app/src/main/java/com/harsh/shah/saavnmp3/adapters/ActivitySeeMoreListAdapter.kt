@@ -55,8 +55,16 @@ class ActivitySeeMoreListAdapter : RecyclerView.Adapter<ActivitySeeMoreListAdapt
         coverPlayed.text = String.format("%s | %s", data[position]!!.year, data[position]!!.label)
         val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
-        if (url.isNotEmpty()) {
-            Glide.with(coverImage!!).load(url).into(coverImage)
+        if (coverImage != null) {
+            if (url.isNotEmpty()) {
+                Glide.with(coverImage)
+                    .load(url)
+                    .placeholder(R.drawable.baseline_album_24)
+                    .error(R.drawable.baseline_album_24)
+                    .into(coverImage)
+            } else {
+                coverImage.setImageResource(R.drawable.baseline_album_24)
+            }
         }
 
         holder.itemView.setOnClickListener { view: View? ->

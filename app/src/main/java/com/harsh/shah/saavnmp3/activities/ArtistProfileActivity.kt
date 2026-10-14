@@ -27,6 +27,7 @@ import com.harsh.shah.saavnmp3.records.SongResponse.Lyrics
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
+import com.harsh.shah.saavnmp3.utils.ThemeManager
 import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 import com.bumptech.glide.Glide
 
@@ -35,6 +36,7 @@ class ArtistProfileActivity : AppCompatActivity() {
     var binding: ActivityArtistProfileBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeManager.applyTheme(this)
         super.onCreate(savedInstanceState)
         binding = ActivityArtistProfileBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
@@ -56,12 +58,12 @@ class ArtistProfileActivity : AppCompatActivity() {
 //            if (verticalOffset == 0) {} else {}
         }
 
-        binding!!.topSongsRecyclerview.setLayoutManager(LinearLayoutManager(this))
-        binding!!.topAlbumsRecyclerview.setLayoutManager(LinearLayoutManager(this))
-        binding!!.topSinglesRecyclerview.setLayoutManager(LinearLayoutManager(this))
-        binding!!.topSongsRecyclerview.attachSnapHelper()
-        binding!!.topAlbumsRecyclerview.attachSnapHelper()
-        binding!!.topSinglesRecyclerview.attachSnapHelper()
+        binding!!.topSongsRecyclerview.layoutManager = LinearLayoutManager(this)
+        binding!!.topAlbumsRecyclerview.layoutManager = LinearLayoutManager(this)
+        binding!!.topSinglesRecyclerview.layoutManager = LinearLayoutManager(this)
+        binding!!.topSongsRecyclerview.isNestedScrollingEnabled = false
+        binding!!.topAlbumsRecyclerview.isNestedScrollingEnabled = false
+        binding!!.topSinglesRecyclerview.isNestedScrollingEnabled = false
 
         binding!!.topSongsSeeMore.setOnClickListener { v: View? ->
             startActivity(

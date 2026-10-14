@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Wraps the mini-player card in a FrameLayout so we can overlay
-  a thin progress bar at the very bottom without disrupting the
-  existing horizontal layout.
--->
+<!-- Material 3 Floating Mini Player -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/play_bar_background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/_12sdp"
-    android:layout_marginVertical="@dimen/_8sdp"
+    android:layout_marginHorizontal="@dimen/_10sdp"
+    android:layout_marginBottom="@dimen/_10sdp"
+    android:layout_marginTop="@dimen/_4sdp"
     android:background="@drawable/play_bar_background"
-    android:elevation="@dimen/_24sdp"
+    android:elevation="8dp"
+    android:clipToOutline="true"
     android:visibility="gone"
     tools:visibility="visible">
 
@@ -22,119 +20,136 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="@dimen/_8sdp"
+        android:paddingHorizontal="@dimen/_8sdp"
+        android:paddingTop="@dimen/_7sdp"
+        android:paddingBottom="@dimen/_9sdp"
         android:gravity="center_vertical">
 
+        <!-- Album Art Squircle Card -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="@dimen/_8sdp"
-            app:strokeWidth="0dp">
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            app:cardCornerRadius="@dimen/_10sdp"
+            app:strokeWidth="0dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@android:color/transparent">
 
             <ImageView
                 android:id="@+id/play_bar_cover_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/spotify_dark_green"
+                android:scaleType="centerCrop"
                 android:contentDescription="Mini Player Cover Image" />
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Track Title & Artist -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_4sdp"
             android:layout_weight="1">
 
             <TextView
                 android:id="@+id/play_bar_music_title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
                 android:text="@string/app_name"
                 android:textStyle="bold"
+                android:fontFamily="@font/avenir_next_bold"
                 android:textColor="@color/textMain"
                 android:textSize="@dimen/_12ssp" />
 
             <TextView
                 android:id="@+id/play_bar_music_desc"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:layout_marginTop="1dp"
                 android:text="@string/app_name"
+                android:fontFamily="@font/avenir_next_regular"
                 android:textColor="@color/textSec"
                 android:textSize="@dimen/_10ssp" />
 
         </LinearLayout>
 
+        <!-- Playback Controls -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/play_bar_prev_icon"
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
+                android:layout_width="@dimen/_28sdp"
+                android:layout_height="@dimen/_28sdp"
                 android:focusable="true"
-                android:src="@drawable/skip_previous_24px"
                 android:clickable="true"
+                android:background="?attr/actionBarItemBackground"
+                android:src="@drawable/skip_previous_24px"
                 android:padding="@dimen/_4sdp"
                 android:contentDescription="Previous" />
 
             <ImageView
                 android:id="@+id/play_bar_play_pause_icon"
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
+                android:layout_width="@dimen/_32sdp"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_marginHorizontal="@dimen/_2sdp"
                 android:src="@drawable/play_arrow_24px"
-                android:padding="@dimen/_4sdp"
+                android:padding="@dimen/_5sdp"
                 android:focusable="true"
                 android:clickable="true"
+                android:background="?attr/actionBarItemBackground"
                 android:contentDescription="Play/Pause" />
 
             <ImageView
                 android:id="@+id/play_bar_next_icon"
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
+                android:layout_width="@dimen/_28sdp"
+                android:layout_height="@dimen/_28sdp"
                 android:focusable="true"
-                android:src="@drawable/skip_next_24px"
                 android:clickable="true"
+                android:background="?attr/actionBarItemBackground"
+                android:src="@drawable/skip_next_24px"
                 android:padding="@dimen/_4sdp"
                 android:contentDescription="Next" />
 
             <ImageView
                 android:id="@+id/play_bar_queue_icon"
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
+                android:layout_width="@dimen/_28sdp"
+                android:layout_height="@dimen/_28sdp"
+                android:layout_marginStart="@dimen/_2sdp"
                 android:focusable="true"
-                android:src="@drawable/ic_queue_music"
                 android:clickable="true"
-                android:padding="@dimen/_4sdp"
+                android:background="?attr/actionBarItemBackground"
+                android:src="@drawable/ic_queue_music"
+                android:padding="@dimen/_5sdp"
                 android:contentDescription="Queue" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <!--
-      Thin progress bar pinned to the bottom of the card.
-      Uses a ProgressBar in horizontal style with max=1000
-      for smooth sub-second resolution.
-    -->
+    <!-- Thin Material 3 Progress Bar at the bottom -->
     <ProgressBar
         android:id="@+id/play_bar_progress"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="3dp"
         android:layout_gravity="bottom"
         android:max="1000"
         android:progress="0"
         android:progressBackgroundTint="@android:color/transparent"
-        android:progressTint="@color/textMain"
+        android:progressTint="?attr/colorPrimary"
         android:indeterminate="false" />
 
 </FrameLayout>

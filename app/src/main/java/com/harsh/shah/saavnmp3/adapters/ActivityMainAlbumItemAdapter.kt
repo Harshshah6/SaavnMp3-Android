@@ -48,7 +48,18 @@ class ActivityMainAlbumItemAdapter(private val data: MutableList<AlbumItem?>) :
         holder.itemView.findViewById<View>(R.id.albumSubTitle).isSelected = true
 
         val coverImage = holder.itemView.findViewById<ImageView?>(R.id.coverImage)
-        Glide.with(coverImage!!).load(data[position]!!.albumCover).into(coverImage)
+        val coverUrl = data[position]?.albumCover
+        if (coverImage != null) {
+            if (!coverUrl.isNullOrEmpty()) {
+                Glide.with(coverImage)
+                    .load(coverUrl)
+                    .placeholder(R.drawable.baseline_album_24)
+                    .error(R.drawable.baseline_album_24)
+                    .into(coverImage)
+            } else {
+                coverImage.setImageResource(R.drawable.baseline_album_24)
+            }
+        }
 
         holder.itemView.setOnClickListener { v: View? ->
             v!!.context.startActivity(

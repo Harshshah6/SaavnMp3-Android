@@ -56,6 +56,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import com.harsh.shah.saavnmp3.utils.ThemeManager
 
 class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnection {
     private val TAG = "MusicOverviewActivity"
@@ -152,9 +153,18 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
     // @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeManager.applyTheme(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMusicOverviewBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
+
+        val primaryColor = ThemeManager.getPrimaryColor(this)
+        val onPrimaryColor = ThemeManager.getOnPrimaryColor(this)
+        binding!!.PlayPauseIconBg.setCardBackgroundColor(ColorStateList.valueOf(primaryColor))
+        binding!!.playPauseImage.imageTintList = ColorStateList.valueOf(onPrimaryColor)
+        binding!!.seekbar.progressTintList = ColorStateList.valueOf(primaryColor)
+        binding!!.seekbar.thumbTintList = ColorStateList.valueOf(primaryColor)
+        binding!!.trackQuality.setTextColor(primaryColor)
 
         binding!!.title.isSelected = true
         binding!!.description.isSelected = true
@@ -261,7 +271,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 MusicPlayerManager.togglePlayPause()
 
                 // Update UI based on new state
-                if (MusicPlayerManager.player?.isPlaying == true) {
+                if (MusicPlayerManager.isPlayerPlaying()) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -453,14 +463,13 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
         binding!!.shuffleIcon.setOnClickListener {
             val player = MusicPlayerManager.player
+            val primaryColor = ThemeManager.getPrimaryColor(this)
             if (player != null) {
                 player.shuffleModeEnabled = !player.shuffleModeEnabled
                 if (player.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList =
-                    ColorStateList.valueOf(getResources().getColor(R.color.spotify_green))
+                    ColorStateList.valueOf(primaryColor)
                 else binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(
-                    getResources().getColor(
-                        R.color.textSec
-                    )
+                    resources.getColor(R.color.textSec, null)
                 )
             }
             if (isDebugMode) Toast.makeText(
@@ -488,7 +497,11 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 .inflate(layoutInflater)
             _binding.albumTitle.text = binding!!.title.text.toString()
             _binding.albumSubTitle.text = binding!!.description.text.toString()
-            Glide.with(_binding.coverImage).load(IMAGE_URL).into(_binding.coverImage)
+            Glide.with(_binding.coverImage)
+                .load(IMAGE_URL)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
+                .into(_binding.coverImage)
             val linearLayout = _binding.main
 
             _binding.goToAlbum.setOnClickListener(View.OnClickListener {
@@ -824,7 +837,13 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         IMAGE_URL = if (!image.isNullOrEmpty()) image[image.size - 1]?.url ?: "" else ""
         SHARE_URL = song.url ?: ""
         if (IMAGE_URL!!.isNotEmpty()) {
-            Glide.with(binding!!.coverImage).load(IMAGE_URL).into(binding!!.coverImage)
+            Glide.with(binding!!.coverImage)
+                .load(IMAGE_URL)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
+                .into(binding!!.coverImage)
+        } else {
+            binding!!.coverImage.setImageResource(R.drawable.baseline_album_24)
         }
         val downloadUrls = song.downloadUrl
 
@@ -999,8 +1018,15 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         if (binding!!.description.text.toString() != MusicPlayerManager.MUSIC_DESCRIPTION) {
             binding!!.description.text = MusicPlayerManager.MUSIC_DESCRIPTION
         }
-        Glide.with(binding!!.coverImage).load(MusicPlayerManager.IMAGE_URL)
-            .into(binding!!.coverImage)
+        if (!MusicPlayerManager.IMAGE_URL.isNullOrBlank()) {
+            Glide.with(binding!!.coverImage)
+                .load(MusicPlayerManager.IMAGE_URL)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
+                .into(binding!!.coverImage)
+        } else {
+            binding!!.coverImage.setImageResource(R.drawable.baseline_album_24)
+        }
         val p = MusicPlayerManager.player ?: return
         binding!!.seekbar.progress = ((p.currentPosition.toFloat() / p.duration) * 100).toInt()
 
@@ -1023,8 +1049,9 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         // Update repeat and shuffle button UI
         updateRepeatButtonUI()
 
-        if (p.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(getResources().getColor(R.color.spotify_green))
-        else binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(getResources().getColor(R.color.textSec))
+        val primaryColor = ThemeManager.getPrimaryColor(this)
+        if (p.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(primaryColor)
+        else binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.textSec, null))
 
         mHandler.postDelayed(mUpdateTimeTask, 1000)
     }
@@ -1033,10 +1060,11 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         val tintColor: Int
         val p = MusicPlayerManager.player ?: return
         val repeatMode: Int = p.repeatMode
+        val primaryColor = ThemeManager.getPrimaryColor(this)
 
         when (repeatMode) {
             Player.REPEAT_MODE_ONE -> {
-                tintColor = getResources().getColor(R.color.spotify_green)
+                tintColor = primaryColor
                 try {
                     binding!!.repeatIcon.setImageResource(R.drawable.repeat_one_24px)
                 } catch (e: Exception) {
@@ -1047,17 +1075,17 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
 
             Player.REPEAT_MODE_ALL -> {
-                tintColor = getResources().getColor(R.color.spotify_green)
+                tintColor = primaryColor
                 binding!!.repeatIcon.setImageResource(R.drawable.repeat_24px)
             }
 
             Player.REPEAT_MODE_OFF -> {
-                tintColor = getResources().getColor(R.color.textSec)
+                tintColor = resources.getColor(R.color.textSec, null)
                 binding!!.repeatIcon.setImageResource(R.drawable.repeat_24px)
             }
 
             else -> {
-                tintColor = getResources().getColor(R.color.textSec)
+                tintColor = resources.getColor(R.color.textSec, null)
                 binding!!.repeatIcon.setImageResource(R.drawable.repeat_24px)
             }
         }
@@ -1082,7 +1110,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 updateTrackInfo()
                 updateSeekbar()
 
-                if (MusicPlayerManager.player?.isPlaying == true) {
+                if (MusicPlayerManager.isPlayerPlaying()) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -1110,7 +1138,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 updateTrackInfo()
                 updateSeekbar()
 
-                if (MusicPlayerManager.player?.isPlaying == true) {
+                if (MusicPlayerManager.isPlayerPlaying()) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)

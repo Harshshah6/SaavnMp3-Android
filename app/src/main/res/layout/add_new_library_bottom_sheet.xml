@@ -4,16 +4,18 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bottom_sheet_background"
-    android:paddingVertical="@dimen/_18sdp">
+    android:paddingTop="@dimen/_10sdp"
+    android:paddingBottom="@dimen/_18sdp">
 
+    <!-- Material 3 Drag Handle -->
     <View
         android:id="@+id/bar"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_2sdp"
+        android:layout_width="36dp"
+        android:layout_height="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@color/textSec"/>
+        android:background="@drawable/m3_bottom_sheet_drag_handle"/>
 
     <LinearLayout
         android:id="@+id/main"
@@ -23,29 +25,48 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bar"
-        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_12sdp"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/_12sdp">
+        android:paddingHorizontal="@dimen/_16sdp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Give your playlist a name"
-            android:textSize="@dimen/_14ssp"
-            android:paddingHorizontal="@dimen/_12sdp"
+            android:text="New Playlist"
+            android:fontFamily="@font/avenir_next_bold"
+            android:textColor="@color/textMain"
+            android:textSize="@dimen/_16ssp"
             android:layout_gravity="center"
             android:paddingVertical="@dimen/_4sdp"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Give your playlist a name to start adding songs."
+            android:fontFamily="@font/avenir_next_regular"
+            android:textColor="@color/textSec"
+            android:textSize="@dimen/_10ssp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/_10sdp"/>
+
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/_12sdp">
+            app:boxCornerRadiusTopStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxStrokeColor="@color/buttonBackground"
+            android:layout_marginBottom="@dimen/_14sdp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="My playlist #1"
+                android:hint="Playlist name"
+                android:fontFamily="@font/avenir_next_regular"
+                android:textColor="@color/textMain"
                 android:singleLine="true"/>
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -53,43 +74,29 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:gravity="end"
             android:orientation="horizontal">
 
-            <com.google.android.material.card.MaterialCardView
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancel"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="@dimen/_99sdp">
+                android:textColor="@color/textSec"
+                android:fontFamily="@font/avenir_next_bold"
+                android:text="Cancel"/>
 
-                <Button
-                    android:id="@+id/cancel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:textColor="@color/textMain"
-                    android:textStyle="bold"
-                    android:text="Cancel"/>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/create"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="@dimen/_99sdp"
-                android:layout_marginStart="@dimen/_12sdp">
-
-                <Button
-                    android:id="@+id/create"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/spotify_green"
-                    android:textColor="@color/spotify_black"
-                    android:textStyle="bold"
-                    android:text="Create"/>
-
-            </com.google.android.material.card.MaterialCardView>
+                app:backgroundTint="@color/buttonBackground"
+                android:textColor="@color/background"
+                android:fontFamily="@font/avenir_next_bold"
+                app:cornerRadius="999dp"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:text="Create"/>
 
         </LinearLayout>
 

@@ -7,8 +7,9 @@
     android:layout_height="match_parent"
     tools:context=".activities.SavedLibrariesActivity"
     android:fitsSystemWindows="true"
-    android:background="@color/background">
+    android:background="?attr/colorSurface">
 
+    <!-- Material 3 Toolbar -->
     <LinearLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -18,59 +19,78 @@
         app:layout_constraintTop_toTopOf="parent"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="@dimen/_8sdp">
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_8sdp">
 
         <ImageView
-            android:layout_width="@dimen/_35sdp"
-            android:layout_height="@dimen/_35sdp"
-            android:padding="@dimen/_4sdp"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_6sdp"
             android:onClick="backPress"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
             android:src="@drawable/round_arrow_back_24"
+            app:tint="@color/textMain"
+            android:contentDescription="Back"
             tools:ignore="UsingOnClickInXml" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_8sdp"
+            android:layout_marginStart="@dimen/_8sdp"
             android:text="Your Library"
-            android:textSize="@dimen/_16ssp"
-            android:textStyle="bold"
+            android:fontFamily="@font/avenir_next_bold"
+            android:textColor="@color/textMain"
+            android:textSize="@dimen/_18ssp"
             android:layout_weight="1" />
 
         <ImageView
-            android:contentDescription="import library"
+            android:contentDescription="Import library"
             android:id="@+id/importLibrary"
-            android:layout_width="@dimen/_35sdp"
-            android:layout_height="@dimen/_35sdp"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
             android:src="@drawable/ic_import"
-            android:padding="@dimen/_4sdp"
+            android:padding="@dimen/_6sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
+            app:tint="@color/textMain"
             tools:ignore="HardcodedText" />
 
         <ImageView
-            android:contentDescription="export library"
+            android:contentDescription="Export library"
             android:id="@+id/exportLibrary"
-            android:layout_width="@dimen/_35sdp"
-            android:layout_height="@dimen/_35sdp"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
             android:src="@drawable/ic_export"
-            android:padding="@dimen/_4sdp"
+            android:padding="@dimen/_6sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
+            app:tint="@color/textMain"
             tools:ignore="HardcodedText" />
 
         <ImageView
-            android:contentDescription="add new library"
+            android:contentDescription="Add new library"
             android:id="@+id/addNewLibrary"
-            android:layout_width="@dimen/_35sdp"
-            android:layout_height="@dimen/_35sdp"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
             android:src="@drawable/round_add_24"
-            android:padding="@dimen/_4sdp"
+            android:padding="@dimen/_6sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
+            app:tint="@color/green"
             tools:ignore="HardcodedText" />
 
     </LinearLayout>
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/divider"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/textSec"
+        android:layout_height="0.6dp"
+        app:dividerColor="@color/dividerBackground"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -85,25 +105,62 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/mini_player"
-        app:layout_constraintVertical_weight="1"
         tools:listitem="@layout/activity_list_song_item"
-        android:layout_marginTop="@dimen/_4sdp" />
+        android:paddingVertical="@dimen/_6sdp" />
 
-    <TextView
+    <!-- Empty State View -->
+    <LinearLayout
         android:id="@+id/empty_list_tv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:text=":( No saved items found.\nClick on + to add new"
         android:gravity="center"
-        android:textStyle="bold"
-        android:textColor="@color/textSec"
+        android:orientation="vertical"
+        android:padding="@dimen/_24sdp"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/divider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/mini_player"
-        android:textSize="@dimen/_18ssp" />
+        app:layout_constraintBottom_toTopOf="@+id/mini_player">
 
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="@dimen/_60sdp"
+            android:layout_height="@dimen/_60sdp"
+            app:cardCornerRadius="999dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/surfaceContainerHighest">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/_14sdp"
+                android:src="@drawable/baseline_library_music_24"
+                app:tint="@color/textSec" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_14sdp"
+            android:text="No playlists found"
+            android:fontFamily="@font/avenir_next_bold"
+            android:textColor="@color/textMain"
+            android:textSize="@dimen/_15ssp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:text="Tap + at the top right to create your first playlist or import an existing library."
+            android:gravity="center"
+            android:fontFamily="@font/avenir_next_regular"
+            android:textColor="@color/textSec"
+            android:textSize="@dimen/_11ssp" />
+
+    </LinearLayout>
+
+    <!-- Floating Mini Player -->
     <include
         android:id="@+id/mini_player"
         layout="@layout/layout_mini_player"

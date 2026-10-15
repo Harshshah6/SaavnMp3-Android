@@ -16,6 +16,10 @@ import com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch.OnCheckChan
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.ThemeManager
 import androidx.core.content.edit
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.harsh.shah.saavnmp3.databinding.SleepTimerBottomSheetBinding
+import com.harsh.shah.saavnmp3.utils.SleepTimerManager
+import android.widget.Toast
 
 class SettingsActivity : AppCompatActivity() {
     var binding: ActivitySettingsBinding? = null
@@ -62,6 +66,20 @@ class SettingsActivity : AppCompatActivity() {
                 settingsSharedPrefManager.playInBackground = isChecked
             }
         })
+
+        // Autoplay Recommendations Switch
+        binding!!.autoplaySwitch?.setChecked(sharedPreferenceManager.isAutoplayEnabled)
+        binding!!.autoplaySwitch?.setOnCheckChangeListener(object : OnCheckChangeListener {
+            override fun onCheckChanged(isChecked: Boolean) {
+                sharedPreferenceManager.isAutoplayEnabled = isChecked
+            }
+        })
+
+        // Sleep Timer Launcher
+        updateSleepTimerText()
+        binding!!.sleepTimerSetting?.setOnClickListener {
+            showSleepTimerBottomSheet()
+        }
 
         // Theme Mode (System, Dark, Light)
         val themeCheckedId = if (settingsSharedPrefManager.theme == "dark") R.id.dark
@@ -140,8 +158,89 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateSleepTimerText() {
+        if (SleepTimerManager.isTimerActive) {
+            binding!!.sleepTimerStatusText?.text = "Timer active: ${SleepTimerManager.getFormattedRemainingTime()} remaining"
+        } else {
+            binding!!.sleepTimerStatusText?.text = "Automatically stop music when you fall asleep."
+        }
+    }
+
+    private fun showSleepTimerBottomSheet() {
+        val bottomSheet = BottomSheetDialog(this, R.style.MyBottomSheetDialogTheme)
+        val sheetBinding = SleepTimerBottomSheetBinding.inflate(layoutInflater)
+        bottomSheet.setContentView(sheetBinding.root)
+
+        fun refreshTimerUI() {
+            if (SleepTimerManager.isTimerActive) {
+                sheetBinding.activeTimerCard.visibility = View.VISIBLE
+                sheetBinding.remainingTimeText.text = SleepTimerManager.getFormattedRemainingTime()
+            } else {
+                sheetBinding.activeTimerCard.visibility = View.GONE
+            }
+            updateSleepTimerText()
+        }
+
+        refreshTimerUI()
+
+        val timerListener = object : SleepTimerManager.SleepTimerListener {
+            override fun onTimerTick(remainingSeconds: Long) {
+                sheetBinding.remainingTimeText.text = SleepTimerManager.getFormattedRemainingTime()
+                updateSleepTimerText()
+            }
+
+            override fun onTimerFinished() {
+                refreshTimerUI()
+            }
+
+            override fun onTimerCancelled() {
+                refreshTimerUI()
+            }
+        }
+
+        SleepTimerManager.addListener(timerListener)
+        bottomSheet.setOnDismissListener {
+            SleepTimerManager.removeListener(timerListener)
+        }
+
+        sheetBinding.timerOption15.setOnClickListener {
+            SleepTimerManager.startTimer(15)
+            refreshTimerUI()
+        }
+        sheetBinding.timerOption30.setOnClickListener {
+            SleepTimerManager.startTimer(30)
+            refreshTimerUI()
+        }
+        sheetBinding.timerOption45.setOnClickListener {
+            SleepTimerManager.startTimer(45)
+            refreshTimerUI()
+        }
+        sheetBinding.timerOption60.setOnClickListener {
+            SleepTimerManager.startTimer(60)
+            refreshTimerUI()
+        }
+        sheetBinding.timerOptionEndOfTrack.setOnClickListener {
+            SleepTimerManager.startEndOfTrackTimer()
+            refreshTimerUI()
+        }
+
+        sheetBinding.btnAdd5.setOnClickListener {
+            SleepTimerManager.addMinutes(5)
+            refreshTimerUI()
+        }
+
+        sheetBinding.btnCancelTimer.setOnClickListener {
+            SleepTimerManager.cancelTimer()
+            refreshTimerUI()
+            Toast.makeText(this, "Sleep timer turned off", Toast.LENGTH_SHORT).show()
+        }
+
+        bottomSheet.show()
+    }
+
     override fun onResume() {
         super.onResume()
+        updateSleepTimerText()
         MiniPlayerHelper.onActivityResume(this)
     }
 

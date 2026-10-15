@@ -115,6 +115,34 @@
             app:title="Download song"
             android:src="@drawable/baseline_download_for_offline_24"/>
 
+        <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
+            android:id="@+id/recommendations"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Similar songs &amp; recommendations"
+            android:src="@drawable/ic_recommendation"/>
+
+        <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
+            android:id="@+id/sleep_timer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Sleep timer"
+            android:src="@drawable/ic_sleep_timer"/>
+
+        <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
+            android:id="@+id/playback_speed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Playback speed"
+            android:src="@drawable/ic_speed"/>
+
+        <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
+            android:id="@+id/equalizer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Equalizer"
+            android:src="@drawable/ic_equalizer"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

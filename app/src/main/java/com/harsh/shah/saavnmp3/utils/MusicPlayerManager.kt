@@ -443,10 +443,63 @@ object MusicPlayerManager {
                     SONG_URL = getDownloadUrl(firstSong.downloadUrl)
                     setMusicDetails(IMAGE_URL, MUSIC_TITLE, MUSIC_DESCRIPTION, MUSIC_ID)
                     prepareMediaPlayer()
+
+                    // Record to recently played history
+                    val primaryArtist = firstSong.artists?.primary?.firstOrNull()
+                    val artistsStr = firstSong.artists?.all?.joinToString(", ") { it?.name() ?: "" } ?: ""
+                    sharedPreferenceManager?.addRecentlyPlayed(
+                        com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library.Songs(
+                            firstSong.id,
+                            firstSong.name(),
+                            artistsStr,
+                            IMAGE_URL
+                        ),
+                        artistId = primaryArtist?.id,
+                        artistName = primaryArtist?.name()
+                    )
                 }
             }
             override fun onErrorResponse(tag: String?, message: String?) {}
         })
+    }
+
+    private var isFetchingAutoplay = false
+
+    private fun fetchAndAppendAutoplayRecommendations(currentSong: SongResponse.Song) {
+        if (isFetchingAutoplay) return
+        isFetchingAutoplay = true
+        val ctx = appContext ?: BaseApplicationClass.currentActivity ?: return
+
+        RecommendationManager.getRecommendationsForSong(ctx, currentSong, limit = 10) { recommendedSongs ->
+            isFetchingAutoplay = false
+            if (recommendedSongs.isNotEmpty()) {
+                val queue = trackQueue ?: ArrayList()
+                val newIds = recommendedSongs.mapNotNull { it.id }.filter { !queue.contains(it) }
+                if (newIds.isNotEmpty()) {
+                    queue.addAll(newIds)
+                    trackQueue = queue
+                    track_position++
+                    if (track_position < queue.size) {
+                        MUSIC_ID = queue[track_position]
+                        playTrack()
+                        showNotification()
+                        updateWidget()
+                        val act = BaseApplicationClass.currentActivity
+                        if (act != null) {
+                            android.widget.Toast.makeText(act, "Autoplay: Playing recommended tracks", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun setPlaybackSpeed(speed: Float) {
+        player?.playbackParameters = androidx.media3.common.PlaybackParameters(speed)
+    }
+
+    fun getPlaybackSpeed(): Float {
+        return player?.playbackParameters?.speed ?: 1.0f
     }
 
     fun nextTrack() {
@@ -458,7 +511,18 @@ object MusicPlayerManager {
             when (p.repeatMode) {
                 Player.REPEAT_MODE_ONE -> { p.seekTo(0); p.play(); return }
                 Player.REPEAT_MODE_ALL -> { track_position = 0 }
-                else -> { return }
+                else -> {
+                    // Check Autoplay Recommended Music
+                    val prefs = sharedPreferenceManager ?: appContext?.let { SharedPreferenceManager.getInstance(it) }
+                    if (prefs?.isAutoplayEnabled == true && CURRENT_TRACK?.data?.isNotEmpty() == true) {
+                        val currentSong = CURRENT_TRACK!!.data!![0]
+                        if (currentSong != null) {
+                            fetchAndAppendAutoplayRecommendations(currentSong)
+                            return
+                        }
+                    }
+                    return
+                }
             }
         } else {
             if (p.shuffleModeEnabled && trackQueue!!.size > 1) {

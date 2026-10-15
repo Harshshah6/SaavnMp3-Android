@@ -53,6 +53,30 @@
             android:contentDescription="Lyrics" />
 
         <ImageView
+            android:id="@+id/recommendation_icon"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_7sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
+            android:src="@drawable/ic_recommendation"
+            app:tint="@color/textMain"
+            android:contentDescription="Similar Tracks" />
+
+        <ImageView
+            android:id="@+id/favorite_icon"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_7sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
+            android:src="@drawable/favorite_outline_24px"
+            app:tint="@color/textMain"
+            android:contentDescription="Favorite" />
+
+        <ImageView
             android:id="@+id/share_icon"
             android:layout_width="@dimen/_34sdp"
             android:layout_height="@dimen/_34sdp"

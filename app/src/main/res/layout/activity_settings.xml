@@ -319,6 +319,68 @@
                         app:textOff="Filter out tracks marked with explicit (18+) label."
                         app:textOn="Explicit content is playable and listed." />
 
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/autoplay_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Autoplay Similar Tracks"
+                        app:textOff="Playback stops when current queue finishes."
+                        app:textOn="Keep the music going! Automatically plays recommendations when queue ends." />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        app:dividerColor="?attr/colorOutlineVariant"
+                        android:layout_marginVertical="@dimen/_4sdp"
+                        android:layout_marginHorizontal="@dimen/_12sdp" />
+
+                    <LinearLayout
+                        android:id="@+id/sleep_timer_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/_14sdp"
+                        android:paddingVertical="@dimen/_10sdp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sleep Timer"
+                                android:fontFamily="@font/avenir_next_bold"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/_13ssp" />
+
+                            <TextView
+                                android:id="@+id/sleep_timer_status_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Automatically stop music when you fall asleep."
+                                android:fontFamily="@font/avenir_next_regular"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="@dimen/_10ssp"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:src="@drawable/ic_sleep_timer"
+                            app:tint="?attr/colorPrimary"
+                            android:contentDescription="Sleep Timer" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>

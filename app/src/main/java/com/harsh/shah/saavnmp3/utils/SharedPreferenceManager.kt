@@ -322,6 +322,132 @@ class SharedPreferenceManager private constructor(context: Context) {
         )
     }
 
+    // ---------- Liked Songs ----------
+    fun getLikedSongs(): MutableList<SavedLibraries.Library.Songs> {
+        val json = getJson(KEY_LIKED_SONGS)
+        if (json.isNullOrEmpty()) return ArrayList()
+        return try {
+            val type = object : com.google.gson.reflect.TypeToken<MutableList<SavedLibraries.Library.Songs>>() {}.type
+            gson.fromJson(json, type) ?: ArrayList()
+        } catch (e: Exception) {
+            ArrayList()
+        }
+    }
+
+    fun isSongLiked(id: String?): Boolean {
+        if (id.isNullOrEmpty()) return false
+        val list = getLikedSongs()
+        return list.any { it.id == id }
+    }
+
+    fun toggleLikedSong(song: SavedLibraries.Library.Songs): Boolean {
+        if (song.id.isNullOrEmpty()) return false
+        val list = getLikedSongs()
+        val index = list.indexOfFirst { it.id == song.id }
+        val nowLiked: Boolean
+        if (index >= 0) {
+            list.removeAt(index)
+            nowLiked = false
+        } else {
+            list.add(0, song)
+            nowLiked = true
+        }
+        putJson(KEY_LIKED_SONGS, gson.toJson(list))
+        syncLikedSongsToLibrary(list)
+        return nowLiked
+    }
+
+    private fun syncLikedSongsToLibrary(likedSongs: List<SavedLibraries.Library.Songs>) {
+        val savedLibraries = this.savedLibrariesData ?: SavedLibraries(ArrayList())
+        val lists = savedLibraries.lists ?: ArrayList()
+        val likedLibId = "user_liked_songs_library"
+        val existingIndex = lists.indexOfFirst { it?.id == likedLibId }
+
+        val coverImage = likedSongs.firstOrNull()?.image ?: ""
+        val likedLibrary = SavedLibraries.Library(
+            id = likedLibId,
+            isCreatedByUser = true,
+            isAlbum = false,
+            name = "Liked Songs",
+            image = coverImage,
+            description = "${likedSongs.size} songs",
+            songs = likedSongs.toMutableList()
+        )
+
+        if (existingIndex >= 0) {
+            lists[existingIndex] = likedLibrary
+        } else if (likedSongs.isNotEmpty()) {
+            lists.add(0, likedLibrary)
+        }
+        this.savedLibrariesData = savedLibraries
+        setSavedLibraryDataById(likedLibId, likedLibrary)
+    }
+
+    // ---------- Recently Played ----------
+    fun getRecentlyPlayed(): MutableList<SavedLibraries.Library.Songs> {
+        val json = getJson(KEY_RECENTLY_PLAYED)
+        if (json.isNullOrEmpty()) return ArrayList()
+        return try {
+            val type = object : com.google.gson.reflect.TypeToken<MutableList<SavedLibraries.Library.Songs>>() {}.type
+            gson.fromJson(json, type) ?: ArrayList()
+        } catch (e: Exception) {
+            ArrayList()
+        }
+    }
+
+    fun addRecentlyPlayed(
+        song: SavedLibraries.Library.Songs,
+        artistId: String? = null,
+        artistName: String? = null
+    ) {
+        if (song.id.isNullOrEmpty()) return
+        val list = getRecentlyPlayed()
+        list.removeAll { it.id == song.id }
+        list.add(0, song)
+        val cappedList = if (list.size > 30) list.take(30).toMutableList() else list
+        putJson(KEY_RECENTLY_PLAYED, gson.toJson(cappedList))
+
+        if (!artistId.isNullOrEmpty()) lastPlayedArtistId = artistId
+        if (!artistName.isNullOrEmpty()) lastPlayedArtistName = artistName
+    }
+
+    // ---------- Autoplay & Recommendations Preferences ----------
+    var isAutoplayEnabled: Boolean
+        get() {
+            val json = getJson(KEY_AUTOPLAY)
+            if (json.isNullOrEmpty()) return true
+            return try {
+                gson.fromJson(json, Boolean::class.java)
+            } catch (e: Exception) {
+                true
+            }
+        }
+        set(value) {
+            putJson(KEY_AUTOPLAY, gson.toJson(value))
+        }
+
+    var lastPlayedArtistId: String?
+        get() {
+            val json = getJson(KEY_LAST_ARTIST_ID)
+            return if (json.isNullOrEmpty()) null else try {
+                gson.fromJson(json, String::class.java)
+            } catch (e: Exception) { null }
+        }
+        set(value) {
+            putJson(KEY_LAST_ARTIST_ID, gson.toJson(value))
+        }
+
+    var lastPlayedArtistName: String?
+        get() {
+            val json = getJson(KEY_LAST_ARTIST_NAME)
+            return if (json.isNullOrEmpty()) null else try {
+                gson.fromJson(json, String::class.java)
+            } catch (e: Exception) { null }
+        }
+        set(value) {
+            putJson(KEY_LAST_ARTIST_NAME, gson.toJson(value))
+        }
+
     // ---------- Migration helpers for one-time migration ----------
     /**
      * Migrate all entries from the old SharedPreferences named "cache" into Room.
@@ -369,6 +495,12 @@ class SharedPreferenceManager private constructor(context: Context) {
 
         // old SharedPreferences name used by your previous manager
         private const val OLD_PREFS_NAME = "cache"
+
+        private const val KEY_LIKED_SONGS = "user_liked_songs"
+        private const val KEY_RECENTLY_PLAYED = "user_recently_played_songs"
+        private const val KEY_AUTOPLAY = "autoplay_recommendations"
+        private const val KEY_LAST_ARTIST_ID = "last_played_artist_id"
+        private const val KEY_LAST_ARTIST_NAME = "last_played_artist_name"
 
         fun getInstance(context: Context): SharedPreferenceManager {
             if (instance == null) instance = SharedPreferenceManager(context)

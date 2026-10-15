@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_background"
+    android:paddingTop="@dimen/_10sdp"
+    android:paddingBottom="@dimen/_16sdp">
+
+    <!-- Material 3 Drag Handle -->
+    <View
+        android:id="@+id/drag_handle"
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:background="@drawable/m3_bottom_sheet_drag_handle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Header Section -->
+    <LinearLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/_14sdp"
+        app:layout_constraintTop_toBottomOf="@id/drag_handle">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/_16sdp"
+                    android:layout_height="@dimen/_16sdp"
+                    android:layout_marginEnd="@dimen/_6sdp"
+                    android:src="@drawable/ic_recommendation"
+                    app:tint="?attr/colorPrimary"
+                    android:contentDescription="Recommendations" />
+
+                <TextView
+                    android:id="@+id/rec_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/avenir_next_bold"
+                    android:text="Recommended Tracks"
+                    android:textColor="@color/textMain"
+                    android:textSize="@dimen/_14ssp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/rec_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/avenir_next_regular"
+                android:maxLines="1"
+                android:text="Similar songs you might love"
+                android:textColor="@color/textSec"
+                android:textSize="@dimen/_10ssp" />
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/play_all_btn"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_32sdp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingHorizontal="@dimen/_12sdp"
+            android:text="Play All"
+            android:textSize="@dimen/_10ssp"
+            android:visibility="gone"
+            app:cornerRadius="999dp"
+            app:icon="@drawable/play_arrow_24px"
+            app:iconSize="@dimen/_14sdp" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loading_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_24sdp"
+        android:layout_marginBottom="@dimen/_24sdp"
+        android:indeterminateTint="?attr/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_layout" />
+
+    <TextView
+        android:id="@+id/empty_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginBottom="@dimen/_20sdp"
+        android:fontFamily="@font/avenir_next_regular"
+        android:gravity="center"
+        android:text="No recommendations found for this track."
+        android:textColor="@color/textSec"
+        android:textSize="@dimen/_11ssp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_layout" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rec_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_260sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="@dimen/_8sdp"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_layout"
+        tools:listitem="@layout/activity_list_song_item" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

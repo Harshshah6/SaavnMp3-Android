@@ -130,15 +130,137 @@
                 android:layout_height="match_parent"
                 android:paddingBottom="@dimen/_24sdp">
 
+                <!-- Recently Played Section -->
+                <LinearLayout
+                    android:id="@+id/recently_played_section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/_12sdp"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="@dimen/_12sdp"
+                        android:layout_marginBottom="@dimen/_8sdp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/avenir_next_bold"
+                            android:includeFontPadding="false"
+                            android:text="Recently Played"
+                            android:textColor="@color/textMain"
+                            android:textSize="@dimen/_16ssp" />
+
+                        <ImageView
+                            android:layout_width="@dimen/_18sdp"
+                            android:layout_height="@dimen/_18sdp"
+                            android:src="@drawable/ic_history"
+                            app:tint="@color/textSec"
+                            android:contentDescription="Recently Played" />
+
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recently_played_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="@dimen/_8sdp"
+                        android:scrollbars="none"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="5"
+                        tools:listitem="@layout/activity_main_songs_item" />
+
+                </LinearLayout>
+
+                <!-- Recommended For You Section -->
+                <LinearLayout
+                    android:id="@+id/recommended_for_you_section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_14sdp"
+                    android:orientation="vertical"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/recently_played_section">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/_12sdp"
+                        android:layout_marginBottom="@dimen/_8sdp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/recommended_section_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/avenir_next_bold"
+                                android:includeFontPadding="false"
+                                android:text="Recommended For You"
+                                android:textColor="@color/textMain"
+                                android:textSize="@dimen/_16ssp" />
+
+                            <ImageView
+                                android:layout_width="@dimen/_18sdp"
+                                android:layout_height="@dimen/_18sdp"
+                                android:src="@drawable/ic_recommendation"
+                                app:tint="?attr/colorPrimary"
+                                android:contentDescription="Recommendations" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/recommended_section_subtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:includeFontPadding="false"
+                            android:text="Based on your recent listening"
+                            android:textColor="@color/textSec"
+                            android:textSize="@dimen/_10ssp" />
+
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recommended_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="@dimen/_8sdp"
+                        android:scrollbars="none"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="5"
+                        tools:listitem="@layout/activity_main_songs_item" />
+
+                </LinearLayout>
+
                 <!-- Popular Songs Section -->
                 <LinearLayout
                     android:id="@+id/__popular_songs_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_14sdp"
                     android:orientation="vertical"
-                    android:paddingTop="@dimen/_12sdp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toBottomOf="@id/recommended_for_you_section">
 
                     <TextView
                         android:layout_width="wrap_content"

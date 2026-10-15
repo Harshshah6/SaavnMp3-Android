@@ -141,12 +141,41 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
+        binding!!.recentlyPlayedRecyclerView?.setLayoutManager(
+            LinearLayoutManager(
+                this,
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+        )
+        binding!!.recommendedRecyclerView?.setLayoutManager(
+            LinearLayoutManager(
+                this,
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+        )
+
         // Snap helpers — smooth magnetic scroll on all horizontal lists
+        binding!!.recentlyPlayedRecyclerView?.attachSnapHelper()
+        binding!!.recommendedRecyclerView?.attachSnapHelper()
         binding!!.popularSongsRecyclerView.attachSnapHelper()
         binding!!.popularArtistsRecyclerView.attachSnapHelper()
         binding!!.popularAlbumsRecyclerView.attachSnapHelper()
         binding!!.savedRecyclerView.attachSnapHelper()
 
+        binding!!.recentlyPlayedRecyclerView?.let {
+            OverScrollDecoratorHelper.setUpOverScroll(
+                it,
+                OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL
+            )
+        }
+        binding!!.recommendedRecyclerView?.let {
+            OverScrollDecoratorHelper.setUpOverScroll(
+                it,
+                OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL
+            )
+        }
         OverScrollDecoratorHelper.setUpOverScroll(
             binding!!.popularSongsRecyclerView,
             OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL
@@ -286,6 +315,8 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         NetworkChangeReceiver.registerReceiver(this, networkChangeReceiver)
         showSavedLibrariesData()
+        showRecentlyPlayedData()
+        showRecommendedData()
         MiniPlayerHelper.onActivityResume(this)
         val config = ThemeManager.getThemeConfig(this)
         if (currentThemeConfig != null && currentThemeConfig != config) {
@@ -315,6 +346,8 @@ class MainActivity : AppCompatActivity() {
         artists.clear()
         albums.clear()
         playlists.clear()
+        showRecentlyPlayedData()
+        showRecommendedData()
 
         val songSeeds = listOf("2025","2026","Hits", "Latest", "Romantic", "Chill", "Lo-Fi", "Dance", "Hindi", "Sad", "Love", "Workout", " ")
         val artistSeeds = listOf("2025","2026", " ")
@@ -524,6 +557,7 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }
+        binding!!.recommendedRecyclerView?.setAdapter(ActivityMainAlbumItemAdapter(dataShimmer))
         binding!!.popularSongsRecyclerView.setAdapter(ActivityMainAlbumItemAdapter(dataShimmer))
         binding!!.popularAlbumsRecyclerView.setAdapter(ActivityMainAlbumItemAdapter(dataShimmer))
         binding!!.popularArtistsRecyclerView.setAdapter(
@@ -532,6 +566,34 @@ class MainActivity : AppCompatActivity() {
             )
         )
         binding!!.playlistRecyclerView.setAdapter(ActivityMainPlaylistAdapter(dataShimmer))
+    }
+
+    private fun showRecentlyPlayedData() {
+        val prefs = SharedPreferenceManager.getInstance(this)
+        val recentList = prefs.getRecentlyPlayed()
+        if (recentList.isEmpty()) {
+            binding?.recentlyPlayedSection?.visibility = View.GONE
+        } else {
+            binding?.recentlyPlayedSection?.visibility = View.VISIBLE
+            val items = recentList.map { song ->
+                AlbumItem(song.title ?: "", song.description ?: "", song.image ?: "", song.id)
+            }
+            binding?.recentlyPlayedRecyclerView?.adapter = ActivityMainPopularSongs(items.toMutableList())
+        }
+    }
+
+    private fun showRecommendedData() {
+        com.harsh.shah.saavnmp3.utils.RecommendationManager.getHomePersonalizedRecommendations(this) { title, subtitle, items ->
+            if (isFinishing || isDestroyed) return@getHomePersonalizedRecommendations
+            if (items.isNotEmpty()) {
+                binding?.recommendedForYouSection?.visibility = View.VISIBLE
+                binding?.recommendedSectionTitle?.text = title
+                binding?.recommendedSectionSubtitle?.text = subtitle
+                binding?.recommendedRecyclerView?.adapter = ActivityMainPopularSongs(items.toMutableList())
+            } else {
+                binding?.recommendedForYouSection?.visibility = View.GONE
+            }
+        }
     }
 
     private fun showOfflineData() {

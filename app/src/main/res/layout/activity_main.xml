@@ -6,63 +6,103 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/background"
+    android:background="?attr/colorSurface"
     tools:context=".activities.MainActivity">
 
+    <!-- Material 3 Top App Bar -->
     <LinearLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="@dimen/_8sdp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/_12sdp"
-        android:paddingVertical="@dimen/_12sdp"
-        app:layout_constraintBottom_toTopOf="@+id/refreshLayout"
+        android:paddingHorizontal="@dimen/_14sdp"
+        android:paddingVertical="@dimen/_10sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- Navigation Drawer Trigger -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="@dimen/_25sdp"
-            android:layout_height="@dimen/_25sdp"
+            android:layout_width="@dimen/_32sdp"
+            android:layout_height="@dimen/_32sdp"
             app:cardCornerRadius="999dp"
             app:strokeWidth="0dp"
-            app:cardBackgroundColor="@android:color/transparent">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/surfaceContainer">
 
             <ImageView
                 android:id="@+id/profile_icon"
-                android:layout_width="@dimen/_25sdp"
-                android:layout_height="28dp"
-                android:padding="@dimen/_2sdp"
-                android:src="@drawable/round_menu_24" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/_6sdp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/round_menu_24"
+                app:tint="@color/textMain"
+                android:contentDescription="Navigation Menu" />
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <!-- App Branding -->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_12sdp"
-            android:fontFamily="@font/avenir_next_bold"
-            android:includeFontPadding="false"
-            android:text="@string/app_name"
-            android:textColor="@color/textMain"
-            android:textSize="@dimen/_14ssp"
-            android:layout_weight="1" />
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="@dimen/_20ssp"
-            android:layout_height="@dimen/_20sdp"
-            android:src="@drawable/search_24px"
-            android:contentDescription="@android:string/search_go"
-            android:onClick="openSearch"
-            tools:ignore="UsingOnClickInXml" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/avenir_next_bold"
+                android:includeFontPadding="false"
+                android:text="@string/app_name"
+                android:textColor="@color/textMain"
+                android:textSize="@dimen/_16ssp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/avenir_next_regular"
+                android:includeFontPadding="false"
+                android:text="Discover Music"
+                android:textColor="@color/textSec"
+                android:textSize="@dimen/_9ssp" />
+
+        </LinearLayout>
+
+        <!-- Search Button -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="@dimen/_32sdp"
+            android:layout_height="@dimen/_32sdp"
+            app:cardCornerRadius="999dp"
+            app:strokeWidth="0dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/surfaceContainer">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/search_24px"
+                android:padding="@dimen/_6sdp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@android:string/search_go"
+                android:onClick="openSearch"
+                app:tint="@color/textMain"
+                tools:ignore="UsingOnClickInXml" />
+
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/__divider"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
+        android:layout_height="0.6dp"
+        app:dividerColor="@color/dividerBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
@@ -72,7 +112,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/mini_player"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/__divider">
@@ -80,7 +120,7 @@
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:fillViewport="true"
             android:overScrollMode="never"
             android:scrollbars="none">
@@ -88,19 +128,145 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="12dp">
+                android:paddingBottom="@dimen/_24sdp">
 
+                <!-- Recently Played Section -->
+                <LinearLayout
+                    android:id="@+id/recently_played_section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/_12sdp"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="@dimen/_12sdp"
+                        android:layout_marginBottom="@dimen/_8sdp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/avenir_next_bold"
+                            android:includeFontPadding="false"
+                            android:text="Recently Played"
+                            android:textColor="@color/textMain"
+                            android:textSize="@dimen/_16ssp" />
+
+                        <ImageView
+                            android:layout_width="@dimen/_18sdp"
+                            android:layout_height="@dimen/_18sdp"
+                            android:src="@drawable/ic_history"
+                            app:tint="@color/textSec"
+                            android:contentDescription="Recently Played" />
+
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recently_played_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="@dimen/_8sdp"
+                        android:scrollbars="none"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="5"
+                        tools:listitem="@layout/activity_main_songs_item" />
+
+                </LinearLayout>
+
+                <!-- Recommended For You Section -->
+                <LinearLayout
+                    android:id="@+id/recommended_for_you_section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_14sdp"
+                    android:orientation="vertical"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/recently_played_section">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/_12sdp"
+                        android:layout_marginBottom="@dimen/_8sdp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/recommended_section_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/avenir_next_bold"
+                                android:includeFontPadding="false"
+                                android:text="Recommended For You"
+                                android:textColor="@color/textMain"
+                                android:textSize="@dimen/_16ssp" />
+
+                            <ImageView
+                                android:layout_width="@dimen/_18sdp"
+                                android:layout_height="@dimen/_18sdp"
+                                android:src="@drawable/ic_recommendation"
+                                app:tint="?attr/colorPrimary"
+                                android:contentDescription="Recommendations" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/recommended_section_subtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:includeFontPadding="false"
+                            android:text="Based on your recent listening"
+                            android:textColor="@color/textSec"
+                            android:textSize="@dimen/_10ssp" />
+
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recommended_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="@dimen/_8sdp"
+                        android:scrollbars="none"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="5"
+                        tools:listitem="@layout/activity_main_songs_item" />
+
+                </LinearLayout>
+
+                <!-- Popular Songs Section -->
                 <LinearLayout
                     android:id="@+id/__popular_songs_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_14sdp"
                     android:orientation="vertical"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toBottomOf="@id/recommended_for_you_section">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_12sdp"
+                        android:layout_marginBottom="@dimen/_8sdp"
                         android:fontFamily="@font/avenir_next_bold"
                         android:includeFontPadding="false"
                         android:text="Popular Songs"
@@ -109,22 +275,24 @@
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/popular_songs_recycler_view"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="@dimen/_8sdp"
                         android:scrollbars="none"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:itemCount="10"
+                        tools:itemCount="5"
                         tools:listitem="@layout/activity_main_songs_item" />
-
 
                 </LinearLayout>
 
+                <!-- Popular Artists Section -->
                 <LinearLayout
                     android:id="@+id/__popular_artists_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_8sdp"
+                    android:layout_marginTop="@dimen/_14sdp"
                     android:orientation="vertical"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/__popular_songs_section">
@@ -132,31 +300,34 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_12sdp"
+                        android:layout_marginBottom="@dimen/_8sdp"
                         android:fontFamily="@font/avenir_next_bold"
                         android:includeFontPadding="false"
-                        android:text="Popular artists"
+                        android:text="Popular Artists"
                         android:textColor="@color/textMain"
                         android:textSize="@dimen/_16ssp" />
 
-
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/popular_artists_recycler_view"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="@dimen/_8sdp"
                         android:scrollbars="none"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:itemCount="10"
+                        tools:itemCount="5"
                         tools:listitem="@layout/activity_main_artists_item" />
-
 
                 </LinearLayout>
 
+                <!-- Popular Albums Section -->
                 <LinearLayout
                     android:id="@+id/__popular_albums_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_8sdp"
+                    android:layout_marginTop="@dimen/_14sdp"
                     android:orientation="vertical"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/__popular_artists_section">
@@ -164,29 +335,34 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_12sdp"
+                        android:layout_marginBottom="@dimen/_8sdp"
                         android:fontFamily="@font/avenir_next_bold"
                         android:includeFontPadding="false"
-                        android:text="Popular albums"
+                        android:text="Popular Albums"
                         android:textColor="@color/textMain"
                         android:textSize="@dimen/_16ssp" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/popular_albums_recycler_view"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="@dimen/_8sdp"
                         android:scrollbars="none"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:itemCount="10"
+                        tools:itemCount="5"
                         tools:listitem="@layout/activity_main_songs_item" />
 
                 </LinearLayout>
 
+                <!-- Saved Libraries Section -->
                 <LinearLayout
                     android:id="@+id/saved_libraries_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_8sdp"
+                    android:layout_marginTop="@dimen/_14sdp"
                     android:orientation="vertical"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/__popular_albums_section">
@@ -194,6 +370,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_12sdp"
+                        android:layout_marginBottom="@dimen/_8sdp"
                         android:fontFamily="@font/avenir_next_bold"
                         android:includeFontPadding="false"
                         android:text="Saved Libraries"
@@ -202,33 +380,37 @@
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/saved_recycler_view"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="@dimen/_8sdp"
                         android:scrollbars="none"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:itemCount="10"
+                        tools:itemCount="5"
                         tools:listitem="@layout/activity_main_songs_item" />
 
                 </LinearLayout>
 
+                <!-- Popular Playlists Section -->
                 <LinearLayout
                     android:id="@+id/__popular_playlists_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_8sdp"
-                    android:layout_marginBottom="@dimen/_50sdp"
-                    android:elevation="@dimen/_8sdp"
+                    android:layout_marginTop="@dimen/_14sdp"
                     android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/_10sdp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/saved_libraries_section">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_2sdp"
+                        android:layout_marginBottom="@dimen/_8sdp"
                         android:fontFamily="@font/avenir_next_bold"
                         android:includeFontPadding="false"
-                        android:text="Popular playlists"
+                        android:text="Popular Playlists"
                         android:textColor="@color/textMain"
                         android:textSize="@dimen/_16ssp" />
 
@@ -236,23 +418,14 @@
                         android:id="@+id/playlist_recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/_12sdp"
                         android:overScrollMode="never"
                         android:scrollbars="none"
                         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                         app:spanCount="2"
-                        tools:itemCount="10"
+                        tools:itemCount="6"
                         tools:listitem="@layout/activity_main_playlist_item" />
 
                 </LinearLayout>
-
-                <androidx.constraintlayout.widget.Barrier
-                    android:id="@+id/barrier"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:barrierDirection="bottom"
-                    app:constraint_referenced_ids="saved_libraries_section" />
-
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -260,6 +433,7 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <!-- Floating Mini Player -->
     <include
         android:id="@+id/mini_player"
         layout="@layout/layout_mini_player"

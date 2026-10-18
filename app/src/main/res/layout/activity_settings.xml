@@ -7,8 +7,9 @@
     android:layout_height="match_parent"
     tools:context=".activities.SettingsActivity"
     android:fitsSystemWindows="true"
-    android:background="@color/background">
+    android:background="?attr/colorSurface">
 
+    <!-- Material 3 Toolbar -->
     <LinearLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -16,32 +17,40 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="@dimen/_12sdp"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_8sdp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
         <ImageView
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_6sdp"
             android:src="@drawable/round_arrow_back_24"
             android:onClick="backPress"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/actionBarItemBackground"
+            app:tint="?attr/colorOnSurface"
+            android:contentDescription="Back"
             tools:ignore="UsingOnClickInXml" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Settings"
-            android:textColor="@color/textMain"
-            android:textSize="@dimen/_18sdp"
-            android:paddingHorizontal="@dimen/_12sdp" />
+            android:fontFamily="@font/avenir_next_bold"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="@dimen/_18ssp"
+            android:paddingHorizontal="@dimen/_8sdp" />
 
     </LinearLayout>
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/divider"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/textSec"
+        android:layout_height="0.6dp"
+        app:dividerColor="?attr/colorOutlineVariant"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -60,170 +69,419 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingVertical="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_10sdp"
             android:orientation="vertical">
 
+            <!-- 1. Appearance & Theme Manager Card -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Data-saving and offline"
-                android:paddingHorizontal="@dimen/_12sdp"
-                android:paddingVertical="@dimen/_4sdp"
-                android:textColor="@color/textMain"
-                android:textStyle="bold"
-                android:textSize="@dimen/_14sdp" />
+                android:text="Appearance &amp; Themes"
+                android:paddingHorizontal="@dimen/_4sdp"
+                android:paddingTop="@dimen/_4sdp"
+                android:paddingBottom="@dimen/_6sdp"
+                android:textColor="?attr/colorPrimary"
+                android:fontFamily="@font/avenir_next_bold"
+                android:textSize="@dimen/_13ssp" />
 
-            <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
-                android:id="@+id/download_over_cellular"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:textHead="Downloads over cellular"
-                app:textOff="Download starts or continue only when you're connected to Wi-Fi."
-                app:textOn="Download starts or continue when you're connected to Wi-Fi or cellular."
-                app:checked="true" />
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                android:layout_marginBottom="@dimen/_12sdp">
 
-            <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
-                android:id="@+id/high_quality_track"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:textHead="Stream tracks in high quality"
-                app:textOff="Stream tracks in low/medium quality when you're not connected to Wi-Fi."
-                app:textOn="Stream tracks in high quality when you're connected to Wi-Fi or cellular."
-                app:checked="true" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.2dp"
-                android:layout_marginVertical="@dimen/_8sdp"
-                android:background="@color/textSec" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Storage"
-                android:paddingHorizontal="@dimen/_12sdp"
-                android:paddingVertical="@dimen/_4sdp"
-                android:textColor="@color/textMain"
-                android:textStyle="bold"
-                android:textSize="@dimen/_14sdp" />
-
-            <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
-                android:id="@+id/store_in_cache"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:textHead="Store Track &amp; Album Data"
-                app:textOff="Will not store any details to cache. More Data Consumption."
-                app:textOn="Will store data to cache. Less Data Consumption. Helps when API Server is down."
-                app:checked="true" />
-
-            <TextView
-                android:id="@+id/clear_cache"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Clear All Cached data"
-                android:paddingHorizontal="@dimen/_12sdp"
-                android:paddingVertical="@dimen/_8sdp"
-                android:textColor="@color/textMain"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.2dp"
-                android:layout_marginVertical="@dimen/_8sdp"
-                android:background="@color/textSec" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Other"
-                android:paddingHorizontal="@dimen/_12sdp"
-                android:paddingVertical="@dimen/_4sdp"
-                android:textColor="@color/textMain"
-                android:textStyle="bold"
-                android:textSize="@dimen/_14sdp" />
-
-            <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
-                android:id="@+id/explicit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:textHead="Allow explicit content"
-                app:textOff="No explicit content will be listed or played."
-                app:textOn="Explicit content (labelled as 18+) is playable."
-                app:checked="true" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.2dp"
-                android:layout_marginVertical="@dimen/_8sdp"
-                android:background="@color/textSec" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Playback"
-                android:paddingHorizontal="@dimen/_12sdp"
-                android:paddingVertical="@dimen/_4sdp"
-                android:textColor="@color/textMain"
-                android:textStyle="bold"
-                android:textSize="@dimen/_14sdp" />
-
-            <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
-                android:id="@+id/play_in_background"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:textHead="Play in background"
-                app:textOff="Music stops when you remove the app from recents."
-                app:textOn="Music continues to play when app is cleared from recents."
-                app:checked="true" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.2dp"
-                android:layout_marginVertical="@dimen/_8sdp"
-                android:background="@color/textSec" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Theme"
-                android:paddingHorizontal="@dimen/_12sdp"
-                android:paddingVertical="@dimen/_4sdp"
-                android:textColor="@color/textMain"
-                android:textStyle="bold"
-                android:textSize="@dimen/_14sdp" />
-
-            <RadioGroup
-                android:id="@+id/theme_chip_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="@dimen/_12sdp">
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/dark"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Dark" />
+                    android:orientation="vertical"
+                    android:paddingVertical="@dimen/_8sdp">
 
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/light"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Theme Mode"
+                        android:paddingHorizontal="@dimen/_14sdp"
+                        android:paddingTop="@dimen/_4sdp"
+                        android:paddingBottom="@dimen/_2sdp"
+                        android:textColor="?attr/colorOnSurface"
+                        android:fontFamily="@font/avenir_next_bold"
+                        android:textSize="@dimen/_12ssp" />
+
+                    <!-- RadioGroup for System, Dark, Light -->
+                    <RadioGroup
+                        android:id="@+id/theme_chip_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/_12sdp">
+
+                        <com.google.android.material.radiobutton.MaterialRadioButton
+                            android:id="@+id/system"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:textColor="?attr/colorOnSurface"
+                            android:text="Follow System" />
+
+                        <com.google.android.material.radiobutton.MaterialRadioButton
+                            android:id="@+id/dark"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:textColor="?attr/colorOnSurface"
+                            android:text="Dark Mode" />
+
+                        <com.google.android.material.radiobutton.MaterialRadioButton
+                            android:id="@+id/light"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:textColor="?attr/colorOnSurface"
+                            android:text="Light Mode" />
+
+                    </RadioGroup>
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        app:dividerColor="?attr/colorOutlineVariant"
+                        android:layout_marginVertical="@dimen/_6sdp"
+                        android:layout_marginHorizontal="@dimen/_12sdp" />
+
+                    <!-- Dynamic Color Switch (Material You) -->
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/dynamic_color_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Material You Dynamic Colors"
+                        app:textOff="Use curated theme palette."
+                        app:textOn="Derives colors dynamically from your device wallpaper (Android 12+)." />
+
+                    <!-- Palette Selector Section -->
+                    <LinearLayout
+                        android:id="@+id/palette_section"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingTop="@dimen/_4sdp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Material Color Palette"
+                            android:paddingHorizontal="@dimen/_14sdp"
+                            android:paddingTop="@dimen/_4sdp"
+                            android:paddingBottom="@dimen/_4sdp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:fontFamily="@font/avenir_next_bold"
+                            android:textSize="@dimen/_12ssp" />
+
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:scrollbars="none"
+                            android:overScrollMode="never"
+                            android:paddingHorizontal="@dimen/_10sdp"
+                            android:paddingBottom="@dimen/_6sdp">
+
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/palette_chip_group"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:singleSelection="true"
+                                app:selectionRequired="true">
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/palette_emerald"
+                                    style="@style/Widget.Material3.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Emerald (Green)"
+                                    android:checkable="true" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/palette_ocean"
+                                    style="@style/Widget.Material3.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Ocean (Blue)"
+                                    android:checkable="true" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/palette_purple"
+                                    style="@style/Widget.Material3.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Sunset (Purple)"
+                                    android:checkable="true" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/palette_crimson"
+                                    style="@style/Widget.Material3.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Crimson (Rose)"
+                                    android:checkable="true" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/palette_amber"
+                                    style="@style/Widget.Material3.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Amber (Gold)"
+                                    android:checkable="true" />
+
+                            </com.google.android.material.chip.ChipGroup>
+
+                        </HorizontalScrollView>
+
+                    </LinearLayout>
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        app:dividerColor="?attr/colorOutlineVariant"
+                        android:layout_marginVertical="@dimen/_6sdp"
+                        android:layout_marginHorizontal="@dimen/_12sdp" />
+
+                    <!-- Pure Black (AMOLED) Switch -->
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/amoled_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Pure Black (AMOLED Dark Mode)"
+                        app:textOff="Standard dark surface container colors."
+                        app:textOn="Pitch black (#000000) background for OLED displays." />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 2. Streaming & Playback Card -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Playback &amp; Streaming"
+                android:paddingHorizontal="@dimen/_4sdp"
+                android:paddingTop="@dimen/_4sdp"
+                android:paddingBottom="@dimen/_6sdp"
+                android:textColor="?attr/colorPrimary"
+                android:fontFamily="@font/avenir_next_bold"
+                android:textSize="@dimen/_13ssp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                android:layout_marginBottom="@dimen/_12sdp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Light" />
+                    android:orientation="vertical"
+                    android:paddingVertical="@dimen/_6sdp">
 
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/system"
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/high_quality_track"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Stream in High Quality"
+                        app:textOff="Low/medium quality when not connected to Wi-Fi."
+                        app:textOn="Stream 320kbps tracks on both Wi-Fi and mobile data." />
+
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/play_in_background"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Play in Background"
+                        app:textOff="Music stops when you clear the app from recents."
+                        app:textOn="Music playback continues in background." />
+
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/download_over_cellular"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Downloads over Cellular"
+                        app:textOff="Download starts or continues only on Wi-Fi."
+                        app:textOn="Download tracks on both Wi-Fi and cellular networks." />
+
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/explicit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Allow Explicit Content"
+                        app:textOff="Filter out tracks marked with explicit (18+) label."
+                        app:textOn="Explicit content is playable and listed." />
+
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/autoplay_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Autoplay Similar Tracks"
+                        app:textOff="Playback stops when current queue finishes."
+                        app:textOn="Keep the music going! Automatically plays recommendations when queue ends." />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        app:dividerColor="?attr/colorOutlineVariant"
+                        android:layout_marginVertical="@dimen/_4sdp"
+                        android:layout_marginHorizontal="@dimen/_12sdp" />
+
+                    <LinearLayout
+                        android:id="@+id/sleep_timer_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/_14sdp"
+                        android:paddingVertical="@dimen/_10sdp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sleep Timer"
+                                android:fontFamily="@font/avenir_next_bold"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/_13ssp" />
+
+                            <TextView
+                                android:id="@+id/sleep_timer_status_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Automatically stop music when you fall asleep."
+                                android:fontFamily="@font/avenir_next_regular"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="@dimen/_10ssp"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:src="@drawable/ic_sleep_timer"
+                            app:tint="?attr/colorPrimary"
+                            android:contentDescription="Sleep Timer" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 3. Storage & Cache Card -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Storage &amp; Cache"
+                android:paddingHorizontal="@dimen/_4sdp"
+                android:paddingTop="@dimen/_4sdp"
+                android:paddingBottom="@dimen/_6sdp"
+                android:textColor="?attr/colorPrimary"
+                android:fontFamily="@font/avenir_next_bold"
+                android:textSize="@dimen/_13ssp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                android:layout_marginBottom="@dimen/_16sdp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Follow System" />
+                    android:orientation="vertical"
+                    android:paddingVertical="@dimen/_6sdp">
 
-            </RadioGroup>
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/store_in_cache"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Store Track &amp; Album Cache"
+                        app:textOff="Will not store details in cache. Higher data usage."
+                        app:textOn="Stores data locally in cache for instant playback and offline access." />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        app:dividerColor="?attr/colorOutlineVariant"
+                        android:layout_marginVertical="@dimen/_4sdp"
+                        android:layout_marginHorizontal="@dimen/_12sdp" />
+
+                    <LinearLayout
+                        android:id="@+id/clear_cache"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/_14sdp"
+                        android:paddingVertical="@dimen/_10sdp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Clear All Cached Data"
+                                android:fontFamily="@font/avenir_next_bold"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/_13ssp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Frees up storage used for cached audio and metadata."
+                                android:fontFamily="@font/avenir_next_regular"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="@dimen/_10ssp"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:src="@drawable/round_close_24"
+                            app:tint="?attr/colorOnSurfaceVariant"
+                            android:contentDescription="Clear" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
     </ScrollView>
 
+    <!-- Floating Mini Player -->
     <include
         android:id="@+id/mini_player"
         layout="@layout/layout_mini_player"

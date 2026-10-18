@@ -33,6 +33,7 @@ import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.util.Locale
 import androidx.core.net.toUri
+import com.harsh.shah.saavnmp3.utils.ThemeManager
 
 class SearchActivity : AppCompatActivity() {
     var binding: ActivitySearchBinding? = null
@@ -117,6 +118,7 @@ class SearchActivity : AppCompatActivity() {
     // ─────────────────────────────────────────────────────────────────────────
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeManager.applyTheme(this)
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
@@ -124,7 +126,6 @@ class SearchActivity : AppCompatActivity() {
 
         OverScrollDecoratorHelper.setUpOverScroll(binding!!.hscrollview)
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
-        binding!!.recyclerView.attachSnapHelper()
 
         binding!!.edittext.requestFocus()
 

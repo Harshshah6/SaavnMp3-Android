@@ -17,7 +17,10 @@ import androidx.core.net.toUri
 import android.widget.Toast
 
 
-class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
+class ActivityListSongsItemAdapter(
+    private val data: MutableList<Song>,
+    private val fallbackCoverUrl: String? = null
+) :
     RecyclerView.Adapter<ActivityListSongsItemAdapter.ViewHolder?>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val _v = View.inflate(
@@ -56,10 +59,19 @@ class ActivityListSongsItemAdapter(private val data: MutableList<Song>) :
         (holder.itemView.findViewById<View?>(R.id.artist) as TextView).text = artistsNames.toString()
 
         val images = song.image
-        val imgUrl = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
-        if (imgUrl.isNotEmpty()) {
-            Glide.with(holder.itemView).load(imgUrl)
-                .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?)!!)
+        val imgUrl = if (!images.isNullOrEmpty()) images[images.size - 1]?.url ?: ""
+                     else fallbackCoverUrl ?: ""
+        val coverView = holder.itemView.findViewById<ImageView?>(R.id.coverImage)
+        if (coverView != null) {
+            if (imgUrl.isNotEmpty()) {
+                Glide.with(holder.itemView)
+                    .load(imgUrl)
+                    .placeholder(R.drawable.baseline_album_24)
+                    .error(R.drawable.baseline_album_24)
+                    .into(coverView)
+            } else {
+                coverView.setImageResource(R.drawable.baseline_album_24)
+            }
         }
 
         val moreIcon = holder.itemView.findViewById<ImageView>(R.id.more)

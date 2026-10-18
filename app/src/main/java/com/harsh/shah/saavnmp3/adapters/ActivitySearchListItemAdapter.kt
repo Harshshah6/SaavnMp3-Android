@@ -102,8 +102,18 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
             moreIcon.visibility = View.GONE
         }
 
-        Glide.with(holder.itemView).load(item.coverImage)
-            .into((holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView?)!!)
+        val coverView = holder.itemView.findViewById<ImageView?>(R.id.coverImage)
+        if (coverView != null) {
+            if (!item.coverImage.isNullOrEmpty()) {
+                Glide.with(holder.itemView)
+                    .load(item.coverImage)
+                    .placeholder(R.drawable.baseline_album_24)
+                    .error(R.drawable.baseline_album_24)
+                    .into(coverView)
+            } else {
+                coverView.setImageResource(R.drawable.baseline_album_24)
+            }
+        }
 
         holder.itemView.setOnClickListener {
             val intent = Intent()

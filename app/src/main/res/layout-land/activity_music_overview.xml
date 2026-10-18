@@ -34,6 +34,28 @@
             android:layout_weight="1" />
 
         <ImageView
+            android:id="@+id/recommendation_icon"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="@dimen/_10sdp"
+            android:src="@drawable/ic_recommendation"
+            app:tint="@color/textMain" />
+
+        <ImageView
+            android:id="@+id/favorite_icon"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="@dimen/_10sdp"
+            android:src="@drawable/favorite_outline_24px"
+            app:tint="@color/textMain" />
+
+        <ImageView
             android:id="@+id/lyrics_icon"
             android:visibility="gone"
             android:layout_width="@dimen/_40sdp"

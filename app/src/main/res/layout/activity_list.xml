@@ -7,61 +7,69 @@
     android:fitsSystemWindows="true"
     android:layout_height="match_parent"
     tools:context=".activities.ListActivity"
-    android:background="@color/background">
+    android:background="?attr/colorSurface">
 
+    <!-- Material 3 Toolbar -->
     <LinearLayout
         android:id="@+id/__toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_8sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="@dimen/_45sdp"
-            android:layout_height="@dimen/_45sdp"
-            android:padding="@dimen/_12sdp"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_6sdp"
             android:src="@drawable/round_arrow_back_24"
-            android:contentDescription="back"
+            android:contentDescription="Back"
             android:onClick="backPress"
             android:focusable="true"
             android:clickable="true"
-            android:foreground="?attr/selectableItemBackground" />
+            android:background="?attr/actionBarItemBackground"
+            app:tint="@color/textMain" />
 
         <View
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/share_icon"
-            android:layout_width="@dimen/_45sdp"
-            android:layout_height="@dimen/_45sdp"
-            android:padding="@dimen/_12sdp"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_6sdp"
             android:src="@drawable/share_24px"
-            android:contentDescription="share"
+            android:contentDescription="Share"
             android:focusable="true"
             android:clickable="true"
-            android:foreground="?attr/selectableItemBackground" />
+            android:background="?attr/actionBarItemBackground"
+            app:tint="@color/textMain" />
 
         <ImageView
             android:id="@+id/more_icon"
-            android:layout_width="@dimen/_45sdp"
-            android:layout_height="@dimen/_45sdp"
-            android:padding="@dimen/_12sdp"
+            android:layout_width="@dimen/_34sdp"
+            android:layout_height="@dimen/_34sdp"
+            android:padding="@dimen/_6sdp"
             android:src="@drawable/more_vert_24px"
-            android:contentDescription="more"
+            android:contentDescription="More Options"
             android:focusable="true"
             android:clickable="true"
-            android:foreground="?attr/selectableItemBackground" />
+            android:background="?attr/actionBarItemBackground"
+            app:tint="@color/textMain" />
 
     </LinearLayout>
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/__divider"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
+        android:layout_height="0.6dp"
+        app:dividerColor="@color/dividerBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/__toolbar" />
@@ -84,126 +92,170 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingVertical="@dimen/_12sdp"
-            android:paddingHorizontal="@dimen/_8sdp">
+            android:paddingHorizontal="@dimen/_10sdp">
 
-            <LinearLayout
+            <!-- Hero Playlist/Album Header Card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:strokeWidth="0dp"
-                    android:elevation="@dimen/_5sdp">
-
-                    <ImageView
-                        android:id="@+id/album_cover"
-                        android:layout_width="@dimen/_100sdp"
-                        android:layout_height="@dimen/_100sdp"
-                        android:background="@color/textSec" />
-
-                </com.google.android.material.card.MaterialCardView>
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@color/surfaceContainerLow"
+                android:layout_marginBottom="@dimen/_12sdp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center_vertical"
-                    android:padding="@dimen/_8sdp">
+                    android:orientation="horizontal"
+                    android:padding="@dimen/_10sdp"
+                    android:gravity="center_vertical">
 
-                    <TextView
-                        android:id="@+id/albumTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Playlist Title"
-                        android:textSize="@dimen/_18ssp"
-                        android:textColor="@color/textMain" />
+                    <!-- Album Cover Squircle -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="@dimen/_96sdp"
+                        android:layout_height="@dimen/_96sdp"
+                        app:cardBackgroundColor="@android:color/transparent"
+                        app:strokeWidth="0dp"
+                        app:cardElevation="4dp"
+                        app:cardCornerRadius="18dp">
 
-                    <TextView
-                        android:id="@+id/albumSubTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Playlist - {year}"
-                        android:textColor="@color/textSec" />
+                        <ImageView
+                            android:id="@+id/album_cover"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Album Art" />
+
+                    </com.google.android.material.card.MaterialCardView>
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="@dimen/_8sdp">
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/_10sdp">
 
-                        <Button
-                            android:id="@+id/playAllBtn"
-                            android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/albumTitle"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Play"
-                            android:drawableStart="@android:drawable/ic_media_play"
-                            app:startIconTint="@color/textMain"
-                            android:layout_weight="1" />
+                            android:text="Playlist Title"
+                            android:fontFamily="@font/avenir_next_bold"
+                            android:textSize="@dimen/_15ssp"
+                            android:textColor="@color/textMain"
+                            android:ellipsize="end"
+                            android:maxLines="2" />
 
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="@dimen/_35sdp"
-                            android:layout_height="@dimen/_35sdp"
-                            android:layout_marginStart="@dimen/_8sdp"
-                            app:cardCornerRadius="@dimen/_100sdp"
-                            app:cardBackgroundColor="@android:color/transparent"
-                            app:strokeWidth="0dp"
-                            android:visibility="gone">
+                        <TextView
+                            android:id="@+id/albumSubTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Playlist • Year"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:textSize="@dimen/_10ssp"
+                            android:textColor="@color/textSec" />
 
-                            <ImageView
-                                android:contentDescription="add_to_library"
-                                android:id="@+id/add_to_library"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/round_add_24"
-                                android:padding="@dimen/_4sdp"
-                                tools:ignore="HardcodedText" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="@dimen/_10sdp">
 
-                        </com.google.android.material.card.MaterialCardView>
+                            <!-- Modern Material 3 Play Button -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/playAllBtn"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Play"
+                                android:fontFamily="@font/avenir_next_bold"
+                                app:icon="@drawable/play_arrow_24px"
+                                app:iconTint="@color/background"
+                                app:iconGravity="textStart"
+                                android:textColor="@color/background"
+                                app:backgroundTint="@color/buttonBackground"
+                                app:cornerRadius="999dp" />
+
+                            <!-- Add To Library Button -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="@dimen/_32sdp"
+                                android:layout_height="@dimen/_32sdp"
+                                android:layout_marginStart="@dimen/_8sdp"
+                                app:cardCornerRadius="999dp"
+                                app:cardBackgroundColor="@color/surfaceContainerHighest"
+                                app:strokeWidth="0dp"
+                                app:cardElevation="0dp"
+                                android:visibility="gone">
+
+                                <ImageView
+                                    android:contentDescription="Add to library"
+                                    android:id="@+id/add_to_library"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/round_add_24"
+                                    android:padding="@dimen/_6sdp"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    app:tint="@color/textMain"
+                                    tools:ignore="HardcodedText" />
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
                 </LinearLayout>
 
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
+            <!-- Track List Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="@dimen/_12sdp">
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/_4sdp"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_marginBottom="@dimen/_6sdp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="Songs"
                     android:layout_weight="1"
-                    android:textSize="@dimen/_18ssp"
-                    android:textColor="@color/green" />
+                    android:fontFamily="@font/avenir_next_bold"
+                    android:textSize="@dimen/_16ssp"
+                    android:textColor="@color/textMain" />
 
                 <TextView
                     android:id="@+id/add_more_songs"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="add songs"
+                    android:text="+ Add songs"
+                    android:fontFamily="@font/avenir_next_bold"
                     android:textSize="@dimen/_11ssp"
-                    android:textColor="@color/green" />
+                    android:textColor="@color/green"
+                    android:padding="@dimen/_4sdp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground" />
 
             </LinearLayout>
 
+            <!-- Song List -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_4sdp"
                 android:overScrollMode="never"
                 android:scrollbars="none"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:spanCount="1"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="5"
                 tools:listitem="@layout/activity_list_song_item" />
 

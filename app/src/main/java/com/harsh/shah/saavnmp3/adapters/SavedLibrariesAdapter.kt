@@ -37,7 +37,13 @@ class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
         val coverUrl = library.image?.takeIf { it.isNotBlank() }
             ?: library.songs?.firstOrNull { it?.image?.isNotBlank() == true }?.image
         if (!coverUrl.isNullOrBlank()) {
-            Glide.with(holder.coverImage!!).load(coverUrl).into(holder.coverImage!!)
+            Glide.with(holder.coverImage!!)
+                .load(coverUrl)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
+                .into(holder.coverImage!!)
+        } else {
+            holder.coverImage?.setImageResource(R.drawable.baseline_album_24)
         }
 
         // 3-dots more menu

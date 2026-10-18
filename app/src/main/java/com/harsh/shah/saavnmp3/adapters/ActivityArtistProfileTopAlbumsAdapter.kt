@@ -44,7 +44,13 @@ class ActivityArtistProfileTopAlbumsAdapter(private val data: MutableList<Albums
         val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (url.isNotEmpty()) {
-            Glide.with(itemView.coverImage).load(url).into(itemView.coverImage)
+            Glide.with(itemView.coverImage)
+                .load(url)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
+                .into(itemView.coverImage)
+        } else {
+            itemView.coverImage.setImageResource(R.drawable.baseline_album_24)
         }
 
         holder.itemView.setOnClickListener(View.OnClickListener {

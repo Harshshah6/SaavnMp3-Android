@@ -116,7 +116,13 @@ class QueueSongsAdapter(
         val images = song.image
         val imgUrl = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
         if (imgUrl.isNotEmpty()) {
-            Glide.with(coverImage).load(imgUrl).into(coverImage)
+            Glide.with(coverImage)
+                .load(imgUrl)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
+                .into(coverImage)
+        } else {
+            coverImage.setImageResource(R.drawable.baseline_album_24)
         }
         
         // Use the "more" icon as the remove button

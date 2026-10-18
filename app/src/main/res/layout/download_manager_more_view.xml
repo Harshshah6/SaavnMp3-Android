@@ -4,16 +4,18 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bottom_sheet_background"
-    android:paddingVertical="@dimen/_18sdp">
+    android:paddingTop="@dimen/_10sdp"
+    android:paddingBottom="@dimen/_18sdp">
 
+    <!-- Material 3 Drag Handle -->
     <View
         android:id="@+id/bar"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_2sdp"
+        android:layout_width="36dp"
+        android:layout_height="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@color/textSec"/>
+        android:background="@drawable/m3_bottom_sheet_drag_handle"/>
 
     <LinearLayout
         android:id="@+id/main"
@@ -23,200 +25,222 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bar"
-        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_10sdp"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/_8sdp">
+        android:paddingHorizontal="@dimen/_12sdp">
 
-        <TextView
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Track Details"
-            android:paddingVertical="@dimen/_4sdp"
-            android:paddingHorizontal="@dimen/_8sdp"
-            android:textSize="@dimen/_16ssp"
-            android:textColor="@color/textMain"/>
-        <View
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/textSec"/>
-
-        <LinearLayout
+        <!-- Cover and Song Header Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/_8sdp"
-            android:gravity="center_vertical">
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
-                app:cardCornerRadius="@dimen/_8sdp"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:strokeWidth="0dp">
-
-                <ImageView
-                    android:id="@+id/coverImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/textSec"/>
-
-            </com.google.android.material.card.MaterialCardView>
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/surfaceContainerHighest"
+            android:layout_marginBottom="@dimen/_10sdp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_8sdp"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:padding="@dimen/_8sdp"
+                android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/songTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textSize="@dimen/_13ssp"/>
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="@dimen/_36sdp"
+                    android:layout_height="@dimen/_36sdp"
+                    app:cardCornerRadius="10dp"
+                    app:cardBackgroundColor="@color/surfaceContainerLow"
+                    app:strokeWidth="0dp">
 
-                <TextView
-                    android:id="@+id/songSubTitle"
-                    android:layout_width="wrap_content"
+                    <ImageView
+                        android:id="@+id/coverImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:background="@color/surfaceContainerLow"
+                        android:contentDescription="Cover Art" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textSize="@dimen/_10ssp"
-                    android:textColor="@color/textSec"/>
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/songTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/app_name"
+                        android:fontFamily="@font/avenir_next_bold"
+                        android:textColor="@color/textMain"
+                        android:textSize="@dimen/_13ssp"/>
+
+                    <TextView
+                        android:id="@+id/songSubTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="@string/app_name"
+                        android:fontFamily="@font/avenir_next_regular"
+                        android:textSize="@dimen/_10ssp"
+                        android:textColor="@color/textSec"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <LinearLayout
+        <!-- Track Metadata Section -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/_8sdp">
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/surfaceContainerLow"
+            android:layout_marginBottom="@dimen/_10sdp">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_weight="1"
-                android:gravity="start">
+                android:orientation="vertical"
+                android:padding="@dimen/_10sdp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Album : "
-                    android:textColor="@color/textMain"
-                    android:textSize="@dimen/_14ssp"/>
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="@dimen/_6sdp">
 
-                <TextView
-                    android:id="@+id/albumTitle"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Album: "
+                        android:fontFamily="@font/avenir_next_bold"
+                        android:textColor="@color/textMain"
+                        android:textSize="@dimen/_12ssp"/>
+
+                    <TextView
+                        android:id="@+id/albumTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Album Name"
+                        android:singleLine="true"
+                        android:fontFamily="@font/avenir_next_regular"
+                        android:textColor="@color/textSec"
+                        android:textSize="@dimen/_12ssp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="SaavnMp3"
-                    android:singleLine="true"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:lines="1"
-                    android:textColor="@color/textSec"
-                    android:textSize="@dimen/_13ssp"/>
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="@dimen/_6sdp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Year: "
+                        android:fontFamily="@font/avenir_next_bold"
+                        android:textColor="@color/textMain"
+                        android:textSize="@dimen/_12ssp"/>
+
+                    <TextView
+                        android:id="@+id/songYear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2025"
+                        android:fontFamily="@font/avenir_next_regular"
+                        android:textColor="@color/textSec"
+                        android:textSize="@dimen/_12ssp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="@dimen/_6sdp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bitrate: "
+                        android:fontFamily="@font/avenir_next_bold"
+                        android:textColor="@color/textMain"
+                        android:textSize="@dimen/_12ssp"/>
+
+                    <TextView
+                        android:id="@+id/bitrate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="320 kbps"
+                        android:fontFamily="@font/avenir_next_regular"
+                        android:textColor="@color/textSec"
+                        android:textSize="@dimen/_12ssp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Duration: "
+                        android:fontFamily="@font/avenir_next_bold"
+                        android:textColor="@color/textMain"
+                        android:textSize="@dimen/_12ssp"/>
+
+                    <TextView
+                        android:id="@+id/duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="03:45"
+                        android:fontFamily="@font/avenir_next_regular"
+                        android:textColor="@color/textSec"
+                        android:textSize="@dimen/_12ssp"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_weight="1"
-                android:gravity="start">
+        </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Year : "
-                    android:textColor="@color/textMain"
-                    android:textSize="@dimen/_14ssp"/>
-
-                <TextView
-                    android:id="@+id/songYear"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="2025"
-                    android:textColor="@color/textSec"
-                    android:textSize="@dimen/_13ssp"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/_8sdp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bitrate : "
-                android:textColor="@color/textMain"
-                android:textSize="@dimen/_14ssp"/>
-
-            <TextView
-                android:id="@+id/bitrate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="320 kbps"
-                android:textColor="@color/textSec"
-                android:textSize="@dimen/_13ssp"/>
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/_8sdp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Duration : "
-                android:textColor="@color/textMain"
-                android:textSize="@dimen/_14ssp"/>
-
-            <TextView
-                android:id="@+id/duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="300 Seconds"
-                android:textColor="@color/textSec"
-                android:textSize="@dimen/_13ssp"/>
-
-        </LinearLayout>
-
+        <!-- Open Action Button -->
         <LinearLayout
             android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/_6sdp"
+            android:paddingHorizontal="@dimen/_12sdp"
+            android:paddingVertical="@dimen/_10sdp"
             android:gravity="center_vertical"
             android:background="@drawable/outline_button_background"
             android:foreground="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/_8sdp"
-            android:layout_marginHorizontal="@dimen/_2sdp">
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="OPEN"
+                android:text="PLAY SONG"
                 android:layout_weight="1"
+                android:fontFamily="@font/avenir_next_bold"
                 android:textColor="@color/textMain"
-                android:paddingHorizontal="@dimen/_8sdp"
-                android:textSize="@dimen/_14ssp"/>
+                android:textSize="@dimen/_13ssp"/>
+
             <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/open_in_new_24px"/>
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:src="@drawable/open_in_new_24px"
+                app:tint="@color/textMain"
+                android:contentDescription="Open" />
 
         </LinearLayout>
 

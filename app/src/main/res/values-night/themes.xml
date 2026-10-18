@@ -1,35 +1,108 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme (Dark mode) -->
     <style name="Base.Theme.Melotune" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Edge-to-edge & system bar configuration (Dark mode) -->
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:navigationBarColor">@color/background</item>
         <item name="android:windowLightNavigationBar">false</item>
 
-        <!-- Dark theme colors -->
-        <item name="colorPrimary">@color/spotify_green</item>
-        <item name="colorPrimaryVariant">@color/spotify_dark_green</item>
-        <item name="colorOnPrimary">@color/text_dark</item>
+        <!-- Material 3 Surface hierarchy -->
+        <item name="android:colorBackground">@color/m3_surface_dark</item>
+        <item name="colorOnBackground">@color/m3_on_surface_dark</item>
+        <item name="colorSurface">@color/m3_surface_dark</item>
+        <item name="colorOnSurface">@color/m3_on_surface_dark</item>
+        <item name="colorSurfaceVariant">@color/m3_surface_variant_dark</item>
+        <item name="colorOnSurfaceVariant">@color/m3_on_surface_variant_dark</item>
+        <item name="colorSurfaceContainerLowest">@color/m3_surface_container_lowest_dark</item>
+        <item name="colorSurfaceContainerLow">@color/m3_surface_container_low_dark</item>
+        <item name="colorSurfaceContainer">@color/m3_surface_container_dark</item>
+        <item name="colorSurfaceContainerHigh">@color/m3_surface_container_high_dark</item>
+        <item name="colorSurfaceContainerHighest">@color/m3_surface_container_highest_dark</item>
+        <item name="colorOutline">@color/m3_outline_dark</item>
+        <item name="colorOutlineVariant">@color/m3_outline_variant_dark</item>
 
-        <item name="android:colorBackground">@color/background_dark</item>
-        <item name="colorOnBackground">@color/text_light</item>
+        <!-- Default Emerald / Green Palette (Dark) -->
+        <item name="colorPrimary">@color/emerald_primary_dark</item>
+        <item name="colorOnPrimary">@color/emerald_on_primary_dark</item>
+        <item name="colorPrimaryContainer">@color/emerald_primary_container_dark</item>
+        <item name="colorOnPrimaryContainer">@color/emerald_on_primary_container_dark</item>
+        <item name="colorSecondary">@color/emerald_secondary_dark</item>
+        <item name="colorOnSecondary">@color/emerald_on_secondary_dark</item>
+        <item name="colorSecondaryContainer">@color/emerald_secondary_container_dark</item>
+        <item name="colorOnSecondaryContainer">@color/emerald_on_secondary_container_dark</item>
+        <item name="colorTertiary">@color/emerald_tertiary_dark</item>
+        <item name="colorOnTertiary">@color/emerald_on_tertiary_dark</item>
+        <item name="colorTertiaryContainer">@color/emerald_tertiary_container_dark</item>
+        <item name="colorOnTertiaryContainer">@color/emerald_on_tertiary_container_dark</item>
 
-        <item name="colorSurface">@color/spotify_black</item>
-        <item name="colorOnSurface">@color/text_light</item>
-
-        <item name="colorAccent">@color/spotify_green</item>
-
-        <!-- Text colors -->
+        <!-- Text Colors -->
         <item name="android:textColor">@color/text_light</item>
-        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
-
-        <!-- Divider -->
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
         <item name="android:divider">@color/divider_dark</item>
 
+        <!-- Launcher Icons -->
         <item name="android:icon">@mipmap/ic_launcher_night</item>
         <item name="android:roundIcon" tools:ignore="NewApi">@mipmap/ic_launcher_night_round</item>
+
+        <!-- Material 3 Shape Tokens -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Melotune.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Melotune.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Melotune.Large</item>
+
+        <!-- Bottom Sheet style -->
+        <item name="bottomSheetDialogTheme">@style/MyBottomSheetDialogTheme</item>
     </style>
 
+    <!-- Palette Themes (Dark) -->
+    <style name="Theme.Melotune.Emerald" parent="Base.Theme.Melotune">
+        <item name="colorPrimary">@color/emerald_primary_dark</item>
+        <item name="colorOnPrimary">@color/emerald_on_primary_dark</item>
+        <item name="colorPrimaryContainer">@color/emerald_primary_container_dark</item>
+        <item name="colorOnPrimaryContainer">@color/emerald_on_primary_container_dark</item>
+    </style>
+
+    <style name="Theme.Melotune.Ocean" parent="Base.Theme.Melotune">
+        <item name="colorPrimary">@color/ocean_primary_dark</item>
+        <item name="colorOnPrimary">@color/ocean_on_primary_dark</item>
+        <item name="colorPrimaryContainer">@color/ocean_primary_container_dark</item>
+        <item name="colorOnPrimaryContainer">@color/ocean_on_primary_container_dark</item>
+        <item name="colorSecondary">@color/ocean_secondary_dark</item>
+        <item name="colorOnSecondary">@color/ocean_on_secondary_dark</item>
+        <item name="colorSecondaryContainer">@color/ocean_secondary_container_dark</item>
+        <item name="colorOnSecondaryContainer">@color/ocean_on_secondary_container_dark</item>
+    </style>
+
+    <style name="Theme.Melotune.Purple" parent="Base.Theme.Melotune">
+        <item name="colorPrimary">@color/purple_primary_dark</item>
+        <item name="colorOnPrimary">@color/purple_on_primary_dark</item>
+        <item name="colorPrimaryContainer">@color/purple_primary_container_dark</item>
+        <item name="colorOnPrimaryContainer">@color/purple_on_primary_container_dark</item>
+        <item name="colorSecondary">@color/purple_secondary_dark</item>
+        <item name="colorOnSecondary">@color/purple_on_secondary_dark</item>
+        <item name="colorSecondaryContainer">@color/purple_secondary_container_dark</item>
+        <item name="colorOnSecondaryContainer">@color/purple_on_secondary_container_dark</item>
+    </style>
+
+    <style name="Theme.Melotune.Crimson" parent="Base.Theme.Melotune">
+        <item name="colorPrimary">@color/crimson_primary_dark</item>
+        <item name="colorOnPrimary">@color/crimson_on_primary_dark</item>
+        <item name="colorPrimaryContainer">@color/crimson_primary_container_dark</item>
+        <item name="colorOnPrimaryContainer">@color/crimson_on_primary_container_dark</item>
+        <item name="colorSecondary">@color/crimson_secondary_dark</item>
+        <item name="colorOnSecondary">@color/crimson_on_secondary_dark</item>
+        <item name="colorSecondaryContainer">@color/crimson_secondary_container_dark</item>
+        <item name="colorOnSecondaryContainer">@color/crimson_on_secondary_container_dark</item>
+    </style>
+
+    <style name="Theme.Melotune.Amber" parent="Base.Theme.Melotune">
+        <item name="colorPrimary">@color/amber_primary_dark</item>
+        <item name="colorOnPrimary">@color/amber_on_primary_dark</item>
+        <item name="colorPrimaryContainer">@color/amber_primary_container_dark</item>
+        <item name="colorOnPrimaryContainer">@color/amber_on_primary_container_dark</item>
+        <item name="colorSecondary">@color/amber_secondary_dark</item>
+        <item name="colorOnSecondary">@color/amber_on_secondary_dark</item>
+        <item name="colorSecondaryContainer">@color/amber_secondary_container_dark</item>
+        <item name="colorOnSecondaryContainer">@color/amber_on_secondary_container_dark</item>
+    </style>
 </resources>

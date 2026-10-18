@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.adapters
+package com.harsh.shah.saavnmp3.adapters
 
 import android.app.Activity
 import android.content.Intent
@@ -44,8 +44,11 @@ class ActivityDownloadManagerListAdapter(private val data: MutableList<Downloade
         (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = item.title
         (holder.itemView.findViewById<View?>(R.id.artist) as TextView).text = item.artist
 
+        val coverView = holder.itemView.findViewById<ImageView?>(R.id.coverImage)
         if (item.coverImage != null) {
-            (holder.itemView.findViewById<View?>(R.id.coverImage) as ImageView).setImageBitmap(item.coverImage)
+            coverView?.setImageBitmap(item.coverImage)
+        } else {
+            coverView?.setImageResource(R.drawable.baseline_album_24)
         }
 
         holder.itemView.setOnClickListener { view: View? ->

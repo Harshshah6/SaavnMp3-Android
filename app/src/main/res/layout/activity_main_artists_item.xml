@@ -1,48 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
     app:cardBackgroundColor="@android:color/transparent"
-    app:contentPadding="@dimen/_4sdp"
+    android:layout_marginHorizontal="@dimen/_4sdp"
+    android:layout_marginVertical="@dimen/_4sdp"
+    app:cardElevation="0dp"
     app:strokeWidth="0dp">
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="@dimen/_6sdp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        <!-- Circular Avatar with subtle tonal ring -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="@dimen/_86sdp"
+            android:layout_height="@dimen/_86sdp"
+            app:cardCornerRadius="999dp"
+            app:strokeWidth="1.5dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@android:color/transparent">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/artist_img"
-            android:layout_width="@dimen/_90sdp"
-            android:layout_height="@dimen/_90sdp"
-            android:background="@color/textSec"
-            android:padding="@dimen/_8sdp"
-            app:layout_constraintBottom_toTopOf="@+id/artist_name"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize100Percent" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/artist_img"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Melotune.Full"
+                tools:srcCompat="@drawable/ic_launcher_foreground" />
 
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Artist Name -->
         <TextView
             android:id="@+id/artist_name"
-            android:layout_width="match_parent"
+            android:layout_width="@dimen/_86sdp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_6sdp"
             android:ellipsize="marquee"
-            android:maxWidth="@dimen/_80sdp"
+            android:fontFamily="@font/avenir_next_bold"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
             android:singleLine="true"
             android:text="@string/app_name"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/artist_img"
-            app:layout_constraintTop_toBottomOf="@+id/artist_img" />
+            android:textColor="@color/textMain"
+            android:textSize="@dimen/_11ssp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/avenir_next_regular"
+            android:text="Artist"
+            android:textColor="@color/textSec"
+            android:textSize="@dimen/_9ssp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

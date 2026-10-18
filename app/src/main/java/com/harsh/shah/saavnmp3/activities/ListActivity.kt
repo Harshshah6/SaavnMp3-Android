@@ -32,6 +32,7 @@ import com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
+import com.harsh.shah.saavnmp3.utils.ThemeManager
 import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 import com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
 import com.bumptech.glide.Glide
@@ -42,13 +43,13 @@ class ListActivity : AppCompatActivity() {
     private val trackQueue: MutableList<String?> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeManager.applyTheme(this)
         super.onCreate(savedInstanceState)
         binding = ActivityListBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
         MiniPlayerHelper.initMiniPlayer(this)
 
         binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
-        binding!!.recyclerView.attachSnapHelper()
         binding!!.addMoreSongs.visibility = View.GONE
 
         Log.i("ListActivity", "onCreate: reached ListActivity")
@@ -318,8 +319,13 @@ class ListActivity : AppCompatActivity() {
         if (albumItem != null) {
             binding!!.albumTitle.text = albumItem!!.albumTitle()
             binding!!.albumSubTitle.text = albumItem!!.albumSubTitle()
-            if (albumItem!!.albumCover?.isNotBlank() == true) Glide.with(binding!!.albumCover)
-                .load(albumItem!!.albumCover!!).into(binding!!.albumCover)
+            if (albumItem!!.albumCover?.isNotBlank() == true) {
+                Glide.with(binding!!.albumCover)
+                    .load(albumItem!!.albumCover!!)
+                    .placeholder(R.drawable.baseline_album_24)
+                    .error(R.drawable.baseline_album_24)
+                    .into(binding!!.albumCover)
+            }
         }
 
         val apiManager = ApiManager(this)
@@ -460,14 +466,19 @@ class ListActivity : AppCompatActivity() {
         binding!!.albumTitle.text = data.name()
         binding!!.albumSubTitle.text = data.description()
         val imageList = data.image
-        if (!imageList.isNullOrEmpty()) {
-            Glide.with(binding!!.albumCover).load(imageList[imageList.size - 1]?.url ?: "")
+        val coverUrl = if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: ""
+                       else albumItem?.albumCover ?: ""
+        if (coverUrl.isNotEmpty()) {
+            Glide.with(binding!!.albumCover).load(coverUrl)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
                 .into(binding!!.albumCover)
         }
         val songs = data.songs ?: mutableListOf()
         binding!!.recyclerView.setAdapter(
             ActivityListSongsItemAdapter(
-                songs.filterNotNull().toMutableList()
+                songs.filterNotNull().toMutableList(),
+                fallbackCoverUrl = coverUrl
             )
         )
         for (song in songs) {
@@ -505,14 +516,19 @@ class ListActivity : AppCompatActivity() {
         binding!!.albumTitle.text = data.name()
         binding!!.albumSubTitle.text = data.description()
         val imageList = data.image
-        if (!imageList.isNullOrEmpty()) {
-            Glide.with(binding!!.albumCover).load(imageList[imageList.size - 1]?.url ?: "")
+        val coverUrl = if (!imageList.isNullOrEmpty()) imageList[imageList.size - 1]?.url ?: ""
+                       else albumItem?.albumCover ?: ""
+        if (coverUrl.isNotEmpty()) {
+            Glide.with(binding!!.albumCover).load(coverUrl)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
                 .into(binding!!.albumCover)
         }
         val songs = data.songs ?: mutableListOf()
         binding!!.recyclerView.setAdapter(
             ActivityListSongsItemAdapter(
-                songs.filterNotNull().toMutableList()
+                songs.filterNotNull().toMutableList(),
+                fallbackCoverUrl = coverUrl
             )
         )
         for (song in songs) {

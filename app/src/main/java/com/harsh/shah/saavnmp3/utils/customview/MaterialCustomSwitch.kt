@@ -39,14 +39,17 @@ class MaterialCustomSwitch : LinearLayout {
 
 
     private fun init(attrs: AttributeSet?, defStyle: Int) {
-        // Load attributes
-
+        isSaveEnabled = false
         inflate(context, R.layout.material_custom_switch, this)
 
         textHeadView = findViewById(R.id.text_head)
         textDescView = findViewById(R.id.text_desc)
         materialSwitch = findViewById(R.id.materialSwitch)
-        findViewById<View>(R.id.root).setOnClickListener { _: View? -> materialSwitch!!.toggle() }
+        materialSwitch?.isSaveEnabled = false
+
+        findViewById<View>(R.id.root).setOnClickListener {
+            materialSwitch?.toggle()
+        }
 
         materialSwitch!!.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             textDescView!!.text = if (isChecked) textOn else textOff
@@ -63,10 +66,26 @@ class MaterialCustomSwitch : LinearLayout {
 
             textHeadView!!.text = textHead
             textDescView!!.text = (if (checked) textOn else textOff)
-            materialSwitch!!.setChecked(checked)
+            materialSwitch!!.isChecked = checked
         } finally {
             a.recycle()
         }
+    }
+
+    override fun dispatchSaveInstanceState(container: android.util.SparseArray<android.os.Parcelable>?) {
+        // Do not save state of child views to prevent stale switch restoration
+    }
+
+    override fun dispatchRestoreInstanceState(container: android.util.SparseArray<android.os.Parcelable>?) {
+        // Do not restore state of child views
+    }
+
+    override fun onSaveInstanceState(): android.os.Parcelable? {
+        return null
+    }
+
+    override fun onRestoreInstanceState(state: android.os.Parcelable?) {
+        // Do not restore state
     }
 
     fun setOnCheckChangeListener(onCheckChangedListener: OnCheckChangeListener?) {
@@ -74,7 +93,13 @@ class MaterialCustomSwitch : LinearLayout {
     }
 
     fun setChecked(checked: Boolean) {
-        materialSwitch!!.setChecked(checked)
+        textDescView?.text = if (checked) textOn else textOff
+        if (materialSwitch?.isChecked != checked) {
+            val listener = onCheckChangedListener
+            onCheckChangedListener = null
+            materialSwitch?.isChecked = checked
+            onCheckChangedListener = listener
+        }
     }
 
     interface OnCheckChangeListener {

@@ -46,8 +46,16 @@ class ActivityMainArtistsItemAdapter(private val data: MutableList<ArtistsSearch
         val imageView = holder.itemView.findViewById<ImageView?>(R.id.artist_img)
         val images = data[position]?.image
         val url = if (images.isNullOrEmpty()) "" else images[images.size - 1]?.url ?: ""
-        if (url.isNotEmpty()) {
-            Glide.with(imageView!!).load(url).into(imageView)
+        if (imageView != null) {
+            if (url.isNotEmpty()) {
+                Glide.with(imageView)
+                    .load(url)
+                    .placeholder(R.drawable.baseline_album_24)
+                    .error(R.drawable.baseline_album_24)
+                    .into(imageView)
+            } else {
+                imageView.setImageResource(R.drawable.baseline_album_24)
+            }
         }
 
         holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->

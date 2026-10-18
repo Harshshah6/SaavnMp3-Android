@@ -33,6 +33,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.palette.graphics.Palette
 import com.google.gson.Gson
+import com.harsh.shah.saavnmp3.widgets.WidgetCardProvider
+import com.harsh.shah.saavnmp3.widgets.WidgetVinylProvider
 import com.harsh.shah.saavnmp3.BaseApplicationClass
 import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
@@ -119,7 +121,6 @@ object MusicPlayerManager {
                 Log.i(TAG, "Player state changed to: ${getStateString(playbackState)}")
                 when (playbackState) {
                     Player.STATE_READY -> {
-                        player?.play()
                         updateWidget()
                     }
                     Player.STATE_ENDED -> {
@@ -129,6 +130,12 @@ object MusicPlayerManager {
                         updateWidget()
                     }
                 }
+            }
+
+            override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                Log.i(TAG, "Player playWhenReady changed to: $playWhenReady (reason: $reason)")
+                showNotification()
+                updateWidget()
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -182,6 +189,35 @@ object MusicPlayerManager {
         description?.let { MUSIC_DESCRIPTION = it }
         MUSIC_ID = id
         Log.i(TAG, "setMusicDetails: $MUSIC_TITLE - ID: $MUSIC_ID")
+
+        if (!image.isNullOrBlank()) {
+            val ctx = appContext ?: BaseApplicationClass.currentActivity
+            if (ctx != null) {
+                try {
+                    Glide.with(ctx.applicationContext)
+                        .asBitmap()
+                        .load(image)
+                        .into(object : CustomTarget<Bitmap>() {
+                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                Palette.from(resource).generate { palette ->
+                                    palette?.let {
+                                        val swatch = it.darkMutedSwatch ?: it.darkVibrantSwatch ?: it.dominantSwatch
+                                        swatch?.let { s ->
+                                            IMAGE_BG_COLOR = s.rgb
+                                            TEXT_ON_IMAGE_COLOR = s.titleTextColor
+                                            TEXT_ON_IMAGE_COLOR1 = s.bodyTextColor
+                                        }
+                                    }
+                                }
+                            }
+                            override fun onLoadCleared(placeholder: Drawable?) {}
+                        })
+                } catch (e: Exception) {
+                    Log.e(TAG, "Palette generation error: ${e.message}")
+                }
+            }
+        }
+
         updateWidget()
     }
 
@@ -190,8 +226,12 @@ object MusicPlayerManager {
         notificationManager?.cancel(1)
     }
 
-    private fun updateWidget() {
-        appContext?.let { WidgetPlayerProvider.updateAllWidgets(it) }
+    fun updateWidget() {
+        appContext?.let {
+            WidgetPlayerProvider.updateAllWidgets(it)
+            WidgetCardProvider.updateAllWidgets(it)
+            WidgetVinylProvider.updateAllWidgets(it)
+        }
     }
 
     fun getDownloadUrl(downloadUrlList: MutableList<SongResponse.DownloadUrl?>?): String {
@@ -209,7 +249,7 @@ object MusicPlayerManager {
         return if (lastUrl.startsWith("http:")) lastUrl.replace("http:", "https:") else lastUrl
     }
 
-    fun showNotification(playPauseButton: Int = if (player?.playWhenReady == true) R.drawable.baseline_pause_24 else R.drawable.play_arrow_24px) {
+    fun showNotification(playPauseButton: Int = if (isPlayerPlaying()) R.drawable.baseline_pause_24 else R.drawable.play_arrow_24px) {
         val ctx = appContext ?: return
         if (MUSIC_ID.isNullOrEmpty() || MUSIC_TITLE.isNullOrEmpty() || IMAGE_URL.isNullOrEmpty()) return
 
@@ -310,18 +350,28 @@ object MusicPlayerManager {
             val manager = appContext?.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             manager?.notify(1, notification)
         }
+        updateWidget()
+    }
+
+    fun isPlayerPlaying(): Boolean {
+        val p = player ?: return false
+        return p.playWhenReady && p.playbackState != Player.STATE_ENDED && p.playbackState != Player.STATE_IDLE
     }
 
     fun togglePlayPause() {
         val p = player ?: return
-        if (p.isPlaying) p.pause()
-        else if (p.playbackState == Player.STATE_IDLE) prepareMediaPlayer()
-        else p.play()
+        if (isPlayerPlaying()) {
+            p.pause()
+        } else {
+            if (p.playbackState == Player.STATE_IDLE) {
+                prepareMediaPlayer()
+            } else {
+                p.play()
+            }
+        }
 
-        Handler(Looper.getMainLooper()).postDelayed({ 
-            showNotification() 
-            updateWidget()
-        }, 100)
+        showNotification()
+        updateWidget()
     }
 
     fun prepareMediaPlayer() {
@@ -393,10 +443,63 @@ object MusicPlayerManager {
                     SONG_URL = getDownloadUrl(firstSong.downloadUrl)
                     setMusicDetails(IMAGE_URL, MUSIC_TITLE, MUSIC_DESCRIPTION, MUSIC_ID)
                     prepareMediaPlayer()
+
+                    // Record to recently played history
+                    val primaryArtist = firstSong.artists?.primary?.firstOrNull()
+                    val artistsStr = firstSong.artists?.all?.joinToString(", ") { it?.name() ?: "" } ?: ""
+                    sharedPreferenceManager?.addRecentlyPlayed(
+                        com.harsh.shah.saavnmp3.records.sharedpref.SavedLibraries.Library.Songs(
+                            firstSong.id,
+                            firstSong.name(),
+                            artistsStr,
+                            IMAGE_URL
+                        ),
+                        artistId = primaryArtist?.id,
+                        artistName = primaryArtist?.name()
+                    )
                 }
             }
             override fun onErrorResponse(tag: String?, message: String?) {}
         })
+    }
+
+    private var isFetchingAutoplay = false
+
+    private fun fetchAndAppendAutoplayRecommendations(currentSong: SongResponse.Song) {
+        if (isFetchingAutoplay) return
+        isFetchingAutoplay = true
+        val ctx = appContext ?: BaseApplicationClass.currentActivity ?: return
+
+        RecommendationManager.getRecommendationsForSong(ctx, currentSong, limit = 10) { recommendedSongs ->
+            isFetchingAutoplay = false
+            if (recommendedSongs.isNotEmpty()) {
+                val queue = trackQueue ?: ArrayList()
+                val newIds = recommendedSongs.mapNotNull { it.id }.filter { !queue.contains(it) }
+                if (newIds.isNotEmpty()) {
+                    queue.addAll(newIds)
+                    trackQueue = queue
+                    track_position++
+                    if (track_position < queue.size) {
+                        MUSIC_ID = queue[track_position]
+                        playTrack()
+                        showNotification()
+                        updateWidget()
+                        val act = BaseApplicationClass.currentActivity
+                        if (act != null) {
+                            android.widget.Toast.makeText(act, "Autoplay: Playing recommended tracks", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun setPlaybackSpeed(speed: Float) {
+        player?.playbackParameters = androidx.media3.common.PlaybackParameters(speed)
+    }
+
+    fun getPlaybackSpeed(): Float {
+        return player?.playbackParameters?.speed ?: 1.0f
     }
 
     fun nextTrack() {
@@ -408,7 +511,18 @@ object MusicPlayerManager {
             when (p.repeatMode) {
                 Player.REPEAT_MODE_ONE -> { p.seekTo(0); p.play(); return }
                 Player.REPEAT_MODE_ALL -> { track_position = 0 }
-                else -> { return }
+                else -> {
+                    // Check Autoplay Recommended Music
+                    val prefs = sharedPreferenceManager ?: appContext?.let { SharedPreferenceManager.getInstance(it) }
+                    if (prefs?.isAutoplayEnabled == true && CURRENT_TRACK?.data?.isNotEmpty() == true) {
+                        val currentSong = CURRENT_TRACK!!.data!![0]
+                        if (currentSong != null) {
+                            fetchAndAppendAutoplayRecommendations(currentSong)
+                            return
+                        }
+                    }
+                    return
+                }
             }
         } else {
             if (p.shuffleModeEnabled && trackQueue!!.size > 1) {

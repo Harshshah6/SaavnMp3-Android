@@ -34,8 +34,15 @@ class UserCreatedSongsListAdapter(private val data: MutableList<Library.Songs?>)
         holder.binding.title.text = data[position]!!.title
         holder.binding.artist.text = data[position]!!.description
         val imageUrl = data[position]?.image
-        if (imageUrl?.isNotBlank() == true) Glide.with(holder.binding.coverImage)
-            .load(imageUrl).into(holder.binding.coverImage)
+        if (imageUrl?.isNotBlank() == true) {
+            Glide.with(holder.binding.coverImage)
+                .load(imageUrl)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
+                .into(holder.binding.coverImage)
+        } else {
+            holder.binding.coverImage.setImageResource(R.drawable.baseline_album_24)
+        }
 
         // Wire up the 3-dots menu
         val moreIcon = holder.itemView.findViewById<ImageView>(R.id.more)

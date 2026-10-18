@@ -52,7 +52,7 @@ object MiniPlayerHelper {
         
         activity.findViewById<View>(R.id.play_bar_play_pause_icon)?.setOnClickListener {
             MusicPlayerManager.togglePlayPause()
-            handler.postDelayed({ updatePlayBar(activity) }, 100)
+            updatePlayBar(activity)
         }
         
         activity.findViewById<View>(R.id.play_bar_prev_icon)?.setOnClickListener { view ->
@@ -109,24 +109,33 @@ object MiniPlayerHelper {
         titleText?.text = MusicPlayerManager.MUSIC_TITLE
         descText?.text = MusicPlayerManager.MUSIC_DESCRIPTION
         
-        if (coverImage != null && !MusicPlayerManager.IMAGE_URL.isNullOrBlank()) {
-            try {
-                Glide.with(coverImage).load(MusicPlayerManager.IMAGE_URL).into(coverImage)
-            } catch (e: Exception) {
-                Log.e("MiniPlayerHelper", "Error loading image: ${e.message}")
+        if (coverImage != null) {
+            if (!MusicPlayerManager.IMAGE_URL.isNullOrBlank()) {
+                try {
+                    Glide.with(coverImage)
+                        .load(MusicPlayerManager.IMAGE_URL)
+                        .placeholder(R.drawable.baseline_album_24)
+                        .error(R.drawable.baseline_album_24)
+                        .into(coverImage)
+                } catch (e: Exception) {
+                    Log.e("MiniPlayerHelper", "Error loading image: ${e.message}")
+                    coverImage.setImageResource(R.drawable.baseline_album_24)
+                }
+            } else {
+                coverImage.setImageResource(R.drawable.baseline_album_24)
             }
         }
         
         val p = MusicPlayerManager.player
         if (p != null && playPauseIcon != null) {
             playPauseIcon.setImageResource(
-                if (p.isPlaying) R.drawable.baseline_pause_24 else R.drawable.play_arrow_24px
+                if (MusicPlayerManager.isPlayerPlaying()) R.drawable.baseline_pause_24 else R.drawable.play_arrow_24px
             )
         }
         
         val gradientDrawable = GradientDrawable()
         gradientDrawable.setColor(MusicPlayerManager.IMAGE_BG_COLOR)
-        gradientDrawable.cornerRadius = 18f
+        gradientDrawable.cornerRadius = 20f * activity.resources.displayMetrics.density
         playBar.background = gradientDrawable
         
         titleText?.setTextColor(MusicPlayerManager.TEXT_ON_IMAGE_COLOR1)

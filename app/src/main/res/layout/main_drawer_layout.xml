@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Material 3 Navigation Drawer Layout -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/background"
+    android:background="@color/surfaceContainerLow"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
-    android:paddingVertical="@dimen/_12sdp">
+    android:paddingVertical="@dimen/_16sdp">
 
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingHorizontal="@dimen/_12sdp">
+        android:paddingHorizontal="@dimen/_16sdp"
+        android:paddingVertical="@dimen/_8sdp">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="@dimen/_35sdp"
-            android:layout_height="@dimen/_35sdp"
-            app:cardCornerRadius="@dimen/_8sdp"
-            app:cardBackgroundColor="@color/background">
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="@dimen/_38sdp"
+            android:layout_height="@dimen/_38sdp"
+            app:cardCornerRadius="@dimen/_12sdp"
+            app:strokeWidth="0dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/surfaceContainerHighest">
 
             <ImageView
                 android:id="@+id/logo"
@@ -29,84 +34,98 @@
                 android:importantForAccessibility="no"
                 android:src="@drawable/icon" />
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginStart="@dimen/_8sdp">
+            android:layout_marginStart="@dimen/_10sdp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/app_name"
+                android:fontFamily="@font/avenir_next_bold"
                 android:textSize="@dimen/_16ssp"
                 android:textColor="@color/textMain" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Made By Harsh &lt;3"
-                android:textSize="@dimen/_9ssp"
+                android:text="Material Music Player"
+                android:fontFamily="@font/avenir_next_regular"
+                android:textSize="@dimen/_10ssp"
                 android:textColor="@color/textSec" />
 
         </LinearLayout>
 
-
     </LinearLayout>
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:layout_width="match_parent"
-        android:layout_height="0.7dp"
-        android:background="@color/textSec"
-        android:layout_marginVertical="@dimen/_8sdp" />
+        android:layout_height="0.6dp"
+        app:dividerColor="@color/dividerBackground"
+        android:layout_marginVertical="@dimen/_10sdp"
+        android:layout_marginHorizontal="@dimen/_12sdp" />
 
-    <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
-        android:id="@+id/library"
+    <!-- Navigation Items -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="Your Library"
-        android:src="@drawable/baseline_library_music_24"
-        app:srcPadding="@dimen/_4sdp" />
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/_8sdp">
 
-    <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
-        android:id="@+id/download_manager"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:title="Downloads"
-        android:src="@drawable/baseline_download_for_offline_24"
-        app:srcPadding="@dimen/_4sdp" />
+        <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
+            android:id="@+id/library"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Your Library"
+            android:src="@drawable/baseline_library_music_24"
+            app:srcPadding="@dimen/_4sdp" />
 
-    <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
-        android:id="@+id/settings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:title="Settings and privacy"
-        android:src="@drawable/settings_24px"
-        app:srcPadding="@dimen/_4sdp" />
+        <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
+            android:id="@+id/download_manager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Downloads"
+            android:src="@drawable/baseline_download_for_offline_24"
+            app:srcPadding="@dimen/_4sdp" />
 
-    <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
-        android:id="@+id/about"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:title="About"
-        android:src="@drawable/round_info_outline_24"
-        app:srcPadding="@dimen/_4sdp" />
+        <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
+            android:id="@+id/settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Settings and privacy"
+            android:src="@drawable/settings_24px"
+            app:srcPadding="@dimen/_4sdp" />
+
+        <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
+            android:id="@+id/about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="About"
+            android:src="@drawable/round_info_outline_24"
+            app:srcPadding="@dimen/_4sdp" />
+
+    </LinearLayout>
 
     <View
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
+    <!-- Footer Version Tag -->
     <TextView
         android:id="@+id/versionTxt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="version 1.0.0"
+        android:fontFamily="@font/avenir_next_regular"
         android:gravity="center"
-        android:paddingStart="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_8sdp"
         tools:ignore="RtlSymmetry"
+        android:textSize="@dimen/_10ssp"
         android:textColor="@color/textSec" />
 
 </LinearLayout>

@@ -45,7 +45,18 @@ class ActivityMainPlaylistAdapter(private val data: MutableList<AlbumItem?>) :
 
         (holder.itemView.findViewById<View?>(R.id.title) as TextView).text = data[position]!!.albumTitle()
         val imageView = holder.itemView.findViewById<ImageView?>(R.id.imageView)
-        Glide.with(imageView!!).load(data[position]!!.albumCover).into(imageView)
+        val coverUrl = data[position]?.albumCover
+        if (imageView != null) {
+            if (!coverUrl.isNullOrEmpty()) {
+                Glide.with(imageView)
+                    .load(coverUrl)
+                    .placeholder(R.drawable.baseline_album_24)
+                    .error(R.drawable.baseline_album_24)
+                    .into(imageView)
+            } else {
+                imageView.setImageResource(R.drawable.baseline_album_24)
+            }
+        }
 
         holder.itemView.setOnClickListener { v: View? ->
             v!!.context.startActivity(

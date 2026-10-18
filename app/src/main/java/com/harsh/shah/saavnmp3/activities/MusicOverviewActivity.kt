@@ -56,6 +56,12 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import com.harsh.shah.saavnmp3.utils.ThemeManager
+import com.harsh.shah.saavnmp3.databinding.RecommendationsBottomSheetBinding
+import com.harsh.shah.saavnmp3.databinding.SleepTimerBottomSheetBinding
+import com.harsh.shah.saavnmp3.adapters.ActivityListSongsItemAdapter
+import com.harsh.shah.saavnmp3.utils.RecommendationManager
+import com.harsh.shah.saavnmp3.utils.SleepTimerManager
 
 class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnection {
     private val TAG = "MusicOverviewActivity"
@@ -152,9 +158,18 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
     // @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeManager.applyTheme(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMusicOverviewBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
+
+        val primaryColor = ThemeManager.getPrimaryColor(this)
+        val onPrimaryColor = ThemeManager.getOnPrimaryColor(this)
+        binding!!.PlayPauseIconBg.setCardBackgroundColor(ColorStateList.valueOf(primaryColor))
+        binding!!.playPauseImage.imageTintList = ColorStateList.valueOf(onPrimaryColor)
+        binding!!.seekbar.progressTintList = ColorStateList.valueOf(primaryColor)
+        binding!!.seekbar.thumbTintList = ColorStateList.valueOf(primaryColor)
+        binding!!.trackQuality.setTextColor(primaryColor)
 
         binding!!.title.isSelected = true
         binding!!.description.isSelected = true
@@ -261,7 +276,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 MusicPlayerManager.togglePlayPause()
 
                 // Update UI based on new state
-                if (MusicPlayerManager.player?.isPlaying == true) {
+                if (MusicPlayerManager.isPlayerPlaying()) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -453,14 +468,13 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
         binding!!.shuffleIcon.setOnClickListener {
             val player = MusicPlayerManager.player
+            val primaryColor = ThemeManager.getPrimaryColor(this)
             if (player != null) {
                 player.shuffleModeEnabled = !player.shuffleModeEnabled
                 if (player.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList =
-                    ColorStateList.valueOf(getResources().getColor(R.color.spotify_green))
+                    ColorStateList.valueOf(primaryColor)
                 else binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(
-                    getResources().getColor(
-                        R.color.textSec
-                    )
+                    resources.getColor(R.color.textSec, null)
                 )
             }
             if (isDebugMode) Toast.makeText(
@@ -468,6 +482,37 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 "Shuffle Mode Changed.",
                 Toast.LENGTH_SHORT
             ).show()
+        }
+
+        binding!!.recommendationIcon?.setOnClickListener {
+            showRecommendationsBottomSheet()
+        }
+
+        binding!!.favoriteIcon?.setOnClickListener {
+            val currentId = MusicPlayerManager.MUSIC_ID ?: ID_FROM_EXTRA
+            if (currentId.isNullOrEmpty()) return@setOnClickListener
+
+            val song = mSongResponse?.data?.getOrNull(0)
+            val title = song?.name() ?: binding!!.title.text.toString()
+            val desc = song?.artists?.all?.joinToString(", ") { it?.name() ?: "" } ?: binding!!.description.text.toString()
+            val img = IMAGE_URL ?: ""
+
+            val songItem = SavedLibraries.Library.Songs(currentId, title, desc, img)
+            val nowLiked = SharedPreferenceManager.getInstance(this).toggleLikedSong(songItem)
+
+            binding!!.favoriteIcon?.animate()
+                ?.scaleX(1.3f)
+                ?.scaleY(1.3f)
+                ?.setDuration(120)
+                ?.withEndAction {
+                    binding!!.favoriteIcon?.animate()?.scaleX(1.0f)?.scaleY(1.0f)?.setDuration(120)?.start()
+                }
+                ?.start()
+
+            updateFavoriteButtonUI()
+
+            val msg = if (nowLiked) "Added to Liked Songs" else "Removed from Liked Songs"
+            Snackbar.make(binding!!.root, msg, Snackbar.LENGTH_SHORT).show()
         }
 
         binding!!.shareIcon.setOnClickListener(View.OnClickListener {
@@ -488,7 +533,11 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 .inflate(layoutInflater)
             _binding.albumTitle.text = binding!!.title.text.toString()
             _binding.albumSubTitle.text = binding!!.description.text.toString()
-            Glide.with(_binding.coverImage).load(IMAGE_URL).into(_binding.coverImage)
+            Glide.with(_binding.coverImage)
+                .load(IMAGE_URL)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
+                .into(_binding.coverImage)
             val linearLayout = _binding.main
 
             _binding.goToAlbum.setOnClickListener(View.OnClickListener {
@@ -583,6 +632,26 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                         }
                     })
             })
+
+            _binding.recommendations.setOnClickListener {
+                bottomSheetDialog.dismiss()
+                showRecommendationsBottomSheet()
+            }
+
+            _binding.sleepTimer.setOnClickListener {
+                bottomSheetDialog.dismiss()
+                showSleepTimerBottomSheet()
+            }
+
+            _binding.playbackSpeed.setOnClickListener {
+                bottomSheetDialog.dismiss()
+                showPlaybackSpeedDialog()
+            }
+
+            _binding.equalizer.setOnClickListener {
+                bottomSheetDialog.dismiss()
+                openEqualizer()
+            }
 
             for (artist in artistsList) {
                 try {
@@ -824,7 +893,13 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         IMAGE_URL = if (!image.isNullOrEmpty()) image[image.size - 1]?.url ?: "" else ""
         SHARE_URL = song.url ?: ""
         if (IMAGE_URL!!.isNotEmpty()) {
-            Glide.with(binding!!.coverImage).load(IMAGE_URL).into(binding!!.coverImage)
+            Glide.with(binding!!.coverImage)
+                .load(IMAGE_URL)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
+                .into(binding!!.coverImage)
+        } else {
+            binding!!.coverImage.setImageResource(R.drawable.baseline_album_24)
         }
         val downloadUrls = song.downloadUrl
 
@@ -841,6 +916,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             prepareMediaPLayer()
         }
 
+        updateFavoriteButtonUI()
         fetchLyricsForCurrentSong(song)
     }
 
@@ -999,8 +1075,15 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         if (binding!!.description.text.toString() != MusicPlayerManager.MUSIC_DESCRIPTION) {
             binding!!.description.text = MusicPlayerManager.MUSIC_DESCRIPTION
         }
-        Glide.with(binding!!.coverImage).load(MusicPlayerManager.IMAGE_URL)
-            .into(binding!!.coverImage)
+        if (!MusicPlayerManager.IMAGE_URL.isNullOrBlank()) {
+            Glide.with(binding!!.coverImage)
+                .load(MusicPlayerManager.IMAGE_URL)
+                .placeholder(R.drawable.baseline_album_24)
+                .error(R.drawable.baseline_album_24)
+                .into(binding!!.coverImage)
+        } else {
+            binding!!.coverImage.setImageResource(R.drawable.baseline_album_24)
+        }
         val p = MusicPlayerManager.player ?: return
         binding!!.seekbar.progress = ((p.currentPosition.toFloat() / p.duration) * 100).toInt()
 
@@ -1023,8 +1106,11 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         // Update repeat and shuffle button UI
         updateRepeatButtonUI()
 
-        if (p.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(getResources().getColor(R.color.spotify_green))
-        else binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(getResources().getColor(R.color.textSec))
+        val primaryColor = ThemeManager.getPrimaryColor(this)
+        if (p.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(primaryColor)
+        else binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.textSec, null))
+
+        updateFavoriteButtonUI()
 
         mHandler.postDelayed(mUpdateTimeTask, 1000)
     }
@@ -1033,10 +1119,11 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         val tintColor: Int
         val p = MusicPlayerManager.player ?: return
         val repeatMode: Int = p.repeatMode
+        val primaryColor = ThemeManager.getPrimaryColor(this)
 
         when (repeatMode) {
             Player.REPEAT_MODE_ONE -> {
-                tintColor = getResources().getColor(R.color.spotify_green)
+                tintColor = primaryColor
                 try {
                     binding!!.repeatIcon.setImageResource(R.drawable.repeat_one_24px)
                 } catch (e: Exception) {
@@ -1047,17 +1134,17 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             }
 
             Player.REPEAT_MODE_ALL -> {
-                tintColor = getResources().getColor(R.color.spotify_green)
+                tintColor = primaryColor
                 binding!!.repeatIcon.setImageResource(R.drawable.repeat_24px)
             }
 
             Player.REPEAT_MODE_OFF -> {
-                tintColor = getResources().getColor(R.color.textSec)
+                tintColor = resources.getColor(R.color.textSec, null)
                 binding!!.repeatIcon.setImageResource(R.drawable.repeat_24px)
             }
 
             else -> {
-                tintColor = getResources().getColor(R.color.textSec)
+                tintColor = resources.getColor(R.color.textSec, null)
                 binding!!.repeatIcon.setImageResource(R.drawable.repeat_24px)
             }
         }
@@ -1082,7 +1169,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 updateTrackInfo()
                 updateSeekbar()
 
-                if (MusicPlayerManager.player?.isPlaying == true) {
+                if (MusicPlayerManager.isPlayerPlaying()) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -1110,7 +1197,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 updateTrackInfo()
                 updateSeekbar()
 
-                if (MusicPlayerManager.player?.isPlaying == true) {
+                if (MusicPlayerManager.isPlayerPlaying()) {
                     binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
                 } else {
                     binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
@@ -1140,6 +1227,187 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
     fun showNotification(playPauseButton: Int) {
         MusicPlayerManager.showNotification()
+    }
+
+    private fun updateFavoriteButtonUI() {
+        val currentId = MusicPlayerManager.MUSIC_ID ?: ID_FROM_EXTRA
+        if (currentId.isNullOrEmpty() || binding == null) return
+        val isLiked = SharedPreferenceManager.getInstance(this).isSongLiked(currentId)
+        if (isLiked) {
+            binding!!.favoriteIcon?.setImageResource(R.drawable.favorite_24px)
+            binding!!.favoriteIcon?.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.red, null))
+        } else {
+            binding!!.favoriteIcon?.setImageResource(R.drawable.favorite_outline_24px)
+            binding!!.favoriteIcon?.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.textMain, null))
+        }
+    }
+
+    private fun showRecommendationsBottomSheet() {
+        val currentSong = mSongResponse?.data?.getOrNull(0)
+        if (currentSong == null) {
+            Toast.makeText(this, "Song details not loaded yet", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val bottomSheet = BottomSheetDialog(this, R.style.MyBottomSheetDialogTheme)
+        val sheetBinding = RecommendationsBottomSheetBinding.inflate(layoutInflater)
+        bottomSheet.setContentView(sheetBinding.root)
+
+        sheetBinding.recSubtitle.text = "Similar to ${currentSong.name()}"
+        sheetBinding.loadingProgress.visibility = View.VISIBLE
+        sheetBinding.recRecyclerView.visibility = View.GONE
+        sheetBinding.emptyText.visibility = View.GONE
+        sheetBinding.playAllBtn.visibility = View.GONE
+
+        RecommendationManager.getRecommendationsForSong(this, currentSong, limit = 15) { recommendations ->
+            if (isFinishing || isDestroyed) return@getRecommendationsForSong
+            sheetBinding.loadingProgress.visibility = View.GONE
+
+            if (recommendations.isEmpty()) {
+                sheetBinding.emptyText.visibility = View.VISIBLE
+            } else {
+                sheetBinding.recRecyclerView.visibility = View.VISIBLE
+                sheetBinding.playAllBtn.visibility = View.VISIBLE
+
+                val adapter = ActivityListSongsItemAdapter(
+                    recommendations.toMutableList(),
+                    currentSong.image?.lastOrNull()?.url
+                )
+                sheetBinding.recRecyclerView.adapter = adapter
+
+                sheetBinding.playAllBtn.setOnClickListener {
+                    MusicPlayerManager.trackQueue?.clear()
+                    recommendations.mapNotNull { it.id }.forEach { id ->
+                        MusicPlayerManager.trackQueue?.add(id)
+                    }
+                    if (!MusicPlayerManager.trackQueue.isNullOrEmpty()) {
+                        MusicPlayerManager.track_position = 0
+                        MusicPlayerManager.MUSIC_ID = MusicPlayerManager.trackQueue!![0]
+                        MusicPlayerManager.playTrack()
+                    }
+                    bottomSheet.dismiss()
+                }
+            }
+        }
+
+        bottomSheet.show()
+    }
+
+    private fun showSleepTimerBottomSheet() {
+        val bottomSheet = BottomSheetDialog(this, R.style.MyBottomSheetDialogTheme)
+        val sheetBinding = SleepTimerBottomSheetBinding.inflate(layoutInflater)
+        bottomSheet.setContentView(sheetBinding.root)
+
+        fun refreshTimerUI() {
+            if (SleepTimerManager.isTimerActive) {
+                sheetBinding.activeTimerCard.visibility = View.VISIBLE
+                sheetBinding.remainingTimeText.text = SleepTimerManager.getFormattedRemainingTime()
+            } else {
+                sheetBinding.activeTimerCard.visibility = View.GONE
+            }
+        }
+
+        refreshTimerUI()
+
+        val timerListener = object : SleepTimerManager.SleepTimerListener {
+            override fun onTimerTick(remainingSeconds: Long) {
+                sheetBinding.remainingTimeText.text = SleepTimerManager.getFormattedRemainingTime()
+            }
+
+            override fun onTimerFinished() {
+                refreshTimerUI()
+            }
+
+            override fun onTimerCancelled() {
+                refreshTimerUI()
+            }
+        }
+
+        SleepTimerManager.addListener(timerListener)
+        bottomSheet.setOnDismissListener {
+            SleepTimerManager.removeListener(timerListener)
+        }
+
+        sheetBinding.timerOption15.setOnClickListener {
+            SleepTimerManager.startTimer(15)
+            refreshTimerUI()
+        }
+        sheetBinding.timerOption30.setOnClickListener {
+            SleepTimerManager.startTimer(30)
+            refreshTimerUI()
+        }
+        sheetBinding.timerOption45.setOnClickListener {
+            SleepTimerManager.startTimer(45)
+            refreshTimerUI()
+        }
+        sheetBinding.timerOption60.setOnClickListener {
+            SleepTimerManager.startTimer(60)
+            refreshTimerUI()
+        }
+        sheetBinding.timerOptionEndOfTrack.setOnClickListener {
+            SleepTimerManager.startEndOfTrackTimer()
+            refreshTimerUI()
+        }
+
+        sheetBinding.btnAdd5.setOnClickListener {
+            SleepTimerManager.addMinutes(5)
+            refreshTimerUI()
+        }
+
+        sheetBinding.btnCancelTimer.setOnClickListener {
+            SleepTimerManager.cancelTimer()
+            refreshTimerUI()
+            Toast.makeText(this, "Sleep timer turned off", Toast.LENGTH_SHORT).show()
+        }
+
+        bottomSheet.show()
+    }
+
+    private fun showPlaybackSpeedDialog() {
+        val speeds = arrayOf("0.5x", "0.75x", "1.0x (Normal)", "1.25x", "1.5x", "2.0x")
+        val speedValues = floatArrayOf(0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f)
+        val currentSpeed = MusicPlayerManager.getPlaybackSpeed()
+
+        var selectedIndex = 2 // default 1.0x
+        for (i in speedValues.indices) {
+            if (kotlin.math.abs(speedValues[i] - currentSpeed) < 0.05f) {
+                selectedIndex = i
+                break
+            }
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Playback Speed")
+            .setSingleChoiceItems(speeds, selectedIndex) { dialog, which ->
+                val selectedSpeed = speedValues[which]
+                MusicPlayerManager.setPlaybackSpeed(selectedSpeed)
+                Toast.makeText(this, "Speed set to ${speeds[which]}", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun openEqualizer() {
+        try {
+            val sessionId = MusicPlayerManager.player?.audioSessionId ?: 0
+            val intent = Intent(android.media.audiofx.AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
+                putExtra("android.media.extra.AUDIO_SESSION_ID", sessionId)
+                putExtra("android.media.extra.PACKAGE_NAME", packageName)
+                putExtra("android.media.extra.CONTENT_TYPE", 0)
+            }
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivity(intent)
+            } else {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Equalizer")
+                    .setMessage("No system audio equalizer found on this device. You can install an equalizer app like Wavelet or Poweramp Equalizer for system-wide DSP controls.")
+                    .setPositiveButton("OK", null)
+                    .show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Equalizer not available: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     companion object {

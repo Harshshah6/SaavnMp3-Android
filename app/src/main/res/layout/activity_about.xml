@@ -6,274 +6,345 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".activities.AboutActivity"
-    android:background="@color/background">
+    android:background="?attr/colorSurface"
+    tools:context=".activities.AboutActivity">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="About Us"
+        app:title="About"
+        app:titleCentered="false"
+        app:titleTextAppearance="?attr/textAppearanceTitleLarge"
         app:navigationIcon="@drawable/round_arrow_back_24"
-        app:titleTextColor="@color/textMain" />
+        app:navigationIconTint="?attr/colorOnSurface"
+        app:titleTextColor="?attr/colorOnSurface" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:overScrollMode="never"
-        android:scrollbars="none">
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/_12sdp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="32dp">
 
+            <!-- App Hero Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:strokeColor="@color/textSec"
-                app:strokeWidth="0.4dp"
-                app:contentPaddingTop="@dimen/_12sdp"
-                app:contentPaddingBottom="@dimen/_12sdp">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="@dimen/_8sdp">
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="76dp"
+                        android:layout_height="76dp"
+                        app:cardCornerRadius="22dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="?attr/colorOutlineVariant"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
 
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="@dimen/_35sdp"
-                            android:layout_height="@dimen/_35sdp"
-                            app:cardBackgroundColor="@android:color/transparent"
-                            app:strokeWidth="0.1dp"
-                            app:cardCornerRadius="@dimen/_8sdp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:importantForAccessibility="no"
-                                android:src="@drawable/icon" />
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <LinearLayout
+                        <ImageView
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_marginStart="@dimen/_8sdp">
+                            android:layout_height="match_parent"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/icon"
+                            android:importantForAccessibility="no" />
+                    </com.google.android.material.card.MaterialCardView>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/app_name"
-                                android:textStyle="bold"
-                                android:textColor="@color/textMain"
-                                android:textSize="@dimen/_18ssp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="@string/app_name"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="22sp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="A beautiful, feature-rich music player inspired by modern design principles, powered by the unofficial JioSaavn API. Easily search for and stream your favorite songs, artists, albums, and playlists. Experience seamless playback, rich artist information, and a premium music listening experience."
-                                android:textColor="@color/textSec" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:lineSpacingExtra="2dp"
+                        android:text="A beautiful, high-fidelity music streaming app built with Material You design and rich features."
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="13sp" />
 
-                        </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                    </LinearLayout>
+            <!-- Actions & Info Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Application"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="13sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingVertical="4dp">
 
                     <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
                         android:id="@+id/versionTxt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/_4sdp"
                         android:src="@drawable/round_info_outline_24"
-                        app:srcPadding="@dimen/_4sdp"
-                        app:title="Version - 1.0 " />
+                        app:srcPadding="8dp"
+                        app:title="Version 1.0" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="56dp"
+                        android:background="?attr/colorOutlineVariant" />
 
                     <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
                         android:id="@+id/email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="Email Us"
                         android:src="@drawable/round_email_24"
-                        app:srcPadding="@dimen/_4sdp" />
+                        app:srcPadding="8dp"
+                        app:title="Contact Support" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="56dp"
+                        android:background="?attr/colorOutlineVariant" />
 
                     <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
                         android:id="@+id/rate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="Rate us"
                         android:src="@drawable/star_24px"
-                        app:srcPadding="@dimen/_2sdp" />
+                        app:srcPadding="8dp"
+                        app:title="Rate on GitHub" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="56dp"
+                        android:background="?attr/colorOutlineVariant" />
 
                     <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
                         android:id="@+id/source_code"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="Source code"
                         android:src="@drawable/github"
-                        app:srcPadding="@dimen/_4sdp" />
+                        app:srcPadding="8dp"
+                        app:title="Source Code" />
 
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Community Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Community &amp; Social"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="13sp" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:strokeColor="@color/textSec"
-                app:strokeWidth="0.4dp"
-                app:contentPaddingTop="@dimen/_12sdp"
-                app:contentPaddingBottom="@dimen/_12sdp"
-                android:layout_marginVertical="@dimen/_12sdp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Community"
-                        android:textSize="@dimen/_12sdp"
-                        android:textColor="@color/textMain"
-                        android:textStyle="bold"
-                        android:layout_marginStart="@dimen/_8sdp" />
-
-                    <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
-                        android:id="@+id/instagram"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:title="Instagram"
-                        android:src="@drawable/instagram"
-                        app:srcPadding="@dimen/_4sdp"
-                        android:layout_marginTop="@dimen/_4sdp" />
+                    android:orientation="vertical"
+                    android:paddingVertical="4dp">
 
                     <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
                         android:id="@+id/telegram"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="Telegram"
                         android:src="@drawable/telegram"
-                        app:srcPadding="@dimen/_4sdp" />
+                        app:srcPadding="8dp"
+                        app:title="Telegram Channel" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="56dp"
+                        android:background="?attr/colorOutlineVariant" />
 
                     <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
                         android:id="@+id/discord"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="Discord"
                         android:src="@drawable/discord"
-                        app:srcPadding="@dimen/_4sdp" />
+                        app:srcPadding="8dp"
+                        app:title="Discord Community" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="56dp"
+                        android:background="?attr/colorOutlineVariant" />
+
+                    <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
+                        android:id="@+id/instagram"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/instagram"
+                        app:srcPadding="8dp"
+                        app:title="Instagram" />
 
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Contributors Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Contributors"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="13sp" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:strokeColor="@color/textSec"
-                app:strokeWidth="0.4dp"
-                app:contentPaddingTop="@dimen/_12sdp"
-                app:contentPaddingBottom="@dimen/_12sdp"
-                android:layout_marginBottom="@dimen/_12sdp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
 
                 <LinearLayout
                     android:id="@+id/layout_contributors"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Contributers"
-                        android:textSize="@dimen/_12sdp"
-                        android:textColor="@color/textMain"
-                        android:textStyle="bold"
-                        android:layout_marginStart="@dimen/_8sdp" />
+                    android:orientation="vertical"
+                    android:paddingVertical="4dp">
 
                     <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="harshshah6"
-                        tools:visibility="visible"
-                        android:visibility="gone"
                         android:src="@drawable/baseline_person_24"
-                        app:srcPadding="@dimen/_4sdp"
-                        android:layout_marginTop="@dimen/_4sdp" />
+                        android:visibility="gone"
+                        app:srcPadding="8dp"
+                        app:title="harshshah6"
+                        tools:visibility="visible" />
 
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- License Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Open Source License"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="13sp" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:strokeColor="@color/textSec"
-                app:strokeWidth="0.4dp"
-                app:contentPadding="@dimen/_12sdp"
-                android:layout_marginBottom="@dimen/_12sdp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="@dimen/_35sdp"
-                        android:layout_height="@dimen/_35sdp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
                         android:importantForAccessibility="no"
                         android:src="@drawable/round_menu_book_24"
-                        android:padding="@dimen/_6sdp" />
+                        app:tint="?attr/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_8sdp"
+                        android:layout_marginStart="14dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-bold"
                             android:text="@string/app_name"
-                            android:textSize="@dimen/_12sdp"
-                            android:textColor="@color/textMain"
-                            android:textStyle="bold" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:lineSpacingExtra="1dp"
                             android:text="@string/app_license"
-                            android:textColor="@color/textSec" />
-
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp" />
                     </LinearLayout>
-
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
-
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

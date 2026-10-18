@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_background"
+    android:paddingTop="@dimen/_10sdp"
+    android:paddingBottom="@dimen/_20sdp">
+
+    <!-- Drag Handle -->
+    <View
+        android:id="@+id/drag_handle"
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:background="@drawable/m3_bottom_sheet_drag_handle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/timer_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/_14sdp"
+        app:layout_constraintTop_toBottomOf="@id/drag_handle">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/_18sdp"
+                android:layout_height="@dimen/_18sdp"
+                android:layout_marginEnd="@dimen/_6sdp"
+                android:src="@drawable/ic_sleep_timer"
+                app:tint="?attr/colorPrimary"
+                android:contentDescription="Sleep Timer" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/avenir_next_bold"
+                android:text="Sleep Timer"
+                android:textColor="@color/textMain"
+                android:textSize="@dimen/_15ssp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/avenir_next_regular"
+            android:text="Music will automatically pause after the selected time"
+            android:textColor="@color/textSec"
+            android:textSize="@dimen/_10ssp" />
+
+        <!-- Active Timer Status Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/active_timer_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/surfaceContainerHighest"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/_12sdp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/avenir_next_regular"
+                        android:text="Time remaining"
+                        android:textColor="@color/textSec"
+                        android:textSize="@dimen/_9ssp" />
+
+                    <TextView
+                        android:id="@+id/remaining_time_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/avenir_next_bold"
+                        android:text="15:00"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="@dimen/_18ssp" />
+
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_add_5"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginEnd="@dimen/_4sdp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="+5m"
+                    android:textSize="@dimen/_9ssp"
+                    app:cornerRadius="999dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_cancel_timer"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/_30sdp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="Stop"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/_9ssp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Timer Options List -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/timer_option_15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/avenir_next_regular"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="15 minutes"
+                android:textColor="@color/textMain"
+                android:textSize="@dimen/_12ssp" />
+
+            <TextView
+                android:id="@+id/timer_option_30"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/avenir_next_regular"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="30 minutes"
+                android:textColor="@color/textMain"
+                android:textSize="@dimen/_12ssp" />
+
+            <TextView
+                android:id="@+id/timer_option_45"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/avenir_next_regular"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="45 minutes"
+                android:textColor="@color/textMain"
+                android:textSize="@dimen/_12ssp" />
+
+            <TextView
+                android:id="@+id/timer_option_60"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/avenir_next_regular"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="60 minutes (1 hour)"
+                android:textColor="@color/textMain"
+                android:textSize="@dimen/_12ssp" />
+
+            <TextView
+                android:id="@+id/timer_option_end_of_track"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/avenir_next_regular"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="End of current track"
+                android:textColor="@color/textMain"
+                android:textSize="@dimen/_12ssp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

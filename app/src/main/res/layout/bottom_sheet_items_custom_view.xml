@@ -15,8 +15,7 @@
         android:id="@+id/icon"
         android:layout_width="@dimen/_24sdp"
         android:layout_height="@dimen/_24sdp"
-        android:src="@drawable/baseline_person_24"
-        app:tint="@color/textMain" />
+        android:src="@drawable/baseline_person_24" />
 
     <TextView
         android:id="@+id/text"

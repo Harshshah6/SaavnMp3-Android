@@ -1,20 +1,18 @@
 package com.harsh.shah.saavnmp3.adapters
 
 import android.content.Intent
-import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.gson.Gson
 import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.ListActivity
 import com.harsh.shah.saavnmp3.adapters.ActivityMainAlbumItemAdapter.ActivityMainAlbumItemAdapterViewHolder
 import com.harsh.shah.saavnmp3.model.AlbumItem
-import com.bumptech.glide.Glide
-import androidx.core.net.toUri
 
 class ActivityMainAlbumItemAdapter(private val data: MutableList<AlbumItem?>) :
     RecyclerView.Adapter<ActivityMainAlbumItemAdapterViewHolder?>() {
@@ -76,8 +74,8 @@ class ActivityMainAlbumItemAdapter(private val data: MutableList<AlbumItem?>) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (data[position]!!.albumTitle() == "<shimmer>") return 1
-        else return 0
+        return if (data[position]!!.albumTitle() == "<shimmer>") 1
+        else 0
     }
 
     class ActivityMainAlbumItemAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

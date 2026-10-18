@@ -42,7 +42,7 @@ class BottomSheetItemView : LinearLayout {
     ) : super(context) {
         init(null, 0)
         this.titleTextView?.text = string
-        if (!imageUrl.isBlank()) {
+        if (imageUrl.isNotBlank()) {
             this.iconImageView?.let {
                 Glide.with(it).load(imageUrl).into(it)
             }
@@ -62,9 +62,9 @@ class BottomSheetItemView : LinearLayout {
         setFocusable(true)
         isClickable = true
 
-        setOnClickListener(OnClickListener { view: View? ->
+        setOnClickListener {
             Log.i("BottomSheetItemView", "init: " + "Clicked!!")
-        })
+        }
 
         if (attrs == null) return
 

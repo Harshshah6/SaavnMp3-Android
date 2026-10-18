@@ -4,11 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
-import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.TextView
@@ -39,29 +36,27 @@ import com.harsh.shah.saavnmp3.records.AlbumsSearch
 import com.harsh.shah.saavnmp3.records.ArtistsSearch
 import com.harsh.shah.saavnmp3.records.PlaylistsSearch
 import com.harsh.shah.saavnmp3.records.SongSearch
+import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.MusicPlayerManager
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
+import com.harsh.shah.saavnmp3.utils.ThemeManager
+import com.harsh.shah.saavnmp3.utils.UpdateUtil
+import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 import com.yarolegovich.slidingrootnav.SlidingRootNav
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.json.JSONException
 import org.json.JSONObject
-import java.util.Calendar
-import androidx.core.net.toUri
-import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
-import com.harsh.shah.saavnmp3.utils.ThemeManager
-import com.harsh.shah.saavnmp3.utils.UpdateUtil
-import com.harsh.shah.saavnmp3.utils.attachSnapHelper
 
 class MainActivity : AppCompatActivity() {
     private var requestStoragePermission: ActivityResultLauncher<Array<String>>? = null
     private val TAG = "MainActivity"
     private var binding: ActivityMainBinding? = null
     private var baseApplicationClass: BaseApplicationClass? = null
-    val songs: MutableList<AlbumItem?> = ArrayList<AlbumItem?>()
-    val artists: MutableList<ArtistsSearch.Data.Results?> = ArrayList<ArtistsSearch.Data.Results?>()
-    val albums: MutableList<AlbumItem?> = ArrayList<AlbumItem?>()
-    val playlists: MutableList<AlbumItem?> = ArrayList<AlbumItem?>()
+    val songs: MutableList<AlbumItem?> = ArrayList()
+    val artists: MutableList<ArtistsSearch.Data.Results?> = ArrayList()
+    val albums: MutableList<AlbumItem?> = ArrayList()
+    val playlists: MutableList<AlbumItem?> = ArrayList()
 
     var networkChangeReceiver: NetworkChangeReceiver =
         NetworkChangeReceiver(object : NetworkStatusListener {
@@ -141,14 +136,14 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        binding!!.recentlyPlayedRecyclerView?.setLayoutManager(
+        binding!!.recentlyPlayedRecyclerView.setLayoutManager(
             LinearLayoutManager(
                 this,
                 LinearLayoutManager.HORIZONTAL,
                 false
             )
         )
-        binding!!.recommendedRecyclerView?.setLayoutManager(
+        binding!!.recommendedRecyclerView.setLayoutManager(
             LinearLayoutManager(
                 this,
                 LinearLayoutManager.HORIZONTAL,
@@ -157,20 +152,20 @@ class MainActivity : AppCompatActivity() {
         )
 
         // Snap helpers — smooth magnetic scroll on all horizontal lists
-        binding!!.recentlyPlayedRecyclerView?.attachSnapHelper()
-        binding!!.recommendedRecyclerView?.attachSnapHelper()
+        binding!!.recentlyPlayedRecyclerView.attachSnapHelper()
+        binding!!.recommendedRecyclerView.attachSnapHelper()
         binding!!.popularSongsRecyclerView.attachSnapHelper()
         binding!!.popularArtistsRecyclerView.attachSnapHelper()
         binding!!.popularAlbumsRecyclerView.attachSnapHelper()
         binding!!.savedRecyclerView.attachSnapHelper()
 
-        binding!!.recentlyPlayedRecyclerView?.let {
+        binding!!.recentlyPlayedRecyclerView.let {
             OverScrollDecoratorHelper.setUpOverScroll(
                 it,
                 OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL
             )
         }
-        binding!!.recommendedRecyclerView?.let {
+        binding!!.recommendedRecyclerView.let {
             OverScrollDecoratorHelper.setUpOverScroll(
                 it,
                 OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL
@@ -237,18 +232,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkIfStorageAccessAvailable(): Boolean {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
-            return true
-        } else {
-            return (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED)
-                    && (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED)
-        }
+        return Build.VERSION.SDK_INT > Build.VERSION_CODES.R || ((ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED))
     }
 
     private fun showSavedLibrariesData() {
@@ -350,7 +341,7 @@ class MainActivity : AppCompatActivity() {
         showRecommendedData()
 
         val songSeeds = listOf("2025","2026","Hits", "Latest", "Romantic", "Chill", "Lo-Fi", "Dance", "Hindi", "Sad", "Love", "Workout", " ")
-        val artistSeeds = listOf("2025","2026", " ")
+        val artistSeeds = listOf(" ")
         val albumSeeds = listOf("2025","2026","Hits", "Latest", "New", "Sad", "Lo-Fi", "Romantic", "Rock", "Pop", "Classic", "Party", " ")
         val playlistSeeds = listOf("2025","2026","Hits", "Latest", "Trending", "Party", "Devotional", "Chill", "Love", "Sad", "Top", "Classic", " ")
         
@@ -557,7 +548,7 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }
-        binding!!.recommendedRecyclerView?.setAdapter(ActivityMainAlbumItemAdapter(dataShimmer))
+        binding!!.recommendedRecyclerView.setAdapter(ActivityMainAlbumItemAdapter(dataShimmer))
         binding!!.popularSongsRecyclerView.setAdapter(ActivityMainAlbumItemAdapter(dataShimmer))
         binding!!.popularAlbumsRecyclerView.setAdapter(ActivityMainAlbumItemAdapter(dataShimmer))
         binding!!.popularArtistsRecyclerView.setAdapter(
@@ -668,8 +659,6 @@ class MainActivity : AppCompatActivity() {
             binding!!.playlistRecyclerView.setAdapter(adapter)
             adapter.notifyDataSetChanged()
         }
-
-        // showData(); //TODO: showData if new data is available
     }
 
     fun openSearch(view: View?) {

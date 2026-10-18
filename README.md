@@ -42,14 +42,15 @@ Melotune is a lightweight, privacy-focused Android music streaming app built wit
 ## Screenshots
 
 <div align="center">
-  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/home.png" alt="Home Screen" width="220"/>
-  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/music.png" alt="Player Screen" width="220"/>
-  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/music_queue.png" alt="Queue Screen" width="220"/>
-  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/search.png" alt="Search Screen" width="220"/>
-  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/artist.jpg" alt="Saved Libraries Screen" width="220"/>
-  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/notification.png" alt="Artist Screen" width="220"/>
-  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/album.png" alt="Album Screen" width="220"/>
-  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="docs/settings.png" alt="Settings Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="fastlane\metadata\android\en-US\images\phoneScreenshots\home.png" alt="Home Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="fastlane\metadata\android\en-US\images\phoneScreenshots\settings.png" alt="Settings Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="fastlane\metadata\android\en-US\images\phoneScreenshots\about.png" alt="About Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="fastlane\metadata\android\en-US\images\phoneScreenshots\player.png" alt="Player Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="fastlane\metadata\android\en-US\images\phoneScreenshots\widgets.png" alt="Widgets Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="fastlane\metadata\android\en-US\images\phoneScreenshots\music_queue.png" alt="Music Queue Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="fastlane\metadata\android\en-US\images\phoneScreenshots\artist.png" alt="Artist Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="fastlane\metadata\android\en-US\images\phoneScreenshots\search.png" alt="Search Screen" width="220"/>
+  <img style="border:2px solid #333; border-radius:12px; margin:4px;" src="fastlane\metadata\android\en-US\images\phoneScreenshots\album.png" alt="Album Screen" width="220"/>
 </div>
 
 

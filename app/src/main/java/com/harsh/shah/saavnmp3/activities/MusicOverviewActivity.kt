@@ -62,6 +62,7 @@ import com.harsh.shah.saavnmp3.databinding.SleepTimerBottomSheetBinding
 import com.harsh.shah.saavnmp3.adapters.ActivityListSongsItemAdapter
 import com.harsh.shah.saavnmp3.utils.RecommendationManager
 import com.harsh.shah.saavnmp3.utils.SleepTimerManager
+import com.harsh.shah.saavnmp3.activities.SettingsActivity.SettingsSharedPrefManager
 
 class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnection {
     private val TAG = "MusicOverviewActivity"
@@ -583,21 +584,41 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
             _binding.download.setOnClickListener(View.OnClickListener { v: View? ->
                 if (TrackDownloader.isAlreadyDownloaded(song.name())) {
-                    startActivity(
-                        Intent(
-                            this@MusicOverviewActivity,
-                            DownloadManagerActivity::class.java
-                        )
-                    )
+                    MaterialAlertDialogBuilder(this@MusicOverviewActivity)
+                        .setTitle("Downloaded Song")
+                        .setMessage("\"${song.name()}\" is downloaded on this device.")
+                        .setPositiveButton("Open Downloads") { _, _ ->
+                            startActivity(
+                                Intent(
+                                    this@MusicOverviewActivity,
+                                    DownloadManagerActivity::class.java
+                                )
+                            )
+                        }
+                        .setNegativeButton("Delete Song") { _, _ ->
+                            if (TrackDownloader.deleteDownloadedSong(this@MusicOverviewActivity, song.name())) {
+                                Toast.makeText(this@MusicOverviewActivity, "Song deleted from device", Toast.LENGTH_SHORT).show()
+                                _binding.download.titleTextView?.text = "Download"
+                            } else {
+                                Toast.makeText(this@MusicOverviewActivity, "Failed to delete song", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        .setNeutralButton("Cancel", null)
+                        .show()
                     return@OnClickListener
                 }
                 val progressDialog = ProgressDialog(this@MusicOverviewActivity)
                 progressDialog.setMessage("Downloading...")
                 progressDialog.setCancelable(false)
                 progressDialog.setCanceledOnTouchOutside(false)
+                val settingsMgr = SettingsSharedPrefManager(this@MusicOverviewActivity)
+                val downloadFormat = TrackDownloader.DownloadFormat.fromExtension(
+                    settingsMgr.downloadFormat
+                )
                 TrackDownloader.downloadAndEmbedMetadata(
                     this@MusicOverviewActivity,
                     song,
+                    downloadFormat,
                     object : TrackDownloadListener {
                         override fun onStarted() {
                             progressDialog.show()

@@ -477,6 +477,183 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- 4. Downloads Card -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Downloads"
+                android:paddingHorizontal="@dimen/_4sdp"
+                android:paddingTop="@dimen/_4sdp"
+                android:paddingBottom="@dimen/_6sdp"
+                android:textColor="?attr/colorPrimary"
+                android:fontFamily="@font/avenir_next_bold"
+                android:textSize="@dimen/_13ssp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                android:layout_marginBottom="@dimen/_16sdp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:paddingHorizontal="@dimen/_14sdp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Download Format"
+                        android:fontFamily="@font/avenir_next_bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="@dimen/_13ssp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Choose the audio format for downloaded songs. MP3 has the widest device support (car players, old speakers). M4A is the native format with highest quality. Lyrics are embedded in all formats."
+                        android:fontFamily="@font/avenir_next_regular"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="@dimen/_10ssp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="@dimen/_10sdp" />
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none"
+                        android:overScrollMode="never">
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/download_format_chip_group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:singleSelection="true"
+                            app:selectionRequired="true">
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/format_mp3"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="MP3 ★ Recommended"
+                                android:checkable="true" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/format_m4a"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="M4A (AAC)"
+                                android:checkable="true" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/format_ogg"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="OGG (Vorbis)"
+                                android:checkable="true" />
+
+                        </com.google.android.material.chip.ChipGroup>
+
+                    </HorizontalScrollView>
+
+                    <!-- Format descriptions -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="@dimen/_8sdp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="@dimen/_4sdp"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="@dimen/_48sdp"
+                                android:layout_height="wrap_content"
+                                android:text="MP3"
+                                android:fontFamily="@font/avenir_next_bold"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="@dimen/_10ssp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Most compatible. Works on car stereos, old speakers &amp; all devices. ~320 kbps."
+                                android:fontFamily="@font/avenir_next_regular"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="@dimen/_10ssp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="@dimen/_4sdp"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="@dimen/_48sdp"
+                                android:layout_height="wrap_content"
+                                android:text="M4A"
+                                android:fontFamily="@font/avenir_next_bold"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/_10ssp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Native format. Best quality, no conversion needed. Supported on Android, iOS, macOS, Windows."
+                                android:fontFamily="@font/avenir_next_regular"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="@dimen/_10ssp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="@dimen/_48sdp"
+                                android:layout_height="wrap_content"
+                                android:text="OGG"
+                                android:fontFamily="@font/avenir_next_bold"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/_10ssp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Open source format. Slightly smaller files, good quality. Supported on Android &amp; Linux."
+                                android:fontFamily="@font/avenir_next_regular"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="@dimen/_10ssp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
 
     </ScrollView>

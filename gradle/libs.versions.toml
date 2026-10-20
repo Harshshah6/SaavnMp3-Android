@@ -27,6 +27,8 @@ jaudiotagger = "3.0.1"
 kotlin = "2.3.20"
 coreKtx = "1.18.0"
 ktor = "2.3.11"
+ffmpegKit = "8.1.9"
+kotlinxCoroutines = "1.10.2"
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
@@ -57,6 +59,8 @@ slidingrootnav = { module = "com.github.yarolegovich:SlidingRootNav", version.re
 ssp-android = { module = "com.intuit.ssp:ssp-android", version.ref = "sspAndroid" }
 swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 jaudiotagger = { module = "net.jthink:jaudiotagger", version.ref = "jaudiotagger" }
+ffmpeg-kit-audio = { module = "dev.ffmpegkit-maintained:ffmpeg-kit-audio", version.ref = "ffmpegKit" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }

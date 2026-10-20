@@ -244,6 +244,37 @@
 
         </LinearLayout>
 
+        <!-- Delete Action Button -->
+        <LinearLayout
+            android:id="@+id/deleteButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_12sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:gravity="center_vertical"
+            android:background="@drawable/outline_button_background"
+            android:foreground="?attr/selectableItemBackground"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="DELETE FROM DEVICE"
+                android:layout_weight="1"
+                android:fontFamily="@font/avenir_next_bold"
+                android:textColor="@color/red"
+                android:textSize="@dimen/_13ssp"/>
+
+            <ImageView
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:src="@drawable/ic_delete_24"
+                app:tint="@color/red"
+                android:contentDescription="Delete" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

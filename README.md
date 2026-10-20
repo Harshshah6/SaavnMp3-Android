@@ -35,7 +35,8 @@ Melotune is a lightweight, privacy-focused Android music streaming app built wit
 - **Search with History**: Instant global search with recent query chips, category filters (Songs, Albums, Playlists, Artists), and auto-suggestions.
 - **Background Playback Settings**: Configurable toggle to keep playing or stop playback when the app is removed from recents.
 - **Library & Playlists**: Create personalized playlists with full JSON **Export & Import** backup support.
-- **High-Quality Audio & Downloads**: Stream and download tracks with embedded metadata and album art.
+- **Multi-Format Downloads**: Download tracks in **MP3** (recommended for car stereos and universal compatibility), **M4A (AAC)** (native source stream), or **OGG (Vorbis)** with embedded synchronized LRC lyrics, full metadata, and high-res artwork.
+- **Offline Download Manager**: Browse downloaded tracks, inspect detailed audio specs, play offline, or delete songs directly from device storage.
 - **Modern Dark/Light UI**: Sleek, Spotify-inspired interface with dynamic color extraction, shimmer loaders, and smooth animations.
 - **Privacy-First**: No account required, no telemetry, and zero tracking.
 
@@ -63,7 +64,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 * Android Studio (latest version recommended)
 * Java 17+
 * Kotlin 2.4.0
-* An Android device or emulator
+* An Android device or emulator (Android 7.0+ / API 24+)
 
 ### Installation
 
@@ -76,17 +77,23 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 ## Built With
 
-*   [Java 17](https://openjdk.org/projects/jdk/17/) & [Kotlin 2.4.0](https://kotlinlang.org/docs/whatsnew24.html) - The programming language used.
-*   [saavn.sumit.co](https://github.com/sumitkolhe/jiosaavn-api) - The unofficial JioSaavn API.
-*   [Glide](https://github.com/bumptech/glide) - An image loading and caching library.
-*   [Picasso](https://github.com/square/picasso) - A powerful image downloading and caching library.
-*   [Gson](https://github.com/google/gson) - A Java library to convert Java Objects into their JSON representation.
-*   [OkHttp](https://github.com/square/okhttp) - An HTTP client for Android and Java applications.
-*   [SwipeRefreshLayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) - Provides a "pull-to-refresh" gesture.
-*   [Shimmer](https://github.com/facebookarchive/shimmer-android) - An Android library that provides an easy way to add a shimmer effect to any view.
-*   [Overscroll-decor](https://github.com/EverythingMe/overscroll-decor) - An Android library for an iOS-like over-scrolling effect.
-*   [SSP](https://github.com/intuit/ssp) & [SDP](https://github.com/intuit/sdp) - Libraries for responsive UI dimensions.
-*   [JAudioTagger](https://github.com/RouHim/jaudiotagger) - A Java library for reading and writing audio metadata.
+*   [Java 17](https://openjdk.org/projects/jdk/17/) & [Kotlin](https://kotlinlang.org/) - Programming languages.
+*   [saavn.sumit.co](https://github.com/sumitkolhe/jiosaavn-api) - The unofficial JioSaavn API for music search, metadata, and streams.
+*   [Media3 ExoPlayer](https://developer.android.com/media/media3/exoplayer) - Audio playback engine for streaming and caching.
+*   [FFmpegKit (Maintained)](https://github.com/arthenica/ffmpeg-kit) - Audio transcoding engine for converting downloads into MP3 (LAME) and OGG (Vorbis).
+*   [JAudioTagger](https://github.com/RouHim/jaudiotagger) - Audio metadata tagging library for ID3v2, MP4, and Vorbis tags, lyrics, and album art.
+*   [LrcLib](https://lrclib.net/) - Client for fetching synchronized LRC and plain lyrics.
+*   [Room Database](https://developer.android.com/training/data-storage/room) - Local SQLite persistence for offline caching.
+*   [Glide](https://github.com/bumptech/glide) - Image loading, memory/disk caching, and bitmap transformations.
+*   [Gson](https://github.com/google/gson) - Java serialization and deserialization library for JSON.
+*   [OkHttp](https://github.com/square/okhttp) & [Logging Interceptor](https://github.com/square/okhttp/tree/master/okhttp-logging-interceptor) - HTTP client for network operations.
+*   [SlidingRootNav](https://github.com/yarolegovich/SlidingRootNav) - Drawer layout with smooth slide animations.
+*   [Shimmer](https://github.com/facebookarchive/shimmer-android) - Shimmer placeholder animations for loading views.
+*   [Overscroll-decor](https://github.com/EverythingMe/overscroll-decor) - iOS-like overscroll bounce physics.
+*   [SSP](https://github.com/intuit/ssp) & [SDP](https://github.com/intuit/sdp) - Responsive size units for scalable screen densities.
+*   [Palette](https://developer.android.com/develop/ui/views/graphics/palette-colors) - Dynamic color extraction from artwork.
+*   [SwipeRefreshLayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) - Pull-to-refresh swipe gesture.
+*   [Paginate](https://github.com/MarkoMilos/Paginate) - Pagination and infinite scroll for RecyclerViews.
 
 <!-- ## Star History
 <a href="https://www.star-history.com/?repos=harshshah6%2FSaavnMp3-Android&type=date&legend=top-left">
@@ -111,6 +118,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Inspired by the clean and minimal UI of Spotify.
 - A big thanks to [saavn.sumit.co](https://github.com/sumitkolhe/jiosaavn-api) for the unofficial JioSaavn API.
+- A big thanks to [@Samyak2403](https://github.com/samyak2403) for implementing the LrcLib for lyrics.
 
 ## Contributors ✨
 

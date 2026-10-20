@@ -1,17 +1,21 @@
 package com.harsh.shah.saavnmp3.adapters
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.activities.MusicOverviewActivity
 import com.harsh.shah.saavnmp3.databinding.DownloadManagerMoreViewBinding
+import com.harsh.shah.saavnmp3.utils.TrackDownloader
 import com.harsh.shah.saavnmp3.utils.TrackDownloader.DownloadedTrack
 
 class ActivityDownloadManagerListAdapter(private val data: MutableList<DownloadedTrack>) :
@@ -52,11 +56,22 @@ class ActivityDownloadManagerListAdapter(private val data: MutableList<Downloade
         }
 
         holder.itemView.setOnClickListener { view: View? ->
-            showDialog(item, view!!)
+            val adapterPos = holder.bindingAdapterPosition
+            if (adapterPos != RecyclerView.NO_POSITION && adapterPos < data.size) {
+                showDialog(data[adapterPos], adapterPos, view!!)
+            }
+        }
+
+        holder.itemView.setOnLongClickListener { view: View? ->
+            val adapterPos = holder.bindingAdapterPosition
+            if (adapterPos != RecyclerView.NO_POSITION && adapterPos < data.size) {
+                showDeleteConfirmation(view!!.context, data[adapterPos], adapterPos)
+            }
+            true
         }
     }
 
-    private fun showDialog(track: DownloadedTrack, view: View) {
+    private fun showDialog(track: DownloadedTrack, position: Int, view: View) {
         val bottomSheetDialog =
             BottomSheetDialog(view.context, R.style.MyBottomSheetDialogTheme)
         val _binding =
@@ -78,8 +93,38 @@ class ActivityDownloadManagerListAdapter(private val data: MutableList<Downloade
             )
             bottomSheetDialog.dismiss()
         })
+        _binding.deleteButton.setOnClickListener {
+            showDeleteConfirmation(view.context, track, position, bottomSheetDialog)
+        }
         bottomSheetDialog.setContentView(_binding.getRoot())
         bottomSheetDialog.show()
+    }
+
+    private fun showDeleteConfirmation(
+        context: Context,
+        track: DownloadedTrack,
+        position: Int,
+        bottomSheet: BottomSheetDialog? = null
+    ) {
+        MaterialAlertDialogBuilder(context)
+            .setTitle("Delete Downloaded Song")
+            .setMessage("Are you sure you want to delete \"${track.title}\" from your device?")
+            .setPositiveButton("Delete") { _, _ ->
+                val deleted = TrackDownloader.deleteDownloadedTrack(context, track)
+                if (deleted) {
+                    bottomSheet?.dismiss()
+                    if (position in data.indices) {
+                        data.removeAt(position)
+                        notifyItemRemoved(position)
+                        notifyItemRangeChanged(position, data.size - position)
+                    }
+                    Toast.makeText(context, "Song deleted from device", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Failed to delete file", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     override fun getItemCount(): Int {

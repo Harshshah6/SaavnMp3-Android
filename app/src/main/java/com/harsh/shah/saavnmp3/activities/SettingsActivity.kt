@@ -15,6 +15,7 @@ import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch.OnCheckChangeListener
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.ThemeManager
+import com.harsh.shah.saavnmp3.utils.TrackDownloader
 import androidx.core.content.edit
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.harsh.shah.saavnmp3.databinding.SleepTimerBottomSheetBinding
@@ -156,6 +157,25 @@ class SettingsActivity : AppCompatActivity() {
                 .setNegativeButton("No", null)
                 .show()
         }
+
+        // Download Format selector (MP3 / M4A / OGG)
+        val currentFormat = settingsSharedPrefManager.downloadFormat
+        val formatCheckedId = when (currentFormat) {
+            TrackDownloader.DownloadFormat.MP3.extension -> R.id.format_mp3
+            TrackDownloader.DownloadFormat.OGG.extension -> R.id.format_ogg
+            else -> R.id.format_m4a
+        }
+        binding!!.downloadFormatChipGroup?.check(formatCheckedId)
+        binding!!.downloadFormatChipGroup?.setOnCheckedStateChangeListener { _, checkedIds ->
+            if (checkedIds.isNotEmpty()) {
+                val newExt = when (checkedIds[0]) {
+                    R.id.format_mp3 -> TrackDownloader.DownloadFormat.MP3.extension
+                    R.id.format_ogg -> TrackDownloader.DownloadFormat.OGG.extension
+                    else -> TrackDownloader.DownloadFormat.M4A.extension
+                }
+                settingsSharedPrefManager.downloadFormat = newExt
+            }
+        }
     }
 
     private fun updateSleepTimerText() {
@@ -284,6 +304,14 @@ class SettingsActivity : AppCompatActivity() {
             get() = sharedPreferences.getBoolean("play_in_background", true)
             set(value) {
                 sharedPreferences.edit { putBoolean("play_in_background", value) }
+            }
+
+        var downloadFormat: String
+            get() = sharedPreferences.getString("download_format",
+                TrackDownloader.DownloadFormat.M4A.extension) ?:
+                TrackDownloader.DownloadFormat.M4A.extension
+            set(value) {
+                sharedPreferences.edit { putString("download_format", value) }
             }
 
         var theme: String?

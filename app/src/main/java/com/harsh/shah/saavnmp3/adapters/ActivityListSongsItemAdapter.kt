@@ -98,6 +98,7 @@ class ActivityListSongsItemAdapter(
         }
 
         holder.itemView.setOnClickListener { view: View? ->
+            MusicPlayerManager.cancelAutoplay()
             MusicPlayerManager.trackQueue?.clear()
             var clickIndex = 0
             var validIndex = 0

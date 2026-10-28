@@ -327,6 +327,22 @@
                         app:textOff="Playback stops when current queue finishes."
                         app:textOn="Keep the music going! Automatically plays recommendations when queue ends." />
 
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/player_gestures"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Player Gestures"
+                        app:textOff="Gestures disabled in music player."
+                        app:textOn="Swipe left/right for tracks, drag down to minimize." />
+
+                    <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                        android:id="@+id/tap_album_lyrics_toggle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:textHead="Tap Album to Toggle Lyrics"
+                        app:textOff="Tapping album cover will not toggle lyrics."
+                        app:textOn="Tap album cover art to quickly view synchronized lyrics." />
+
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"

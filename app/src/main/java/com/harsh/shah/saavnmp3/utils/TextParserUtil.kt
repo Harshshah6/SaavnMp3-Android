@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.utils
+package com.harsh.shah.saavnmp3.utils
 
 import androidx.core.text.HtmlCompat
 

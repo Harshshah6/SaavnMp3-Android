@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.records
+package com.harsh.shah.saavnmp3.records
 
 
 data class ArtistAllAlbum(

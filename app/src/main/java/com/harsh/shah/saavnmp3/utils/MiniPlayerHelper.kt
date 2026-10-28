@@ -45,6 +45,7 @@ object MiniPlayerHelper {
                 activity.startActivity(
                     Intent(activity, MusicOverviewActivity::class.java).apply {
                         putExtra("id", MusicPlayerManager.MUSIC_ID)
+                        putExtra("from_mini_player", true)
                     }
                 )
             }

@@ -97,6 +97,7 @@ class MainActivity : AppCompatActivity() {
         updateVersionTextInDrawer()
 
         onDrawerItemsClicked()
+        setupLanguageFilterChips()
 
         binding!!.profileIcon.setOnClickListener {
             slidingRootNavBuilder!!.openMenu(
@@ -220,6 +221,50 @@ class MainActivity : AppCompatActivity() {
         UpdateUtil.checkForUpdates(this)
     }
 
+    private fun setupLanguageFilterChips() {
+        val prefManager = SharedPreferenceManager.getInstance(this)
+        val savedLang = prefManager.homeLanguageFilter
+
+        val chipId = when (savedLang.lowercase()) {
+            "hindi" -> R.id.chip_lang_hindi
+            "english" -> R.id.chip_lang_english
+            "punjabi" -> R.id.chip_lang_punjabi
+            "tamil" -> R.id.chip_lang_tamil
+            "telugu" -> R.id.chip_lang_telugu
+            "malayalam" -> R.id.chip_lang_malayalam
+            "kannada" -> R.id.chip_lang_kannada
+            "bhojpuri" -> R.id.chip_lang_bhojpuri
+            "gujarati" -> R.id.chip_lang_gujarati
+            "marathi" -> R.id.chip_lang_marathi
+            "bengali" -> R.id.chip_lang_bengali
+            else -> R.id.chip_lang_all
+        }
+        binding?.languageChipGroup?.check(chipId)
+
+        binding?.languageChipGroup?.setOnCheckedStateChangeListener { _, checkedIds ->
+            val selectedId = checkedIds.firstOrNull() ?: R.id.chip_lang_all
+            val selectedLang = when (selectedId) {
+                R.id.chip_lang_hindi -> "Hindi"
+                R.id.chip_lang_english -> "English"
+                R.id.chip_lang_punjabi -> "Punjabi"
+                R.id.chip_lang_tamil -> "Tamil"
+                R.id.chip_lang_telugu -> "Telugu"
+                R.id.chip_lang_malayalam -> "Malayalam"
+                R.id.chip_lang_kannada -> "Kannada"
+                R.id.chip_lang_bhojpuri -> "Bhojpuri"
+                R.id.chip_lang_gujarati -> "Gujarati"
+                R.id.chip_lang_marathi -> "Marathi"
+                R.id.chip_lang_bengali -> "Bengali"
+                else -> "All"
+            }
+            if (selectedLang != prefManager.homeLanguageFilter) {
+                prefManager.homeLanguageFilter = selectedLang
+                showShimmerData()
+                showData()
+            }
+        }
+    }
+
     private fun requestStoragePermission() {
         if (!checkIfStorageAccessAvailable()) {
             requestStoragePermission!!.launch(
@@ -340,10 +385,23 @@ class MainActivity : AppCompatActivity() {
         showRecentlyPlayedData()
         showRecommendedData()
 
-        val songSeeds = listOf("2025","2026","Hits", "Latest", "Romantic", "Chill", "Lo-Fi", "Dance", "Hindi", "Sad", "Love", "Workout", " ")
-        val artistSeeds = listOf(" ")
-        val albumSeeds = listOf("2025","2026","Hits", "Latest", "New", "Sad", "Lo-Fi", "Romantic", "Rock", "Pop", "Classic", "Party", " ")
-        val playlistSeeds = listOf("2025","2026","Hits", "Latest", "Trending", "Party", "Devotional", "Chill", "Love", "Sad", "Top", "Classic", " ")
+        val selectedLang = SharedPreferenceManager.getInstance(this).homeLanguageFilter
+        val songSeeds: List<String>
+        val artistSeeds: List<String>
+        val albumSeeds: List<String>
+        val playlistSeeds: List<String>
+
+        if (selectedLang.equals("All", ignoreCase = true)) {
+            songSeeds = listOf("2025","2026","Hits", "Latest", "Romantic", "Chill", "Lo-Fi", "Dance", "Hindi", "Sad", "Love", "Workout", " ")
+            artistSeeds = listOf(" ")
+            albumSeeds = listOf("2025","2026","Hits", "Latest", "New", "Sad", "Lo-Fi", "Romantic", "Rock", "Pop", "Classic", "Party", " ")
+            playlistSeeds = listOf("2025","2026","Hits", "Latest", "Trending", "Party", "Devotional", "Chill", "Love", "Sad", "Top", "Classic", " ")
+        } else {
+            songSeeds = listOf("$selectedLang Hits", "$selectedLang 2026", "$selectedLang Latest", "$selectedLang Romantic", "$selectedLang Top", selectedLang)
+            artistSeeds = listOf(selectedLang)
+            albumSeeds = listOf("$selectedLang Hits", "$selectedLang 2026", "$selectedLang Latest", selectedLang)
+            playlistSeeds = listOf("$selectedLang Hits", "Best of $selectedLang", "$selectedLang Top 50", selectedLang)
+        }
         
         val songQuery = songSeeds.random()
         val artistQuery = artistSeeds.random()

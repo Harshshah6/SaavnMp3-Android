@@ -426,6 +426,20 @@ class SharedPreferenceManager private constructor(context: Context) {
             putJson(KEY_AUTOPLAY, gson.toJson(value))
         }
 
+    var homeLanguageFilter: String
+        get() {
+            val json = getJson("home_language_filter")
+            if (json.isNullOrEmpty()) return "All"
+            return try {
+                gson.fromJson(json, String::class.java) ?: "All"
+            } catch (e: Exception) {
+                "All"
+            }
+        }
+        set(value) {
+            putJson("home_language_filter", gson.toJson(value))
+        }
+
     var lastPlayedArtistId: String?
         get() {
             val json = getJson(KEY_LAST_ARTIST_ID)

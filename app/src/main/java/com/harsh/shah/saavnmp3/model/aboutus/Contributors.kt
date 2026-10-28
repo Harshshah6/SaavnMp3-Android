@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.model.aboutus
+package com.harsh.shah.saavnmp3.model.aboutus
 
 
 data class Contributors(

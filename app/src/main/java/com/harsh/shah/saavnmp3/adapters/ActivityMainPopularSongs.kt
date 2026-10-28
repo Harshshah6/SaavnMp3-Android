@@ -59,24 +59,20 @@ class ActivityMainPopularSongs(private val data: MutableList<AlbumItem?>) :
         }
 
         holder.itemView.setOnClickListener { v: View? ->
+            MusicPlayerManager.cancelAutoplay()
             MusicPlayerManager.trackQueue?.clear()
-            Log.d(
-                "AdapterDebug",
-                "Click at pos: " + position + ". Populating queue with " + data.size + " items."
-            )
+            val songId = data[position]?.id ?: return@setOnClickListener
             for (i in data.indices) {
-                val id = data[i]!!.id
-                Log.d(
-                    "AdapterDebug",
-                    "Queue[" + i + "]: " + id + " - " + data[i]!!.albumTitle()
-                )
-                MusicPlayerManager.trackQueue?.add(id)
+                val item = data[i]
+                if (item != null && item.id != null && item.albumTitle() != "<shimmer>") {
+                    MusicPlayerManager.trackQueue?.add(item.id)
+                }
             }
             MusicPlayerManager.track_position = position
             v!!.context.startActivity(
                 Intent(v.context, MusicOverviewActivity::class.java).putExtra(
                     "id",
-                    data[position]!!.id
+                    songId
                 )
             )
         }

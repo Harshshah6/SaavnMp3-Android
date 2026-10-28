@@ -1,5 +1,8 @@
 package com.harsh.shah.saavnmp3.utils
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -11,9 +14,16 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
+import androidx.core.app.NotificationCompat
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.ReturnCode
+import com.google.gson.Gson
+import com.harsh.shah.saavnmp3.R
+import com.harsh.shah.saavnmp3.network.ApiManager
+import com.harsh.shah.saavnmp3.records.SongResponse
 import com.harsh.shah.saavnmp3.records.SongResponse.Song
+import com.harsh.shah.saavnmp3.services.DownloadCancelReceiver
 import com.samyak.lrclib.LrcLib
 import kotlinx.coroutines.runBlocking
 import org.jaudiotagger.audio.AudioFileIO
@@ -23,9 +33,21 @@ import org.jaudiotagger.tag.mp4.field.Mp4TagReverseDnsField
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
+import java.util.Collections
+import java.util.concurrent.CancellationException
 
 object TrackDownloader {
     private const val TAG = "TrackDownloader"
+
+    const val DOWNLOAD_CHANNEL_ID = "melotune_download_channel"
+    const val DOWNLOAD_NOTIFICATION_ID = 2001
+    const val ACTION_CANCEL_DOWNLOAD = "com.harsh.shah.saavnmp3.CANCEL_DOWNLOAD"
+
+    @Volatile
+    var isCancelled: Boolean = false
+    @Volatile
+    private var currentDownloadThread: Thread? = null
+    private val activeTempFiles = Collections.synchronizedList(mutableListOf<File>())
 
     enum class DownloadFormat(
         val label: String,
@@ -150,7 +172,6 @@ object TrackDownloader {
                     file, title, artist, album, year, bitrate, trackLength, bitmap, trackUID
                 )
                 data.add(downloadedTrack)
-                println(downloadedTrack)
             } catch (e: Exception) {
                 Log.e(TAG, "Error reading file: " + e.message)
             }
@@ -219,14 +240,153 @@ object TrackDownloader {
         return anyDeleted
     }
 
-    fun downloadAndEmbedMetadata(
+    fun createDownloadNotificationChannel(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
+            val existing = manager.getNotificationChannel(DOWNLOAD_CHANNEL_ID)
+            if (existing == null) {
+                val channel = NotificationChannel(
+                    DOWNLOAD_CHANNEL_ID,
+                    "Melotune Downloads",
+                    NotificationManager.IMPORTANCE_LOW
+                ).apply {
+                    description = "Download progress and completion notifications"
+                    setShowBadge(false)
+                }
+                manager.createNotificationChannel(channel)
+            }
+        }
+    }
+
+    private fun getCancelPendingIntent(context: Context): PendingIntent {
+        val intent = Intent(context, DownloadCancelReceiver::class.java).apply {
+            action = ACTION_CANCEL_DOWNLOAD
+        }
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+        return PendingIntent.getBroadcast(context, 0, intent, flags)
+    }
+
+    fun updateDownloadProgressNotification(
+        context: Context,
+        title: String,
+        contentText: String,
+        max: Int = 0,
+        progress: Int = 0,
+        indeterminate: Boolean = true
+    ) {
+        createDownloadNotificationChannel(context)
+        val cancelPendingIntent = getCancelPendingIntent(context)
+        val builder = NotificationCompat.Builder(context, DOWNLOAD_CHANNEL_ID)
+            .setSmallIcon(R.drawable.baseline_download_for_offline_24)
+            .setContentTitle(title)
+            .setContentText(contentText)
+            .setOngoing(true)
+            .setProgress(max, progress, indeterminate)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Cancel", cancelPendingIntent)
+            .setOnlyAlertOnce(true)
+
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        try {
+            manager?.notify(DOWNLOAD_NOTIFICATION_ID, builder.build())
+        } catch (_: SecurityException) {
+        }
+    }
+
+    fun showDownloadCompletedNotification(
+        context: Context,
+        title: String,
+        contentText: String
+    ) {
+        createDownloadNotificationChannel(context)
+        val builder = NotificationCompat.Builder(context, DOWNLOAD_CHANNEL_ID)
+            .setSmallIcon(R.drawable.baseline_download_for_offline_24)
+            .setContentTitle(title)
+            .setContentText(contentText)
+            .setAutoCancel(true)
+            .setOngoing(false)
+            .setProgress(0, 0, false)
+
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        try {
+            manager?.notify(DOWNLOAD_NOTIFICATION_ID, builder.build())
+        } catch (_: SecurityException) {
+        }
+    }
+
+    fun showDownloadFailedNotification(
+        context: Context,
+        title: String,
+        errorMessage: String?
+    ) {
+        createDownloadNotificationChannel(context)
+        val builder = NotificationCompat.Builder(context, DOWNLOAD_CHANNEL_ID)
+            .setSmallIcon(R.drawable.baseline_download_for_offline_24)
+            .setContentTitle(title)
+            .setContentText(errorMessage ?: "An error occurred during download")
+            .setAutoCancel(true)
+            .setOngoing(false)
+            .setProgress(0, 0, false)
+
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        try {
+            manager?.notify(DOWNLOAD_NOTIFICATION_ID, builder.build())
+        } catch (_: SecurityException) {
+        }
+    }
+
+    fun cancelDownload(context: Context) {
+        isCancelled = true
+        try {
+            currentDownloadThread?.interrupt()
+        } catch (_: Exception) {
+        }
+        synchronized(activeTempFiles) {
+            for (f in activeTempFiles) {
+                try {
+                    if (f.exists()) f.delete()
+                } catch (_: Exception) {
+                }
+            }
+            activeTempFiles.clear()
+        }
+        val notifManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        notifManager?.let { mgr ->
+            createDownloadNotificationChannel(context)
+            val notif = NotificationCompat.Builder(context, DOWNLOAD_CHANNEL_ID)
+                .setSmallIcon(R.drawable.baseline_download_for_offline_24)
+                .setContentTitle("Download Cancelled")
+                .setContentText("The download was cancelled.")
+                .setAutoCancel(true)
+                .setOngoing(false)
+                .setProgress(0, 0, false)
+                .build()
+            try {
+                mgr.notify(DOWNLOAD_NOTIFICATION_ID, notif)
+            } catch (_: SecurityException) {
+            }
+        }
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(context, "Download cancelled", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    @Throws(Exception::class)
+    fun downloadSingleTrackSync(
         context: Context,
         song: Song,
         format: DownloadFormat = DownloadFormat.M4A,
-        listener: TrackDownloadListener
-    ) {
-        val audioUrl = song.downloadUrl?.lastOrNull()?.url ?: ""
-        val imageUrl = song.image?.lastOrNull()?.url ?: ""
+        onProgress: ((String) -> Unit)? = null
+    ): Boolean {
+        if (isCancelled || Thread.currentThread().isInterrupted) {
+            throw CancellationException("Download cancelled")
+        }
+
+        var audioUrl = song.downloadUrl?.lastOrNull()?.url ?: ""
+        var imageUrl = song.image?.lastOrNull()?.url ?: ""
         val title = song.name()
         val safeTitle = sanitizeFilename(title)
         val artist = song.artists?.primary?.firstOrNull()?.name() ?: ""
@@ -235,175 +395,360 @@ object TrackDownloader {
         val album = song.album?.name() ?: ""
         val duration = song.duration?.toInt() ?: -1
 
-        Thread {
-            Handler(Looper.getMainLooper()).post { listener.onStarted() }
-            Log.d(TAG, "Downloading [${format.label}] and embedding metadata...")
-
-            try {
-                // Step 1: Download raw M4A to cache
-                val tempM4aFile = File(context.cacheDir, "${safeTitle}_raw.mp4")
-                URL(audioUrl).openStream().use { inp ->
-                    FileOutputStream(tempM4aFile).use { out ->
-                        val buffer = ByteArray(8192)
-                        var bytesRead: Int
-                        while (inp.read(buffer).also { bytesRead = it } != -1) {
-                            out.write(buffer, 0, bytesRead)
-                        }
+        // If audioUrl is blank and song id is available, resolve it synchronously
+        if (audioUrl.isBlank() && !song.id.isNullOrBlank()) {
+            runCatching {
+                val url = "${ApiManager.SONGS_URL}/${song.id}"
+                val connection = URL(url).openConnection()
+                connection.connectTimeout = 8000
+                connection.readTimeout = 8000
+                val json = connection.getInputStream().bufferedReader().use { it.readText() }
+                val fetchedResponse = Gson().fromJson(json, SongResponse::class.java)
+                val fetchedSong = fetchedResponse.data?.firstOrNull()
+                if (fetchedSong != null) {
+                    audioUrl = fetchedSong.downloadUrl?.lastOrNull()?.url ?: ""
+                    if (imageUrl.isBlank()) {
+                        imageUrl = fetchedSong.image?.lastOrNull()?.url ?: ""
                     }
                 }
+            }
+        }
 
-                // Step 2: Fetch lyrics (LrcLib synced preferred, then plain)
-                val plainLyrics: String? = song.lyrics?.lyrics()?.takeIf { it.isNotBlank() }
-                val lrcLyrics: String? = runCatching {
-                    runBlocking {
-                        LrcLib.getLyrics(title = title, artist = artist, duration = duration).getOrNull()
-                            ?: LrcLib.getLyrics(title = title, artist = artist, duration = -1).getOrNull()
+        if (audioUrl.isBlank()) {
+            throw IllegalStateException("Audio URL not found for song: $title")
+        }
+
+        onProgress?.invoke("Downloading audio...")
+        val tempM4aFile = File(context.cacheDir, "${safeTitle}_raw_${System.currentTimeMillis()}.mp4")
+        activeTempFiles.add(tempM4aFile)
+
+        val artworkFile = File(context.cacheDir, "${safeTitle}_artwork_${System.currentTimeMillis()}.jpg")
+        activeTempFiles.add(artworkFile)
+
+        var convertedFile: File? = null
+
+        try {
+            // Step 1: Download raw audio
+            URL(audioUrl).openStream().use { inp ->
+                FileOutputStream(tempM4aFile).use { out ->
+                    val buffer = ByteArray(8192)
+                    var bytesRead: Int
+                    while (inp.read(buffer).also { bytesRead = it } != -1) {
+                        if (isCancelled || Thread.currentThread().isInterrupted) {
+                            throw CancellationException("Download cancelled")
+                        }
+                        out.write(buffer, 0, bytesRead)
                     }
-                }.getOrNull()
-                val lyricsToEmbed: String? = lrcLyrics ?: plainLyrics
-                Log.d(
-                    TAG,
-                    if (lyricsToEmbed != null)
-                        "Lyrics found (${if (lrcLyrics != null) "synced LRC" else "plain"})"
-                    else "No lyrics available for: $title"
-                )
+                }
+            }
 
-                // Step 3: Download artwork
-                val artworkFile = File(context.cacheDir, "${safeTitle}_artwork.jpg")
-                if (imageUrl.isNotBlank()) {
-                    runCatching {
-                        URL(imageUrl).openStream().use { inp ->
-                            FileOutputStream(artworkFile).use { out ->
-                                val buffer = ByteArray(8192)
-                                var bytesRead: Int
-                                while (inp.read(buffer).also { bytesRead = it } != -1) {
-                                    out.write(buffer, 0, bytesRead)
+            if (isCancelled || Thread.currentThread().isInterrupted) {
+                throw CancellationException("Download cancelled")
+            }
+
+            // Step 2: Fetch lyrics
+            onProgress?.invoke("Fetching lyrics...")
+            val plainLyrics: String? = song.lyrics?.lyrics()?.takeIf { it.isNotBlank() }
+            val lrcLyrics: String? = runCatching {
+                runBlocking {
+                    LrcLib.getLyrics(title = title, artist = artist, duration = duration).getOrNull()
+                        ?: LrcLib.getLyrics(title = title, artist = artist, duration = -1).getOrNull()
+                }
+            }.getOrNull()
+            val lyricsToEmbed: String? = lrcLyrics ?: plainLyrics
+
+            if (isCancelled || Thread.currentThread().isInterrupted) {
+                throw CancellationException("Download cancelled")
+            }
+
+            // Step 3: Download artwork
+            if (imageUrl.isNotBlank()) {
+                runCatching {
+                    URL(imageUrl).openStream().use { inp ->
+                        FileOutputStream(artworkFile).use { out ->
+                            val buffer = ByteArray(8192)
+                            var bytesRead: Int
+                            while (inp.read(buffer).also { bytesRead = it } != -1) {
+                                if (isCancelled || Thread.currentThread().isInterrupted) {
+                                    throw CancellationException("Download cancelled")
                                 }
+                                out.write(buffer, 0, bytesRead)
                             }
                         }
                     }
                 }
+            }
 
-                // Step 4: Convert/transcode if needed, then embed tags
-                val taggedFile: File = when (format) {
-                    DownloadFormat.M4A -> {
-                        embedTagsIntoM4a(
-                            context = context,
-                            file = tempM4aFile,
-                            title = title,
-                            artist = artist,
-                            albumArtist = albumArtist,
-                            album = album,
-                            song = song,
-                            artworkFile = artworkFile,
-                            lyrics = lyricsToEmbed
-                        )
-                        tempM4aFile
-                    }
-                    DownloadFormat.MP3 -> {
-                        val mp3File = File(context.cacheDir, "${safeTitle}.mp3")
-                        val session = FFmpegKit.executeWithArguments(
-                            arrayOf(
-                                "-i", tempM4aFile.absolutePath,
-                                "-codec:a", "libmp3lame",
-                                "-qscale:a", "0",
-                                "-id3v2_version", "3",
-                                "-y", mp3File.absolutePath
-                            )
-                        )
-                        if (!ReturnCode.isSuccess(session.returnCode)) {
-                            throw RuntimeException("FFmpeg MP3 transcoding failed: ${session.failStackTrace ?: session.logsAsString}")
-                        }
-                        tempM4aFile.delete()
-                        embedTagsIntoMp3OrOgg(
-                            file = mp3File,
-                            title = title,
-                            artist = artist,
-                            albumArtist = albumArtist,
-                            album = album,
-                            song = song,
-                            artworkFile = artworkFile,
-                            lyrics = lyricsToEmbed
-                        )
-                        mp3File
-                    }
-                    DownloadFormat.OGG -> {
-                        val oggFile = File(context.cacheDir, "${safeTitle}.ogg")
-                        val session = FFmpegKit.executeWithArguments(
-                            arrayOf(
-                                "-i", tempM4aFile.absolutePath,
-                                "-codec:a", "libvorbis",
-                                "-qscale:a", "6",
-                                "-y", oggFile.absolutePath
-                            )
-                        )
-                        if (!ReturnCode.isSuccess(session.returnCode)) {
-                            throw RuntimeException("FFmpeg OGG transcoding failed: ${session.failStackTrace ?: session.logsAsString}")
-                        }
-                        tempM4aFile.delete()
-                        embedTagsIntoMp3OrOgg(
-                            file = oggFile,
-                            title = title,
-                            artist = artist,
-                            albumArtist = albumArtist,
-                            album = album,
-                            song = song,
-                            artworkFile = artworkFile,
-                            lyrics = lyricsToEmbed
-                        )
-                        oggFile
-                    }
+            if (isCancelled || Thread.currentThread().isInterrupted) {
+                throw CancellationException("Download cancelled")
+            }
+
+            // Step 4: Transcode / Tagging
+            onProgress?.invoke("Embedding metadata (${format.label})...")
+            val taggedFile: File = when (format) {
+                DownloadFormat.M4A -> {
+                    embedTagsIntoM4a(
+                        context = context,
+                        file = tempM4aFile,
+                        title = title,
+                        artist = artist,
+                        albumArtist = albumArtist,
+                        album = album,
+                        song = song,
+                        artworkFile = artworkFile,
+                        lyrics = lyricsToEmbed
+                    )
+                    tempM4aFile
                 }
-
-                // Step 5: Insert into MediaStore
-                val values = getContentValues(safeTitle, title, artist, album, song.id, format)
-                val resolver = context.contentResolver
-                val audioCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                    MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-                else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-
-                val newUri = resolver.insert(audioCollection, values)
-                if (newUri == null) {
-                    Log.e(TAG, "Failed to insert into MediaStore")
-                    Handler(Looper.getMainLooper()).post {
-                        listener.onError("Failed to insert into MediaStore")
+                DownloadFormat.MP3 -> {
+                    val mp3File = File(context.cacheDir, "${safeTitle}_${System.currentTimeMillis()}.mp3")
+                    convertedFile = mp3File
+                    activeTempFiles.add(mp3File)
+                    val session = FFmpegKit.executeWithArguments(
+                        arrayOf(
+                            "-i", tempM4aFile.absolutePath,
+                            "-codec:a", "libmp3lame",
+                            "-qscale:a", "0",
+                            "-id3v2_version", "3",
+                            "-y", mp3File.absolutePath
+                        )
+                    )
+                    if (!ReturnCode.isSuccess(session.returnCode)) {
+                        throw RuntimeException("FFmpeg MP3 transcoding failed: ${session.failStackTrace ?: session.logsAsString}")
                     }
-                    return@Thread
+                    tempM4aFile.delete()
+                    embedTagsIntoMp3OrOgg(
+                        file = mp3File,
+                        title = title,
+                        artist = artist,
+                        albumArtist = albumArtist,
+                        album = album,
+                        song = song,
+                        artworkFile = artworkFile,
+                        lyrics = lyricsToEmbed
+                    )
+                    mp3File
                 }
+                DownloadFormat.OGG -> {
+                    val oggFile = File(context.cacheDir, "${safeTitle}_${System.currentTimeMillis()}.ogg")
+                    convertedFile = oggFile
+                    activeTempFiles.add(oggFile)
+                    val session = FFmpegKit.executeWithArguments(
+                        arrayOf(
+                            "-i", tempM4aFile.absolutePath,
+                            "-codec:a", "libvorbis",
+                            "-qscale:a", "6",
+                            "-y", oggFile.absolutePath
+                        )
+                    )
+                    if (!ReturnCode.isSuccess(session.returnCode)) {
+                        throw RuntimeException("FFmpeg OGG transcoding failed: ${session.failStackTrace ?: session.logsAsString}")
+                    }
+                    tempM4aFile.delete()
+                    embedTagsIntoMp3OrOgg(
+                        file = oggFile,
+                        title = title,
+                        artist = artist,
+                        albumArtist = albumArtist,
+                        album = album,
+                        song = song,
+                        artworkFile = artworkFile,
+                        lyrics = lyricsToEmbed
+                    )
+                    oggFile
+                }
+            }
 
-                URL("file://${taggedFile.absolutePath}").openStream().use { inp ->
-                    resolver.openOutputStream(newUri).use { out ->
-                        val buffer = ByteArray(8192)
-                        var bytesRead: Int
-                        while (inp.read(buffer).also { bytesRead = it } != -1) {
-                            checkNotNull(out)
-                            out.write(buffer, 0, bytesRead)
-                        }
+            if (isCancelled || Thread.currentThread().isInterrupted) {
+                throw CancellationException("Download cancelled")
+            }
+
+            // Step 5: Save to MediaStore
+            onProgress?.invoke("Saving to storage...")
+            val values = getContentValues(safeTitle, title, artist, album, song.id, format)
+            val resolver = context.contentResolver
+            val audioCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+
+            val newUri = resolver.insert(audioCollection, values)
+                ?: throw RuntimeException("Failed to insert into MediaStore")
+
+            URL("file://${taggedFile.absolutePath}").openStream().use { inp ->
+                resolver.openOutputStream(newUri).use { out ->
+                    val buffer = ByteArray(8192)
+                    var bytesRead: Int
+                    while (inp.read(buffer).also { bytesRead = it } != -1) {
                         checkNotNull(out)
-                        out.flush()
+                        out.write(buffer, 0, bytesRead)
+                    }
+                    checkNotNull(out)
+                    out.flush()
+                }
+            }
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, newUri))
+            }
+
+            return true
+        } finally {
+            activeTempFiles.remove(tempM4aFile)
+            activeTempFiles.remove(artworkFile)
+            if (convertedFile != null) {
+                activeTempFiles.remove(convertedFile)
+                if (convertedFile.exists()) convertedFile.delete()
+            }
+            if (tempM4aFile.exists()) tempM4aFile.delete()
+            if (artworkFile.exists()) artworkFile.delete()
+        }
+    }
+
+    fun downloadAndEmbedMetadata(
+        context: Context,
+        song: Song,
+        format: DownloadFormat = DownloadFormat.M4A,
+        listener: TrackDownloadListener
+    ) {
+        isCancelled = false
+        val thread = Thread {
+            Handler(Looper.getMainLooper()).post { listener.onStarted() }
+            val title = song.name()
+            Log.d(TAG, "Downloading [${format.label}] and embedding metadata...")
+            updateDownloadProgressNotification(context, "Downloading $title", "Downloading audio...", 0, 0, true)
+
+            try {
+                val success = downloadSingleTrackSync(context, song, format) { status ->
+                    updateDownloadProgressNotification(context, "Downloading $title", status, 0, 0, true)
+                }
+
+                if (success) {
+                    showDownloadCompletedNotification(context, "Download Complete", "$title saved to Music/Melotune")
+                    Handler(Looper.getMainLooper()).post { listener.onFinished() }
+                } else {
+                    if (isCancelled) {
+                        Handler(Looper.getMainLooper()).post { listener.onError("Cancelled") }
+                    } else {
+                        showDownloadFailedNotification(context, "Download Failed", "Could not complete download")
+                        Handler(Looper.getMainLooper()).post { listener.onError("Failed to download") }
                     }
                 }
-
-                taggedFile.delete()
-                artworkFile.delete()
-
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                    context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, newUri))
-                }
-
-                Log.d(
-                    TAG,
-                    "Downloaded and tagged [${format.label}]: $title" +
-                            if (lyricsToEmbed != null) " (with lyrics)" else ""
-                )
-
+            } catch (e: CancellationException) {
+                Log.d(TAG, "Download cancelled by user")
+                Handler(Looper.getMainLooper()).post { listener.onError("Cancelled") }
             } catch (e: Exception) {
-                Log.e(TAG, "Error: " + e.message, e)
+                Log.e(TAG, "Error downloading track: ${e.message}", e)
+                if (!isCancelled) {
+                    showDownloadFailedNotification(context, "Download Failed", e.message)
+                }
                 Handler(Looper.getMainLooper()).post { listener.onError(e.message) }
             } finally {
-                Handler(Looper.getMainLooper()).post { listener.onFinished() }
+                if (currentDownloadThread == Thread.currentThread()) {
+                    currentDownloadThread = null
+                }
             }
-        }.start()
+        }
+        currentDownloadThread = thread
+        thread.start()
+    }
+
+    fun downloadAlbum(
+        context: Context,
+        albumTitle: String,
+        songs: List<Song>,
+        format: DownloadFormat = DownloadFormat.M4A,
+        listener: AlbumDownloadListener? = null
+    ) {
+        if (songs.isEmpty()) {
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(context, "No songs to download in album", Toast.LENGTH_SHORT).show()
+                listener?.onError("Empty songs list")
+            }
+            return
+        }
+
+        isCancelled = false
+        val thread = Thread {
+            Handler(Looper.getMainLooper()).post {
+                listener?.onAlbumStarted(songs.size)
+            }
+            val total = songs.size
+            var downloaded = 0
+            var failed = 0
+
+            updateDownloadProgressNotification(
+                context,
+                "Downloading Album: $albumTitle",
+                "Starting album download (0/$total)...",
+                total,
+                0,
+                false
+            )
+
+            for ((index, song) in songs.withIndex()) {
+                if (isCancelled || Thread.currentThread().isInterrupted) {
+                    break
+                }
+                val songTitle = song.name()
+                Handler(Looper.getMainLooper()).post {
+                    listener?.onTrackProgress(index + 1, total, songTitle)
+                }
+                updateDownloadProgressNotification(
+                    context,
+                    "Downloading Album: $albumTitle (${index + 1}/$total)",
+                    songTitle,
+                    total,
+                    index,
+                    false
+                )
+
+                try {
+                    if (isAlreadyDownloaded(songTitle)) {
+                        downloaded++
+                        continue
+                    }
+                    val success = downloadSingleTrackSync(context, song, format)
+                    if (success) {
+                        downloaded++
+                    } else {
+                        failed++
+                    }
+                } catch (e: CancellationException) {
+                    Log.d(TAG, "Album download cancelled at track: $songTitle")
+                    break
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed downloading track $songTitle in album: ${e.message}")
+                    failed++
+                }
+            }
+
+            if (isCancelled) {
+                cancelDownload(context)
+                Handler(Looper.getMainLooper()).post {
+                    listener?.onAlbumCancelled()
+                }
+            } else {
+                showDownloadCompletedNotification(
+                    context,
+                    "Album Download Complete",
+                    "$albumTitle: $downloaded downloaded" + if (failed > 0) ", $failed failed" else ""
+                )
+                Handler(Looper.getMainLooper()).post {
+                    listener?.onAlbumCompleted(downloaded, failed)
+                    Toast.makeText(
+                        context,
+                        "Album \"$albumTitle\" downloaded ($downloaded/$total songs)",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            if (currentDownloadThread == Thread.currentThread()) {
+                currentDownloadThread = null
+            }
+        }
+        currentDownloadThread = thread
+        thread.start()
     }
 
     private fun embedTagsIntoM4a(
@@ -495,6 +840,14 @@ object TrackDownloader {
     interface TrackDownloadListener {
         fun onStarted()
         fun onFinished()
+        fun onError(errorMessage: String?)
+    }
+
+    interface AlbumDownloadListener {
+        fun onAlbumStarted(totalTracks: Int)
+        fun onTrackProgress(current: Int, total: Int, trackTitle: String)
+        fun onAlbumCompleted(downloadedCount: Int, failedCount: Int)
+        fun onAlbumCancelled()
         fun onError(errorMessage: String?)
     }
 

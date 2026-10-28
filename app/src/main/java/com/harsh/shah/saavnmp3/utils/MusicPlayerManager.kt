@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -72,6 +73,7 @@ object MusicPlayerManager {
     var IMAGE_URL: String? = ""
     var MUSIC_ID: String? = ""
     var SONG_URL: String? = ""
+    var currentlyPlayingTrackId: String? = null
 
     var IMAGE_BG_COLOR: Int = Color.argb(255, 25, 20, 20)
     var TEXT_ON_IMAGE_COLOR: Int = IMAGE_BG_COLOR xor 0x00FFFFFF
@@ -80,6 +82,39 @@ object MusicPlayerManager {
     private var appContext: Context? = null
     private var simpleCache: SimpleCache? = null
     private var sharedPreferenceManager: SharedPreferenceManager? = null
+
+    var isTransitioning: Boolean = false
+    private var wakeLock: PowerManager.WakeLock? = null
+    private var autoplayRequestId: Long = 0L
+
+    fun acquireWakeLock(timeoutMs: Long = 30000L) {
+        try {
+            if (wakeLock == null && appContext != null) {
+                val pm = appContext!!.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                wakeLock = pm?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Melotune:PlaybackWakeLock")
+            }
+            if (wakeLock?.isHeld != true) {
+                wakeLock?.acquire(timeoutMs)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error acquiring wakeLock: \${e.message}")
+        }
+    }
+
+    fun releaseWakeLock() {
+        try {
+            if (wakeLock?.isHeld == true) {
+                wakeLock?.release()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error releasing wakeLock: \${e.message}")
+        }
+    }
+
+    fun cancelAutoplay() {
+        autoplayRequestId++
+        isFetchingAutoplay = false
+    }
 
     @OptIn(UnstableApi::class)
     fun init(context: Context) {
@@ -107,6 +142,7 @@ object MusicPlayerManager {
         player = ExoPlayer.Builder(appContext!!)
             .setMediaSourceFactory(DefaultMediaSourceFactory(cacheDataSourceFactory))
             .setHandleAudioBecomingNoisy(true)
+            .setWakeMode(C.WAKE_MODE_NETWORK)
             .setAudioAttributes(
                 AudioAttributes.Builder()
                     .setUsage(C.USAGE_MEDIA)
@@ -121,6 +157,8 @@ object MusicPlayerManager {
                 Log.i(TAG, "Player state changed to: ${getStateString(playbackState)}")
                 when (playbackState) {
                     Player.STATE_READY -> {
+                        isTransitioning = false
+                        releaseWakeLock()
                         updateWidget()
                     }
                     Player.STATE_ENDED -> {
@@ -146,14 +184,16 @@ object MusicPlayerManager {
 
             override fun onPlayerError(error: PlaybackException) {
                 Log.e(TAG, "Player error: ${error.message}")
+                isTransitioning = false
+                releaseWakeLock()
             }
         })
 
         mediaSession = MediaSessionCompat(appContext!!, TAG).apply {
             setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
             setCallback(object : MediaSessionCompat.Callback() {
-                override fun onPlay() { player?.play(); showNotification() }
-                override fun onPause() { player?.pause(); showNotification() }
+                override fun onPlay() { togglePlayPause() }
+                override fun onPause() { togglePlayPause() }
                 override fun onSkipToNext() { nextTrack() }
                 override fun onSkipToPrevious() { prevTrack() }
                 override fun onSeekTo(pos: Long) {
@@ -346,7 +386,9 @@ object MusicPlayerManager {
                 manager?.notify(1, notification)
             }
         } else {
-            try { musicService?.stopForeground(false) } catch (e: Exception) {}
+            if (!isTransitioning) {
+                try { musicService?.stopForeground(false) } catch (e: Exception) {}
+            }
             val manager = appContext?.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             manager?.notify(1, notification)
         }
@@ -365,6 +407,9 @@ object MusicPlayerManager {
         } else {
             if (p.playbackState == Player.STATE_IDLE) {
                 prepareMediaPlayer()
+            } else if (p.playbackState == Player.STATE_ENDED) {
+                p.seekTo(0)
+                p.play()
             } else {
                 p.play()
             }
@@ -379,12 +424,14 @@ object MusicPlayerManager {
         if (p.isPlaying) p.stop()
         p.clearMediaItems()
         if (SONG_URL.isNullOrEmpty()) return
+        acquireWakeLock(15000L)
 
         var finalUrl = SONG_URL ?: ""
         if (finalUrl.startsWith("http:")) finalUrl = finalUrl.replace("http:", "https:")
 
         val mediaItem = MediaItem.Builder().setUri(finalUrl).setMediaId(SONG_URL ?: "").build()
         isTrackDownloaded = false
+        currentlyPlayingTrackId = MUSIC_ID
         p.setMediaItem(mediaItem)
         p.playWhenReady = true
         p.prepare()
@@ -394,6 +441,7 @@ object MusicPlayerManager {
 
     fun playNext(trackId: String?) {
         if (trackId.isNullOrEmpty()) return
+        cancelAutoplay()
         val queue = trackQueue ?: ArrayList()
         queue.remove(trackId)
         
@@ -415,6 +463,7 @@ object MusicPlayerManager {
 
     fun addToQueue(trackId: String?) {
         if (trackId.isNullOrEmpty()) return
+        cancelAutoplay()
         val queue = trackQueue ?: ArrayList()
         if (!queue.contains(trackId)) {
             queue.add(trackId)
@@ -430,6 +479,15 @@ object MusicPlayerManager {
     }
 
     fun playTrack() {
+        if (MUSIC_ID.isNullOrEmpty()) {
+            isTransitioning = false
+            releaseWakeLock()
+            return
+        }
+        cancelAutoplay()
+        isTransitioning = true
+        acquireWakeLock(30000L)
+
         val ctx = BaseApplicationClass.currentActivity ?: appContext ?: return
         ApiManager(ctx).retrieveSongById(MUSIC_ID!!, null, object : RequestNetwork.RequestListener {
             override fun onResponse(tag: String?, response: String?, responseHeaders: HashMap<String?, Any?>?) {
@@ -457,9 +515,15 @@ object MusicPlayerManager {
                         artistId = primaryArtist?.id,
                         artistName = primaryArtist?.name()
                     )
+                } else {
+                    isTransitioning = false
+                    releaseWakeLock()
                 }
             }
-            override fun onErrorResponse(tag: String?, message: String?) {}
+            override fun onErrorResponse(tag: String?, message: String?) {
+                isTransitioning = false
+                releaseWakeLock()
+            }
         })
     }
 
@@ -468,18 +532,32 @@ object MusicPlayerManager {
     private fun fetchAndAppendAutoplayRecommendations(currentSong: SongResponse.Song) {
         if (isFetchingAutoplay) return
         isFetchingAutoplay = true
+        val currentRequestId = ++autoplayRequestId
+        val currentSongId = currentSong.id ?: return
+        val currentPosSnapshot = track_position
         val ctx = appContext ?: BaseApplicationClass.currentActivity ?: return
 
         RecommendationManager.getRecommendationsForSong(ctx, currentSong, limit = 10) { recommendedSongs ->
             isFetchingAutoplay = false
+            // Verify that this autoplay callback is still valid and wasn't superseded by user selecting a track
+            if (currentRequestId != autoplayRequestId) {
+                Log.d(TAG, "Autoplay discarded: newer request or user selection occurred")
+                return@getRecommendationsForSong
+            }
+            if (MUSIC_ID != currentSongId || track_position != currentPosSnapshot) {
+                Log.d(TAG, "Autoplay discarded: active track or position changed")
+                return@getRecommendationsForSong
+            }
+
             if (recommendedSongs.isNotEmpty()) {
                 val queue = trackQueue ?: ArrayList()
                 val newIds = recommendedSongs.mapNotNull { it.id }.filter { !queue.contains(it) }
                 if (newIds.isNotEmpty()) {
                     queue.addAll(newIds)
                     trackQueue = queue
-                    track_position++
-                    if (track_position < queue.size) {
+                    // Only advance if the user is still at the end of the previous queue
+                    if (track_position == currentPosSnapshot && track_position < queue.size - 1) {
+                        track_position++
                         MUSIC_ID = queue[track_position]
                         playTrack()
                         showNotification()
@@ -503,14 +581,43 @@ object MusicPlayerManager {
     }
 
     fun nextTrack() {
-        if (trackQueue.isNullOrEmpty()) return
-        val p = player ?: return
-        
-        if (trackQueue!!.isEmpty()) return
+        acquireWakeLock(30000L)
+        isTransitioning = true
+
+        if (trackQueue.isNullOrEmpty()) {
+            if (!MUSIC_ID.isNullOrEmpty()) {
+                trackQueue = arrayListOf(MUSIC_ID)
+                track_position = 0
+            } else {
+                isTransitioning = false
+                releaseWakeLock()
+                return
+            }
+        }
+        val p = player ?: run {
+            isTransitioning = false
+            releaseWakeLock()
+            return
+        }
+
+        if (trackQueue!!.isEmpty()) {
+            isTransitioning = false
+            releaseWakeLock()
+            return
+        }
+
         if (track_position >= trackQueue!!.size - 1) {
             when (p.repeatMode) {
-                Player.REPEAT_MODE_ONE -> { p.seekTo(0); p.play(); return }
-                Player.REPEAT_MODE_ALL -> { track_position = 0 }
+                Player.REPEAT_MODE_ONE -> {
+                    p.seekTo(0)
+                    p.play()
+                    isTransitioning = false
+                    releaseWakeLock()
+                    return
+                }
+                Player.REPEAT_MODE_ALL -> {
+                    track_position = 0
+                }
                 else -> {
                     // Check Autoplay Recommended Music
                     val prefs = sharedPreferenceManager ?: appContext?.let { SharedPreferenceManager.getInstance(it) }
@@ -521,6 +628,11 @@ object MusicPlayerManager {
                             return
                         }
                     }
+                    // If no autoplay, restart current track or seek to beginning
+                    p.seekTo(0)
+                    p.play()
+                    isTransitioning = false
+                    releaseWakeLock()
                     return
                 }
             }
@@ -542,17 +654,50 @@ object MusicPlayerManager {
                 track_position = 0
                 MUSIC_ID = trackQueue!![0]
                 playTrack()
+            } else {
+                isTransitioning = false
+                releaseWakeLock()
             }
         }
     }
 
     fun prevTrack() {
-        if (trackQueue.isNullOrEmpty()) return
-        val p = player ?: return
+        acquireWakeLock(30000L)
+        isTransitioning = true
+
+        if (trackQueue.isNullOrEmpty()) {
+            if (!MUSIC_ID.isNullOrEmpty()) {
+                player?.seekTo(0)
+                player?.play()
+            }
+            isTransitioning = false
+            releaseWakeLock()
+            return
+        }
+        val p = player ?: run {
+            isTransitioning = false
+            releaseWakeLock()
+            return
+        }
+
+        if (p.currentPosition > 3000) {
+            p.seekTo(0)
+            p.play()
+            isTransitioning = false
+            releaseWakeLock()
+            return
+        }
 
         if (track_position <= 0) {
-            if (p.repeatMode == Player.REPEAT_MODE_ALL) track_position = trackQueue!!.size - 1
-            else { p.seekTo(0); p.play(); return }
+            if (p.repeatMode == Player.REPEAT_MODE_ALL) {
+                track_position = trackQueue!!.size - 1
+            } else {
+                p.seekTo(0)
+                p.play()
+                isTransitioning = false
+                releaseWakeLock()
+                return
+            }
         } else {
             if (p.shuffleModeEnabled && trackQueue!!.size > 1) {
                 track_position = (Math.random() * trackQueue!!.size).toInt()

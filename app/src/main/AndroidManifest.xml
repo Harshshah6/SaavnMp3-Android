@@ -109,6 +109,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".services.DownloadCancelReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.harsh.shah.saavnmp3.CANCEL_DOWNLOAD" />
+            </intent-filter>
+        </receiver>
+
 
 
         <receiver

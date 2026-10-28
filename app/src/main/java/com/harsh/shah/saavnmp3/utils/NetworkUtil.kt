@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.utils
+package com.harsh.shah.saavnmp3.utils
 
 import android.content.Context
 import android.net.ConnectivityManager

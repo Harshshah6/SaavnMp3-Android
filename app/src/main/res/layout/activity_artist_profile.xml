@@ -103,6 +103,19 @@
                     android:textSize="@dimen/_16ssp"
                     android:textColor="@color/textMain" />
 
+                <ImageView
+                    android:id="@+id/top_songs_sort"
+                    android:layout_width="@dimen/_24sdp"
+                    android:layout_height="@dimen/_24sdp"
+                    android:layout_marginEnd="@dimen/_6sdp"
+                    android:padding="@dimen/_2sdp"
+                    android:src="@drawable/round_sort_24"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="Sort Songs"
+                    app:tint="@color/textSec"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+
                 <TextView
                     android:id="@+id/top_songs_see_more"
                     android:layout_width="wrap_content"

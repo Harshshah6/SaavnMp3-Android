@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.harsh.shah.saavnmp3.adapters.ActivityArtistProfileTopAlbumsAdapter
 import com.harsh.shah.saavnmp3.adapters.ActivityArtistProfileTopSongsAdapter
@@ -19,6 +20,7 @@ import com.harsh.shah.saavnmp3.model.BasicDataRecord
 import com.harsh.shah.saavnmp3.network.ApiManager
 import com.harsh.shah.saavnmp3.network.utility.RequestNetwork
 import com.harsh.shah.saavnmp3.records.AlbumsSearch
+import com.harsh.shah.saavnmp3.records.ArtistAllSongs
 import com.harsh.shah.saavnmp3.records.ArtistSearch
 import com.harsh.shah.saavnmp3.records.SongResponse
 import com.harsh.shah.saavnmp3.records.SongResponse.Album
@@ -34,6 +36,7 @@ import com.bumptech.glide.Glide
 class ArtistProfileActivity : AppCompatActivity() {
     private val TAG = "ArtistProfileActivity"
     var binding: ActivityArtistProfileBinding? = null
+    private var currentTopSongs: MutableList<Song?> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeManager.applyTheme(this)
@@ -73,6 +76,9 @@ class ArtistProfileActivity : AppCompatActivity() {
                     ).putExtra("type", ActivitySeeMoreListAdapter.Mode.TOP_SONGS.name)
                     .putExtra("artist_name", binding!!.artistName.text.toString())
             )
+        }
+        binding!!.topSongsSort?.setOnClickListener {
+            showSongSortDialog()
         }
         binding!!.topAlbumsSeeMore.setOnClickListener {
             startActivity(
@@ -168,9 +174,10 @@ class ArtistProfileActivity : AppCompatActivity() {
             }
             binding!!.artistName.text = data.name()
             binding!!.collapsingToolbarLayout.title = data.name()
+            currentTopSongs = (data.topSongs ?: mutableListOf()).toMutableList()
             binding!!.topSongsRecyclerview.setAdapter(
                 ActivityArtistProfileTopSongsAdapter(
-                    data.topSongs ?: mutableListOf()
+                    currentTopSongs
                 )
             )
             binding!!.topAlbumsRecyclerview.setAdapter(
@@ -227,6 +234,62 @@ class ArtistProfileActivity : AppCompatActivity() {
 
     fun backPress(v: View?) {
         finish()
+    }
+
+    private fun showSongSortDialog() {
+        val sortOptions = arrayOf("Popularity", "Latest", "Alphabetical (A to Z)")
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Sort Songs")
+            .setItems(sortOptions) { _, which ->
+                val sortBy = when (which) {
+                    0 -> ApiManager.SortBy.popularity
+                    1 -> ApiManager.SortBy.latest
+                    2 -> ApiManager.SortBy.alphabetical
+                    else -> ApiManager.SortBy.popularity
+                }
+                val sortOrder = when (which) {
+                    2 -> ApiManager.SortOrder.asc
+                    else -> ApiManager.SortOrder.desc
+                }
+
+                // In-memory sort for instant UI update
+                when (which) {
+                    0 -> currentTopSongs.sortByDescending { it?.playCount ?: 0 }
+                    1 -> currentTopSongs.sortByDescending { it?.year?.toIntOrNull() ?: 0 }
+                    2 -> currentTopSongs.sortBy { it?.name()?.lowercase() ?: "" }
+                }
+                binding!!.topSongsRecyclerview.adapter = ActivityArtistProfileTopSongsAdapter(currentTopSongs)
+
+                // API fetch for complete sorted list
+                if (artistId.isNotBlank()) {
+                    val apiManager = ApiManager(this@ArtistProfileActivity)
+                    apiManager.retrieveArtistSongs(
+                        artistId,
+                        0,
+                        sortBy,
+                        sortOrder,
+                        object : RequestNetwork.RequestListener {
+                            override fun onResponse(tag: String?, response: String?, responseHeaders: HashMap<String?, Any?>?) {
+                                try {
+                                    val artistAllSongs = Gson().fromJson(response, ArtistAllSongs::class.java)
+                                    val songs = artistAllSongs?.data?.songs
+                                    if (artistAllSongs?.success == true && !songs.isNullOrEmpty()) {
+                                        currentTopSongs = songs.take(10).toMutableList()
+                                        binding!!.topSongsRecyclerview.adapter = ActivityArtistProfileTopSongsAdapter(currentTopSongs)
+                                    }
+                                } catch (e: Exception) {
+                                    Log.w(TAG, "Error parsing sorted songs: ${e.message}")
+                                }
+                            }
+
+                            override fun onErrorResponse(tag: String?, message: String?) {
+                                Log.w(TAG, "Sort songs fetch failed: $message")
+                            }
+                        }
+                    )
+                }
+            }
+            .show()
     }
 
     companion object {

@@ -121,6 +121,22 @@
                             app:textOff="Explicit 18+ tracks are blocked from playing."
                             app:textOn="Explicit 18+ songs are allowed to play." />
 
+                        <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                            android:id="@+id/player_gestures"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:textHead="Player Gestures"
+                            app:textOff="Gestures disabled in music player."
+                            app:textOn="Swipe left/right for tracks, drag down to minimize." />
+
+                        <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                            android:id="@+id/tap_album_lyrics_toggle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:textHead="Tap Album to Toggle Lyrics"
+                            app:textOff="Tapping album cover will not toggle lyrics."
+                            app:textOn="Tap album cover art to quickly view synchronized lyrics." />
+
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

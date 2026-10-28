@@ -76,6 +76,22 @@ class SettingsActivity : AppCompatActivity() {
             }
         })
 
+        // Player Gestures Switch
+        binding!!.playerGestures?.setChecked(settingsSharedPrefManager.gesturesEnabled)
+        binding!!.playerGestures?.setOnCheckChangeListener(object : OnCheckChangeListener {
+            override fun onCheckChanged(isChecked: Boolean) {
+                settingsSharedPrefManager.gesturesEnabled = isChecked
+            }
+        })
+
+        // Tap Album to Toggle Lyrics Switch
+        binding!!.tapAlbumLyricsToggle?.setChecked(settingsSharedPrefManager.tapAlbumLyricsToggle)
+        binding!!.tapAlbumLyricsToggle?.setOnCheckChangeListener(object : OnCheckChangeListener {
+            override fun onCheckChanged(isChecked: Boolean) {
+                settingsSharedPrefManager.tapAlbumLyricsToggle = isChecked
+            }
+        })
+
         // Sleep Timer Launcher
         updateSleepTimerText()
         binding!!.sleepTimerSetting?.setOnClickListener {
@@ -318,6 +334,18 @@ class SettingsActivity : AppCompatActivity() {
             get() = sharedPreferences.getString("theme", "system")
             set(theme) {
                 sharedPreferences.edit { putString("theme", theme) }
+            }
+
+        var gesturesEnabled: Boolean
+            get() = sharedPreferences.getBoolean("player_gestures", true)
+            set(value) {
+                sharedPreferences.edit { putBoolean("player_gestures", value) }
+            }
+
+        var tapAlbumLyricsToggle: Boolean
+            get() = sharedPreferences.getBoolean("tap_album_lyrics_toggle", true)
+            set(value) {
+                sharedPreferences.edit { putBoolean("tap_album_lyrics_toggle", value) }
             }
     }
 }

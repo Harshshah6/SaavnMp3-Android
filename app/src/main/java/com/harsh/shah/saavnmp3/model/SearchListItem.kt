@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.model
+package com.harsh.shah.saavnmp3.model
 
 import com.harsh.shah.saavnmp3.utils.TextParserUtil
 

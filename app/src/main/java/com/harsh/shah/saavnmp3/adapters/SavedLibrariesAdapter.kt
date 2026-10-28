@@ -56,8 +56,10 @@ class SavedLibrariesAdapter(private val data: MutableList<Library?>) :
                     "Play All" -> {
                         val songIds = library.songs?.mapNotNull { it?.id } ?: emptyList()
                         if (songIds.isNotEmpty()) {
+                            MusicPlayerManager.cancelAutoplay()
                             MusicPlayerManager.trackQueue = ArrayList(songIds)
                             MusicPlayerManager.track_position = 0
+                            MusicPlayerManager.MUSIC_ID = songIds[0]
                             val intent = Intent(v.context, com.harsh.shah.saavnmp3.activities.MusicOverviewActivity::class.java)
                                 .putExtra("id", songIds[0])
                             v.context.startActivity(intent)

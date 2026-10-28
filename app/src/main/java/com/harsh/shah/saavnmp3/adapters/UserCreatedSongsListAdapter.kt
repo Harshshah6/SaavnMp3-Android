@@ -70,6 +70,7 @@ class UserCreatedSongsListAdapter(private val data: MutableList<Library.Songs?>)
 
         holder.itemView.setOnClickListener { view: View? ->
             // Build full queue from list and set correct position
+            MusicPlayerManager.cancelAutoplay()
             MusicPlayerManager.trackQueue?.clear()
             var clickIndex = 0
             var validIndex = 0

@@ -63,6 +63,10 @@ import com.harsh.shah.saavnmp3.adapters.ActivityListSongsItemAdapter
 import com.harsh.shah.saavnmp3.utils.RecommendationManager
 import com.harsh.shah.saavnmp3.utils.SleepTimerManager
 import com.harsh.shah.saavnmp3.activities.SettingsActivity.SettingsSharedPrefManager
+import android.graphics.Rect
+import android.view.MotionEvent
+import android.view.VelocityTracker
+import android.view.ViewConfiguration
 
 class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnection {
     private val TAG = "MusicOverviewActivity"
@@ -157,12 +161,22 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         showData()
     }
 
+    private var touchDownX = 0f
+    private var touchDownY = 0f
+    private var isTouchOverSeekbar = false
+    private var velocityTracker: VelocityTracker? = null
+    private var touchSlop = 0
+    private var isActivityRecreated = false
+
     // @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeManager.applyTheme(this)
         super.onCreate(savedInstanceState)
+        isActivityRecreated = savedInstanceState != null
         binding = ActivityMusicOverviewBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
+
+        touchSlop = ViewConfiguration.get(this).scaledTouchSlop
 
         val primaryColor = ThemeManager.getPrimaryColor(this)
         val onPrimaryColor = ThemeManager.getOnPrimaryColor(this)
@@ -203,58 +217,10 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         }
 
         binding!!.coverImageCard.setOnClickListener {
+            val tapLyricsEnabled = SettingsSharedPrefManager(this).tapAlbumLyricsToggle
+            if (!tapLyricsEnabled) return@setOnClickListener
             if (currentLyricsList.isNullOrEmpty()) return@setOnClickListener
             toggleLyrics()
-        }
-
-        // Swipe left → next track, swipe right → previous track on the album-art area
-        val swipeGestureDetector = android.view.GestureDetector(
-            this,
-            object : android.view.GestureDetector.SimpleOnGestureListener() {
-                private val SWIPE_THRESHOLD = 80
-                private val SWIPE_VELOCITY_THRESHOLD = 100
-
-                override fun onFling(
-                    e1: android.view.MotionEvent?,
-                    e2: android.view.MotionEvent,
-                    velocityX: Float,
-                    velocityY: Float
-                ): Boolean {
-                    val diffX = e2.x - (e1?.x ?: e2.x)
-                    val diffY = e2.y - (e1?.y ?: e2.y)
-                    if (kotlin.math.abs(diffX) > kotlin.math.abs(diffY) &&
-                        kotlin.math.abs(diffX) > SWIPE_THRESHOLD &&
-                        kotlin.math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD
-                    ) {
-                        if (diffX < 0) {
-                            // Swipe left → next
-                            binding!!.nextIcon.alpha = 0.5f
-                            binding!!.nextIcon.animate().alpha(1.0f).setDuration(200).start()
-                            MusicPlayerManager.nextTrack()
-                        } else {
-                            // Swipe right → previous
-                            binding!!.prevIcon.alpha = 0.5f
-                            binding!!.prevIcon.animate().alpha(1.0f).setDuration(200).start()
-                            MusicPlayerManager.prevTrack()
-                        }
-                        return true
-                    }
-                    return false
-                }
-
-                // Pass through taps so the lyrics toggle still works
-                override fun onSingleTapConfirmed(e: android.view.MotionEvent): Boolean {
-                    if (currentLyricsList.isNullOrEmpty()) return false
-                    toggleLyrics()
-                    return true
-                }
-            }
-        )
-        binding!!.coverArtFrame?.setOnTouchListener { v, event ->
-            // Let the GestureDetector consume the event; return false so children
-            // (coverImageCard / lyricsRecycler) still receive their own touch events.
-            swipeGestureDetector.onTouchEvent(event)
-            false
         }
 
         binding!!.queueIcon?.setOnClickListener {
@@ -485,36 +451,6 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             ).show()
         }
 
-        binding!!.recommendationIcon?.setOnClickListener {
-            showRecommendationsBottomSheet()
-        }
-
-        binding!!.favoriteIcon?.setOnClickListener {
-            val currentId = MusicPlayerManager.MUSIC_ID ?: ID_FROM_EXTRA
-            if (currentId.isNullOrEmpty()) return@setOnClickListener
-
-            val song = mSongResponse?.data?.getOrNull(0)
-            val title = song?.name() ?: binding!!.title.text.toString()
-            val desc = song?.artists?.all?.joinToString(", ") { it?.name() ?: "" } ?: binding!!.description.text.toString()
-            val img = IMAGE_URL ?: ""
-
-            val songItem = SavedLibraries.Library.Songs(currentId, title, desc, img)
-            val nowLiked = SharedPreferenceManager.getInstance(this).toggleLikedSong(songItem)
-
-            binding!!.favoriteIcon?.animate()
-                ?.scaleX(1.3f)
-                ?.scaleY(1.3f)
-                ?.setDuration(120)
-                ?.withEndAction {
-                    binding!!.favoriteIcon?.animate()?.scaleX(1.0f)?.scaleY(1.0f)?.setDuration(120)?.start()
-                }
-                ?.start()
-
-            updateFavoriteButtonUI()
-
-            val msg = if (nowLiked) "Added to Liked Songs" else "Removed from Liked Songs"
-            Snackbar.make(binding!!.root, msg, Snackbar.LENGTH_SHORT).show()
-        }
 
         binding!!.shareIcon.setOnClickListener(View.OnClickListener {
             if (SHARE_URL.isBlank()) return@OnClickListener
@@ -578,80 +514,48 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
             val song = mSongResponse!!.data?.get(0) ?: return@OnClickListener
 
-            if (TrackDownloader.isAlreadyDownloaded(song.name())) {
-                _binding.download.titleTextView?.text = "Download Manager"
+            val currentId = MusicPlayerManager.MUSIC_ID ?: ID_FROM_EXTRA
+            val isLiked = if (!currentId.isNullOrEmpty()) {
+                SharedPreferenceManager.getInstance(this@MusicOverviewActivity).isSongLiked(currentId)
+            } else false
+            val textMainColor = resources.getColor(R.color.textMain, null)
+
+            if (isLiked) {
+                _binding.favorite.titleTextView?.text = "Remove from Liked Songs"
+                _binding.favorite.iconImageView?.setImageResource(R.drawable.favorite_24px)
+                _binding.favorite.iconImageView?.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.red, null))
+            } else {
+                _binding.favorite.titleTextView?.text = "Add to Liked Songs"
+                _binding.favorite.iconImageView?.setImageResource(R.drawable.favorite_outline_24px)
+                _binding.favorite.iconImageView?.imageTintList = ColorStateList.valueOf(textMainColor)
             }
 
-            _binding.download.setOnClickListener(View.OnClickListener { v: View? ->
-                if (TrackDownloader.isAlreadyDownloaded(song.name())) {
-                    MaterialAlertDialogBuilder(this@MusicOverviewActivity)
-                        .setTitle("Downloaded Song")
-                        .setMessage("\"${song.name()}\" is downloaded on this device.")
-                        .setPositiveButton("Open Downloads") { _, _ ->
-                            startActivity(
-                                Intent(
-                                    this@MusicOverviewActivity,
-                                    DownloadManagerActivity::class.java
-                                )
-                            )
-                        }
-                        .setNegativeButton("Delete Song") { _, _ ->
-                            if (TrackDownloader.deleteDownloadedSong(this@MusicOverviewActivity, song.name())) {
-                                Toast.makeText(this@MusicOverviewActivity, "Song deleted from device", Toast.LENGTH_SHORT).show()
-                                _binding.download.titleTextView?.text = "Download"
-                            } else {
-                                Toast.makeText(this@MusicOverviewActivity, "Failed to delete song", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        .setNeutralButton("Cancel", null)
-                        .show()
-                    return@OnClickListener
+            _binding.favorite.setOnClickListener {
+                if (currentId.isNullOrEmpty()) return@setOnClickListener
+                val title = song.name()
+                val desc = song.artists?.all?.joinToString(", ") { it?.name() ?: "" } ?: binding!!.description.text.toString()
+                val img = IMAGE_URL ?: ""
+                val songItem = SavedLibraries.Library.Songs(currentId, title, desc, img)
+                val nowLiked = SharedPreferenceManager.getInstance(this@MusicOverviewActivity).toggleLikedSong(songItem)
+
+                if (nowLiked) {
+                    _binding.favorite.titleTextView?.text = "Remove from Liked Songs"
+                    _binding.favorite.iconImageView?.setImageResource(R.drawable.favorite_24px)
+                    _binding.favorite.iconImageView?.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.red, null))
+                } else {
+                    _binding.favorite.titleTextView?.text = "Add to Liked Songs"
+                    _binding.favorite.iconImageView?.setImageResource(R.drawable.favorite_outline_24px)
+                    _binding.favorite.iconImageView?.imageTintList = ColorStateList.valueOf(textMainColor)
                 }
-                val progressDialog = ProgressDialog(this@MusicOverviewActivity)
-                progressDialog.setMessage("Downloading...")
-                progressDialog.setCancelable(false)
-                progressDialog.setCanceledOnTouchOutside(false)
-                val settingsMgr = SettingsSharedPrefManager(this@MusicOverviewActivity)
-                val downloadFormat = TrackDownloader.DownloadFormat.fromExtension(
-                    settingsMgr.downloadFormat
-                )
-                TrackDownloader.downloadAndEmbedMetadata(
-                    this@MusicOverviewActivity,
-                    song,
-                    downloadFormat,
-                    object : TrackDownloadListener {
-                        override fun onStarted() {
-                            progressDialog.show()
-                        }
 
-                        override fun onFinished() {
-                            progressDialog.dismiss()
-                            if (TrackDownloader.isAlreadyDownloaded(song.name())) {
-                                Toast.makeText(
-                                    this@MusicOverviewActivity, "Successfully Downloaded.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                _binding.download.titleTextView?.text = "Download Manager"
-                            }
-                        }
+                val msg = if (nowLiked) "Added to Liked Songs" else "Removed from Liked Songs"
+                Snackbar.make(binding!!.root, msg, Snackbar.LENGTH_SHORT).show()
+            }
 
-                        override fun onError(errorMessage: String?) {
-                            Toast.makeText(
-                                this@MusicOverviewActivity,
-                                errorMessage,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            val alertDialogBuilder = MaterialAlertDialogBuilder(
-                                this@MusicOverviewActivity
-                            )
-                            alertDialogBuilder.setTitle("Error")
-                            alertDialogBuilder.setMessage(errorMessage)
-                            alertDialogBuilder.setPositiveButton(
-                                "OK"
-                            ) { dialogInterface: DialogInterface?, _: Int -> dialogInterface!!.dismiss() }
-                            alertDialogBuilder.show()
-                        }
-                    })
+            updateDownloadButtonUI(song.name(), _binding)
+
+            _binding.download.setOnClickListener(View.OnClickListener { v: View? ->
+                startDownloadTrack(song, _binding)
             })
 
             _binding.recommendations.setOnClickListener {
@@ -838,7 +742,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         val ID = intent.extras!!.getString("id", "")
         ID_FROM_EXTRA = ID
         // ((ApplicationClass)getApplicationContext()).setMusicDetails(null,null,null,ID);
-        if (MusicPlayerManager.MUSIC_ID == ID) {
+        if (MusicPlayerManager.currentlyPlayingTrackId == ID || MusicPlayerManager.MUSIC_ID == ID) {
             updateSeekbar()
             if (MusicPlayerManager.player?.isPlaying == true) binding!!.playPauseImage.setImageResource(
                 R.drawable.baseline_pause_24
@@ -928,16 +832,50 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
 
         SONG_URL = MusicPlayerManager.getDownloadUrl(downloadUrls)
 
-        if ((MusicPlayerManager.MUSIC_ID != ID_FROM_EXTRA || forced)) {
+        val fromMiniPlayer = intent.getBooleanExtra("from_mini_player", false)
+        val isActivelyPlaying = MusicPlayerManager.isPlayerPlaying()
+        val isPlayerActive = MusicPlayerManager.player != null &&
+                MusicPlayerManager.player?.playbackState != Player.STATE_IDLE &&
+                MusicPlayerManager.player?.playbackState != Player.STATE_ENDED
+        val isSameSong = (MusicPlayerManager.currentlyPlayingTrackId == ID_FROM_EXTRA || MusicPlayerManager.MUSIC_ID == ID_FROM_EXTRA)
+
+        val shouldPlay: Boolean
+        if (forced) {
+            shouldPlay = true
+        } else if (fromMiniPlayer || isActivityRecreated) {
+            shouldPlay = false
+        } else if (isSameSong && isPlayerActive) {
+            if (!isActivelyPlaying) {
+                MusicPlayerManager.player?.play()
+                MusicPlayerManager.showNotification()
+                MusicPlayerManager.updateWidget()
+            }
+            shouldPlay = false
+        } else {
+            shouldPlay = true
+        }
+
+        if (shouldPlay) {
             MusicPlayerManager.setMusicDetails(
                 IMAGE_URL, binding!!.title.text.toString(),
                 binding!!.description.text.toString(), ID_FROM_EXTRA
             )
             MusicPlayerManager.SONG_URL = SONG_URL
             prepareMediaPLayer()
+        } else {
+            val p = MusicPlayerManager.player
+            if (p != null && p.duration > 0) {
+                binding!!.totalDuration.text = convertDuration(p.duration)
+            }
+            if (MusicPlayerManager.isPlayerPlaying()) {
+                binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
+            } else {
+                binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
+            }
+            updateSeekbar()
         }
 
-        updateFavoriteButtonUI()
+        updateDownloadButtonUI(song.name())
         fetchLyricsForCurrentSong(song)
     }
 
@@ -1002,6 +940,209 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     }
 
 
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        val gesturesEnabled = SettingsSharedPrefManager(this).gesturesEnabled
+        if (!gesturesEnabled) {
+            return super.dispatchTouchEvent(ev)
+        }
+
+        when (ev.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                touchDownX = ev.rawX
+                touchDownY = ev.rawY
+
+                val seekbar = binding?.seekbar
+                if (seekbar != null && seekbar.isShown) {
+                    val rect = Rect()
+                    seekbar.getGlobalVisibleRect(rect)
+                    rect.inset(0, -(16 * resources.displayMetrics.density).toInt())
+                    if (rect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                        isTouchOverSeekbar = true
+                        return super.dispatchTouchEvent(ev)
+                    }
+                }
+                isTouchOverSeekbar = false
+
+                velocityTracker?.recycle()
+                velocityTracker = VelocityTracker.obtain()
+                velocityTracker?.addMovement(ev)
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                if (isTouchOverSeekbar) {
+                    return super.dispatchTouchEvent(ev)
+                }
+                velocityTracker?.addMovement(ev)
+            }
+
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (isTouchOverSeekbar) {
+                    isTouchOverSeekbar = false
+                    return super.dispatchTouchEvent(ev)
+                }
+
+                velocityTracker?.addMovement(ev)
+                velocityTracker?.computeCurrentVelocity(1000)
+                val velY = velocityTracker?.yVelocity ?: 0f
+                val velX = velocityTracker?.xVelocity ?: 0f
+                velocityTracker?.recycle()
+                velocityTracker = null
+
+                val deltaX = ev.rawX - touchDownX
+                val deltaY = ev.rawY - touchDownY
+                val absX = kotlin.math.abs(deltaX)
+                val absY = kotlin.math.abs(deltaY)
+                val swipeThreshold = 80 * resources.displayMetrics.density
+                val velocityThreshold = 600f
+
+                // Downward swipe → cleanly minimize player via onBackPressed
+                if (deltaY > swipeThreshold && deltaY > absX * 1.5f && (deltaY > 100 || velY > velocityThreshold)) {
+                    val lyricsRecycler = binding?.lyricsRecycler
+                    val isLyricsVisible = lyricsRecycler?.isVisible == true
+                    val canScrollLyricsUp = lyricsRecycler?.canScrollVertically(-1) == true
+
+                    if (!isLyricsVisible || !canScrollLyricsUp) {
+                        onBackPressedDispatcher.onBackPressed()
+                        return true
+                    }
+                }
+
+                // Horizontal swipe left → next track
+                if (absX > absY * 1.5f && (deltaX < -swipeThreshold || velX < -velocityThreshold)) {
+                    binding?.nextIcon?.let { icon ->
+                        icon.alpha = 0.4f
+                        icon.animate()?.alpha(1f)?.setDuration(200)?.start()
+                    }
+                    MusicPlayerManager.nextTrack()
+                    return true
+                }
+
+                // Horizontal swipe right → previous track
+                if (absX > absY * 1.5f && (deltaX > swipeThreshold || velX > velocityThreshold)) {
+                    binding?.prevIcon?.let { icon ->
+                        icon.alpha = 0.4f
+                        icon.animate()?.alpha(1f)?.setDuration(200)?.start()
+                    }
+                    MusicPlayerManager.prevTrack()
+                    return true
+                }
+            }
+        }
+
+        return super.dispatchTouchEvent(ev)
+    }
+
+    private fun updateDownloadButtonUI(songName: String?, sheetBinding: MusicOverviewMoreInfoBottomSheetBinding? = null) {
+        val isDownloaded = TrackDownloader.isAlreadyDownloaded(songName)
+        val primaryColor = ThemeManager.getPrimaryColor(this)
+        val textMainColor = resources.getColor(R.color.textMain, null)
+
+        if (sheetBinding != null) {
+            if (isDownloaded) {
+                sheetBinding.download.titleTextView?.text = "Downloaded"
+                sheetBinding.download.iconImageView?.setImageResource(R.drawable.round_done_24)
+                sheetBinding.download.iconImageView?.imageTintList = ColorStateList.valueOf(primaryColor)
+            } else {
+                sheetBinding.download.titleTextView?.text = "Download"
+                sheetBinding.download.iconImageView?.setImageResource(R.drawable.baseline_download_for_offline_24)
+                sheetBinding.download.iconImageView?.imageTintList = ColorStateList.valueOf(textMainColor)
+            }
+        }
+    }
+
+    private fun startDownloadTrack(song: SongResponse.Song, sheetBinding: MusicOverviewMoreInfoBottomSheetBinding? = null) {
+        if (TrackDownloader.isAlreadyDownloaded(song.name())) {
+            MaterialAlertDialogBuilder(this@MusicOverviewActivity)
+                .setTitle("Downloaded Song")
+                .setMessage("\"${song.name()}\" is downloaded on this device.")
+                .setPositiveButton("Open Downloads") { _, _ ->
+                    startActivity(
+                        Intent(
+                            this@MusicOverviewActivity,
+                            DownloadManagerActivity::class.java
+                        )
+                    )
+                }
+                .setNegativeButton("Delete Song") { _, _ ->
+                    if (TrackDownloader.deleteDownloadedSong(this@MusicOverviewActivity, song.name())) {
+                        Toast.makeText(this@MusicOverviewActivity, "Song deleted from device", Toast.LENGTH_SHORT).show()
+                        updateDownloadButtonUI(song.name(), sheetBinding)
+                    } else {
+                        Toast.makeText(this@MusicOverviewActivity, "Failed to delete song", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNeutralButton("Cancel", null)
+                .show()
+            return
+        }
+
+        val progressDialog = ProgressDialog(this@MusicOverviewActivity)
+        progressDialog.setMessage("Downloading \"${song.name()}\"...")
+        progressDialog.setCancelable(true)
+        progressDialog.setCanceledOnTouchOutside(true)
+        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel") { _, _ ->
+            TrackDownloader.cancelDownload(this@MusicOverviewActivity)
+            Toast.makeText(this@MusicOverviewActivity, "Download cancelled", Toast.LENGTH_SHORT).show()
+        }
+        progressDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Download in Background") { dialog, _ ->
+            dialog.dismiss()
+            Snackbar.make(binding!!.root, "Downloading in background. Check notifications.", Snackbar.LENGTH_LONG)
+                .setAction("Cancel") {
+                    TrackDownloader.cancelDownload(this@MusicOverviewActivity)
+                }.show()
+        }
+        progressDialog.setOnCancelListener {
+            Snackbar.make(binding!!.root, "Downloading in background. Check notifications.", Snackbar.LENGTH_LONG)
+                .setAction("Cancel") {
+                    TrackDownloader.cancelDownload(this@MusicOverviewActivity)
+                }.show()
+        }
+
+        val settingsMgr = SettingsSharedPrefManager(this@MusicOverviewActivity)
+        val downloadFormat = TrackDownloader.DownloadFormat.fromExtension(
+            settingsMgr.downloadFormat
+        )
+        TrackDownloader.downloadAndEmbedMetadata(
+            this@MusicOverviewActivity,
+            song,
+            downloadFormat,
+            object : TrackDownloadListener {
+                override fun onStarted() {
+                    if (!isFinishing && !isDestroyed) {
+                        progressDialog.show()
+                    }
+                }
+
+                override fun onFinished() {
+                    if (progressDialog.isShowing) {
+                        progressDialog.dismiss()
+                    }
+                    if (TrackDownloader.isAlreadyDownloaded(song.name())) {
+                        Toast.makeText(
+                            this@MusicOverviewActivity, "Successfully Downloaded.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        updateDownloadButtonUI(song.name(), sheetBinding)
+                    }
+                }
+
+                override fun onError(errorMessage: String?) {
+                    if (progressDialog.isShowing) {
+                        progressDialog.dismiss()
+                    }
+                    if (errorMessage != "Cancelled") {
+                        Toast.makeText(
+                            this@MusicOverviewActivity,
+                            "Download error: $errorMessage",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    updateDownloadButtonUI(song.name(), sheetBinding)
+                }
+            }
+        )
+    }
 
     fun backPress(view: View?) {
         finish()
@@ -1131,7 +1272,6 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         if (p.shuffleModeEnabled) binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(primaryColor)
         else binding!!.shuffleIcon.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.textSec, null))
 
-        updateFavoriteButtonUI()
 
         mHandler.postDelayed(mUpdateTimeTask, 1000)
     }
@@ -1230,17 +1370,14 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     }
 
     override fun playClicked() {
-//        Log.i(TAG, "playClicked called from service")
-//        runOnUiThread {
-//            // Retrieve application class to toggle playback
-//            MusicPlayerManager.togglePlayPause()
-//
-//            if (MusicPlayerManager.player?.isPlaying == true) {
-//                binding!!.playPauseImage.setImageResource(R.drawable.baseline_pause_24)
-//            } else {
-//                binding!!.playPauseImage.setImageResource(R.drawable.play_arrow_24px)
-//            }
-//        }
+        runOnUiThread {
+            if (MusicPlayerManager.isPlayerPlaying()) {
+                binding?.playPauseImage?.setImageResource(R.drawable.baseline_pause_24)
+            } else {
+                binding?.playPauseImage?.setImageResource(R.drawable.play_arrow_24px)
+            }
+            updateSeekbar()
+        }
     }
 
     override fun onProgressChanged(progress: Int) {
@@ -1250,18 +1387,6 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
         MusicPlayerManager.showNotification()
     }
 
-    private fun updateFavoriteButtonUI() {
-        val currentId = MusicPlayerManager.MUSIC_ID ?: ID_FROM_EXTRA
-        if (currentId.isNullOrEmpty() || binding == null) return
-        val isLiked = SharedPreferenceManager.getInstance(this).isSongLiked(currentId)
-        if (isLiked) {
-            binding!!.favoriteIcon?.setImageResource(R.drawable.favorite_24px)
-            binding!!.favoriteIcon?.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.red, null))
-        } else {
-            binding!!.favoriteIcon?.setImageResource(R.drawable.favorite_outline_24px)
-            binding!!.favoriteIcon?.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.textMain, null))
-        }
-    }
 
     private fun showRecommendationsBottomSheet() {
         val currentSong = mSongResponse?.data?.getOrNull(0)

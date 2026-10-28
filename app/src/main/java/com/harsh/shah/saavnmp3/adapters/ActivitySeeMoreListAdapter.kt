@@ -68,7 +68,9 @@ class ActivitySeeMoreListAdapter : RecyclerView.Adapter<ActivitySeeMoreListAdapt
         }
 
         holder.itemView.setOnClickListener { view: View? ->
+            MusicPlayerManager.cancelAutoplay()
             MusicPlayerManager.trackQueue?.clear()
+            val songId = data?.getOrNull(position)?.id
             var clickIndex = position
             var validIndex = 0
             if (data != null) {

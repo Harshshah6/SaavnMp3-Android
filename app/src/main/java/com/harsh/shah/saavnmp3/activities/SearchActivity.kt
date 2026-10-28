@@ -27,6 +27,10 @@ import com.harsh.shah.saavnmp3.network.ApiManager
 import com.harsh.shah.saavnmp3.network.utility.RequestNetwork
 import com.harsh.shah.saavnmp3.records.GlobalSearch
 import com.harsh.shah.saavnmp3.records.GlobalSearch.Data.TopQuery
+import com.harsh.shah.saavnmp3.records.AlbumsSearch
+import com.harsh.shah.saavnmp3.records.SongSearch
+import com.harsh.shah.saavnmp3.records.PlaylistsSearch
+import com.harsh.shah.saavnmp3.records.ArtistsSearch
 import com.harsh.shah.saavnmp3.utils.MiniPlayerHelper
 import com.harsh.shah.saavnmp3.utils.SharedPreferenceManager
 import com.harsh.shah.saavnmp3.utils.attachSnapHelper
@@ -269,8 +273,10 @@ class SearchActivity : AppCompatActivity() {
     private fun refreshData() {
         val data: MutableList<SearchListItem?> = ArrayList()
         val checkedChipId = binding!!.chipGroup.checkedChipId
+        val query = currentQuery
+
         if (checkedChipId == R.id.chip_all) {
-            globalSearch!!.data?.topQuery?.results?.forEach { item: TopQuery.Results? ->
+            globalSearch?.data?.topQuery?.results?.forEach { item: TopQuery.Results? ->
                 if (item == null) return@forEach
                 if (!(item.type == "song" || item.type == "album" || item.type == "playlist" || item.type == "artist")) return@forEach
                 
@@ -291,20 +297,108 @@ class SearchActivity : AppCompatActivity() {
             addAlbumsData(data)
             addPlaylistsData(data)
             addArtistsData(data)
-        } else if (checkedChipId == R.id.chip_song) {
-            addSongsData(data)
+            if (!data.isEmpty()) {
+                val uniqueData = data.filterNotNull().distinctBy { it.id }.toMutableList()
+                binding!!.recyclerView.setAdapter(ActivitySearchListItemAdapter(uniqueData))
+            }
         } else if (checkedChipId == R.id.chip_albums) {
             addAlbumsData(data)
+            if (!data.isEmpty()) {
+                binding!!.recyclerView.setAdapter(ActivitySearchListItemAdapter(data.filterNotNull().toMutableList()))
+            }
+            if (query.isNotBlank()) {
+                ApiManager(this).searchAlbums(query, 0, 40, object : RequestNetwork.RequestListener {
+                    override fun onResponse(tag: String?, response: String?, responseHeaders: HashMap<String?, Any?>?) {
+                        if (query != currentQuery || binding?.chipGroup?.checkedChipId != R.id.chip_albums) return
+                        val albumSearch = Gson().fromJson(response, AlbumsSearch::class.java)
+                        if (albumSearch?.success == true) {
+                            val results = albumSearch.data?.results ?: emptyList()
+                            val albumItems = results.filterNotNull().map { item ->
+                                val img = item.image?.lastOrNull()?.url ?: ""
+                                SearchListItem(item.id, item.name(), "${item.language ?: ""} ${item.year ?: ""}".trim(), img, SearchListItem.Type.ALBUM)
+                            }
+                            if (albumItems.isNotEmpty()) {
+                                binding?.recyclerView?.adapter = ActivitySearchListItemAdapter(albumItems.toMutableList())
+                            }
+                        }
+                    }
+                    override fun onErrorResponse(tag: String?, message: String?) {}
+                })
+            }
+        } else if (checkedChipId == R.id.chip_song) {
+            addSongsData(data)
+            if (!data.isEmpty()) {
+                binding!!.recyclerView.setAdapter(ActivitySearchListItemAdapter(data.filterNotNull().toMutableList()))
+            }
+            if (query.isNotBlank()) {
+                ApiManager(this).searchSongs(query, 0, 40, object : RequestNetwork.RequestListener {
+                    override fun onResponse(tag: String?, response: String?, responseHeaders: HashMap<String?, Any?>?) {
+                        if (query != currentQuery || binding?.chipGroup?.checkedChipId != R.id.chip_song) return
+                        val songSearch = Gson().fromJson(response, SongSearch::class.java)
+                        if (songSearch?.success == true) {
+                            val results = songSearch.data?.results ?: emptyList()
+                            val songItems = results.filterNotNull().map { item ->
+                                val img = item.image?.lastOrNull()?.url ?: ""
+                                SearchListItem(item.id, item.name(), "${item.language ?: ""} ${item.year ?: ""}".trim(), img, SearchListItem.Type.SONG)
+                            }
+                            if (songItems.isNotEmpty()) {
+                                binding?.recyclerView?.adapter = ActivitySearchListItemAdapter(songItems.toMutableList())
+                            }
+                        }
+                    }
+                    override fun onErrorResponse(tag: String?, message: String?) {}
+                })
+            }
         } else if (checkedChipId == R.id.chip_playlists) {
             addPlaylistsData(data)
+            if (!data.isEmpty()) {
+                binding!!.recyclerView.setAdapter(ActivitySearchListItemAdapter(data.filterNotNull().toMutableList()))
+            }
+            if (query.isNotBlank()) {
+                ApiManager(this).searchPlaylists(query, 0, 40, object : RequestNetwork.RequestListener {
+                    override fun onResponse(tag: String?, response: String?, responseHeaders: HashMap<String?, Any?>?) {
+                        if (query != currentQuery || binding?.chipGroup?.checkedChipId != R.id.chip_playlists) return
+                        val playlistSearch = Gson().fromJson(response, PlaylistsSearch::class.java)
+                        if (playlistSearch?.success == true) {
+                            val results = playlistSearch.data?.results ?: emptyList()
+                            val playlistItems = results.filterNotNull().map { item ->
+                                val img = item.image?.lastOrNull()?.url ?: ""
+                                SearchListItem(item.id, item.name(), "", img, SearchListItem.Type.PLAYLIST)
+                            }
+                            if (playlistItems.isNotEmpty()) {
+                                binding?.recyclerView?.adapter = ActivitySearchListItemAdapter(playlistItems.toMutableList())
+                            }
+                        }
+                    }
+                    override fun onErrorResponse(tag: String?, message: String?) {}
+                })
+            }
         } else if (checkedChipId == R.id.chip_artists) {
             addArtistsData(data)
+            if (!data.isEmpty()) {
+                binding!!.recyclerView.setAdapter(ActivitySearchListItemAdapter(data.filterNotNull().toMutableList()))
+            }
+            if (query.isNotBlank()) {
+                ApiManager(this).searchArtists(query, 0, 40, object : RequestNetwork.RequestListener {
+                    override fun onResponse(tag: String?, response: String?, responseHeaders: HashMap<String?, Any?>?) {
+                        if (query != currentQuery || binding?.chipGroup?.checkedChipId != R.id.chip_artists) return
+                        val artistSearch = Gson().fromJson(response, ArtistsSearch::class.java)
+                        if (artistSearch?.success == true) {
+                            val results = artistSearch.data?.results ?: emptyList()
+                            val artistItems = results.filterNotNull().map { item ->
+                                val img = item.image?.lastOrNull()?.url ?: ""
+                                SearchListItem(item.id, item.name(), item.role ?: "Artist", img, SearchListItem.Type.ARTIST)
+                            }
+                            if (artistItems.isNotEmpty()) {
+                                binding?.recyclerView?.adapter = ActivitySearchListItemAdapter(artistItems.toMutableList())
+                            }
+                        }
+                    }
+                    override fun onErrorResponse(tag: String?, message: String?) {}
+                })
+            }
         } else {
             throw IllegalStateException("Unexpected value: " + binding!!.chipGroup.checkedChipId)
-        }
-        if (!data.isEmpty()) {
-            val uniqueData = data.filterNotNull().distinctBy { it.id }.toMutableList()
-            binding!!.recyclerView.setAdapter(ActivitySearchListItemAdapter(uniqueData))
         }
     }
 

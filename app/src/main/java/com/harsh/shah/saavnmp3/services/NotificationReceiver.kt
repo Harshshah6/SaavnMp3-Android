@@ -26,20 +26,20 @@ class NotificationReceiver : BroadcastReceiver() {
         when (action) {
             MusicPlayerManager.ACTION_NEXT -> {
                 Log.i(TAG, "Processing NEXT action")
-                serviceIntent.putExtra("action", action)
-                context.startService(serviceIntent)
+                MusicPlayerManager.nextTrack()
+                MusicPlayerManager.musicService?.actionPlaying?.nextClicked()
             }
 
             MusicPlayerManager.ACTION_PREV -> {
                 Log.i(TAG, "Processing PREVIOUS action")
-                serviceIntent.putExtra("action", action)
-                context.startService(serviceIntent)
+                MusicPlayerManager.prevTrack()
+                MusicPlayerManager.musicService?.actionPlaying?.prevClicked()
             }
 
             MusicPlayerManager.ACTION_PLAY -> {
                 Log.i(TAG, "Processing PLAY/PAUSE action")
-                serviceIntent.putExtra("action", action)
-                context.startService(serviceIntent)
+                MusicPlayerManager.togglePlayPause()
+                MusicPlayerManager.musicService?.actionPlaying?.playClicked()
             }
 
             "action_click" -> {

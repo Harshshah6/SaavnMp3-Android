@@ -180,6 +180,33 @@
                                 app:backgroundTint="@color/buttonBackground"
                                 app:cornerRadius="999dp" />
 
+                            <!-- Download Album Button -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/downloadAlbumBtn"
+                                android:layout_width="@dimen/_32sdp"
+                                android:layout_height="@dimen/_32sdp"
+                                android:layout_marginStart="@dimen/_8sdp"
+                                app:cardCornerRadius="999dp"
+                                app:cardBackgroundColor="@color/surfaceContainerHighest"
+                                app:strokeWidth="0dp"
+                                app:cardElevation="0dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:foreground="?attr/selectableItemBackground">
+
+                                <ImageView
+                                    android:id="@+id/downloadAlbumIcon"
+                                    android:contentDescription="Download Album"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/baseline_download_for_offline_24"
+                                    android:padding="@dimen/_6sdp"
+                                    android:clickable="false"
+                                    android:focusable="false"
+                                    app:tint="@color/textMain" />
+
+                            </com.google.android.material.card.MaterialCardView>
+
                             <!-- Add To Library Button -->
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="@dimen/_32sdp"

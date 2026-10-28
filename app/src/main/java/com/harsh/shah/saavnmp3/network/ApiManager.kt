@@ -1,4 +1,4 @@
-﻿package com.harsh.shah.saavnmp3.network
+package com.harsh.shah.saavnmp3.network
 
 import android.content.Context
 import android.net.Uri
@@ -316,7 +316,7 @@ class ApiManager(context: Context?) {
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
-            ARTISTS_URL + "/" + artistId.toInt() + "/songs", "", requestListener
+            "$ARTISTS_URL/$artistId/songs", "", requestListener
         )
     }
 
@@ -336,7 +336,7 @@ class ApiManager(context: Context?) {
         requestNetwork.setParams(queryMap, RequestNetworkController.REQUEST_PARAM)
         requestNetwork.startRequestNetwork(
             RequestNetworkController.GET,
-            ARTISTS_URL + "/" + artistId.toInt() + "/albums", "", requestListener
+            "$ARTISTS_URL/$artistId/albums", "", requestListener
         )
     }
 
@@ -360,15 +360,15 @@ class ApiManager(context: Context?) {
     }
 
     companion object {
-        private const val BASE_URL = "https://melotune.lulli.qzz.io/api/"
-        private val SEARCH_URL: String = BASE_URL + "search"
-        private const val SONGS = "/songs"
-        private const val ALBUMS = "/albums"
-        private const val ARTISTS = "/artists"
-        private const val PLAYLISTS = "/playlists"
-        private val SONGS_URL: String = BASE_URL + "songs"
-        private val ALBUMS_URL: String = BASE_URL + "albums"
-        private val ARTISTS_URL: String = BASE_URL + "artists"
-        private val PLAYLISTS_URL: String = BASE_URL + "playlists"
+        const val BASE_URL = "https://melotune.lulli.qzz.io/api/"
+        val SEARCH_URL: String = BASE_URL + "search"
+        const val SONGS = "/songs"
+        const val ALBUMS = "/albums"
+        const val ARTISTS = "/artists"
+        const val PLAYLISTS = "/playlists"
+        val SONGS_URL: String = BASE_URL + "songs"
+        val ALBUMS_URL: String = BASE_URL + "albums"
+        val ARTISTS_URL: String = BASE_URL + "artists"
+        val PLAYLISTS_URL: String = BASE_URL + "playlists"
     }
 }

@@ -120,6 +120,7 @@ class ActivitySearchListItemAdapter(private val data: MutableList<SearchListItem
             intent.putExtra("id", item.id)
             when (item.type) {
                 SearchListItem.Type.SONG -> {
+                    MusicPlayerManager.cancelAutoplay()
                     MusicPlayerManager.trackQueue?.clear()
                     var clickIndex = 0
                     var validIndex = 0

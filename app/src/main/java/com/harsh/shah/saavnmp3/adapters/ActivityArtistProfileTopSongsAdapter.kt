@@ -77,7 +77,9 @@ class ActivityArtistProfileTopSongsAdapter(private val data: MutableList<Song?>)
         }
 
         holder.itemView.setOnClickListener { view: View? ->
+            MusicPlayerManager.cancelAutoplay()
             MusicPlayerManager.trackQueue?.clear()
+            val songId = data[position]?.id
             var clickIndex = position
             var validIndex = 0
             for (i in data.indices) {

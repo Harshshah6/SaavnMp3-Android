@@ -102,6 +102,13 @@
             android:src="@drawable/baseline_album_24"/>
 
         <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
+            android:id="@+id/favorite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Add to Liked Songs"
+            android:src="@drawable/favorite_outline_24px"/>
+
+        <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
             android:id="@+id/add_to_library"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

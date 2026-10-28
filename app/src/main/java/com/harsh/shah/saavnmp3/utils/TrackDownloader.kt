@@ -80,11 +80,14 @@ object TrackDownloader {
         }
     }
 
-    private fun sanitizeFilename(name: String): String {
-        return name.replace(Regex("[\\\\/:*?\"<>|]"), "_").trim()
+    fun sanitizeFilename(name: String): String {
+        val sanitized = name.replace(Regex("[\\\\/:*?\"<>|]"), "_")
+            .trim()
+            .trim { it == '.' || it.isWhitespace() }
+        return if (sanitized.isBlank()) "Collection" else sanitized
     }
 
-    fun isAlreadyDownloaded(title: String?): Boolean {
+    fun isAlreadyDownloaded(title: String?, subfolder: String? = null): Boolean {
         if (title.isNullOrBlank()) return false
         val musicDir = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC),
@@ -92,10 +95,41 @@ object TrackDownloader {
         )
         if (!musicDir.exists()) return false
         val safeTitle = sanitizeFilename(title)
-        return DownloadFormat.values().any { fmt ->
+        val validFormats = DownloadFormat.values()
+
+        // 1. If a specific subfolder (e.g. album/playlist) is passed, check inside that subfolder first
+        if (!subfolder.isNullOrBlank()) {
+            val safeSubfolder = sanitizeFilename(subfolder)
+            val subDir = File(musicDir, safeSubfolder)
+            if (subDir.exists() && subDir.isDirectory) {
+                val foundInSubDir = validFormats.any { fmt ->
+                    File(subDir, "$safeTitle.${fmt.extension}").exists() ||
+                    File(subDir, "$title.${fmt.extension}").exists()
+                }
+                if (foundInSubDir) return true
+            }
+        }
+
+        // 2. Check directly in the root Melotune directory
+        val foundInRoot = validFormats.any { fmt ->
             File(musicDir, "$safeTitle.${fmt.extension}").exists() ||
             File(musicDir, "$title.${fmt.extension}").exists()
         }
+        if (foundInRoot) return true
+
+        // 3. Check in any immediate subfolder of Melotune
+        val subdirs = musicDir.listFiles { f -> f.isDirectory }
+        if (subdirs != null) {
+            for (dir in subdirs) {
+                val foundInAnySub = validFormats.any { fmt ->
+                    File(dir, "$safeTitle.${fmt.extension}").exists() ||
+                    File(dir, "$title.${fmt.extension}").exists()
+                }
+                if (foundInAnySub) return true
+            }
+        }
+
+        return false
     }
 
     fun getDownloadedTracks(context: Context): MutableList<DownloadedTrack?> {
@@ -106,7 +140,11 @@ object TrackDownloader {
         )
         if (!musicDir.exists()) return data
 
-        val files = musicDir.listFiles() ?: return data
+        val audioExtensions = DownloadFormat.values().map { it.extension.lowercase() }.toSet()
+        val files = musicDir.walkTopDown().maxDepth(3).filter { file ->
+            file.isFile && !file.name.startsWith(".") && file.extension.lowercase() in audioExtensions
+        }.sortedByDescending { it.lastModified() }.toList()
+
         for (file in files) {
             try {
                 val f = AudioFileIO.read(file)
@@ -114,10 +152,10 @@ object TrackDownloader {
                 val audioHeader = f.getAudioHeader()
                 val uidFieldIdPrefix = "----:" + context.packageName + ":"
                 val uidFieldId = uidFieldIdPrefix + "TrackUID"
-                val title: String? = if (tag != null) tag.getFirst(FieldKey.TITLE) else file.name
-                val artist: String? = if (tag != null) tag.getFirst(FieldKey.ARTIST) else ""
-                val album: String? = if (tag != null) tag.getFirst(FieldKey.ALBUM) else ""
-                val year: String? = if (tag != null) tag.getFirst(FieldKey.YEAR) else ""
+                val title: String = tag?.getFirst(FieldKey.TITLE)?.takeIf { it.isNotBlank() } ?: file.nameWithoutExtension
+                val artist: String = tag?.getFirst(FieldKey.ARTIST) ?: ""
+                val album: String = tag?.getFirst(FieldKey.ALBUM) ?: ""
+                val year: String = tag?.getFirst(FieldKey.YEAR) ?: ""
                 val bitrate = if (audioHeader != null) audioHeader.bitRate.toString() else "344"
                 val trackLength = audioHeader?.trackLength?.toString() ?: "0"
 
@@ -185,6 +223,7 @@ object TrackDownloader {
             val file = track.file
             if (file != null && file.exists()) {
                 val path = file.absolutePath
+                val parentDir = file.parentFile
                 deleted = file.delete()
                 runCatching {
                     val resolver = context.contentResolver
@@ -196,6 +235,16 @@ object TrackDownloader {
                         "${MediaStore.Audio.Media.DATA} = ?",
                         arrayOf(path)
                     )
+                }
+                val musicDir = File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC),
+                    "Melotune"
+                )
+                if (parentDir != null && parentDir != musicDir && parentDir.parentFile == musicDir) {
+                    val remaining = parentDir.listFiles()
+                    if (remaining.isNullOrEmpty()) {
+                        parentDir.delete()
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -218,9 +267,19 @@ object TrackDownloader {
             filesToCheck.add(File(musicDir, "$safeTitle.${fmt.extension}"))
             filesToCheck.add(File(musicDir, "$songTitle.${fmt.extension}"))
         }
+        val subdirs = musicDir.listFiles { f -> f.isDirectory }
+        if (subdirs != null) {
+            for (dir in subdirs) {
+                for (fmt in DownloadFormat.values()) {
+                    filesToCheck.add(File(dir, "$safeTitle.${fmt.extension}"))
+                    filesToCheck.add(File(dir, "$songTitle.${fmt.extension}"))
+                }
+            }
+        }
         for (f in filesToCheck) {
             if (f.exists()) {
                 val path = f.absolutePath
+                val parentDir = f.parentFile
                 if (f.delete()) {
                     anyDeleted = true
                     runCatching {
@@ -233,6 +292,12 @@ object TrackDownloader {
                             "${MediaStore.Audio.Media.DATA} = ?",
                             arrayOf(path)
                         )
+                    }
+                    if (parentDir != null && parentDir != musicDir && parentDir.parentFile == musicDir) {
+                        val remaining = parentDir.listFiles()
+                        if (remaining.isNullOrEmpty()) {
+                            parentDir.delete()
+                        }
                     }
                 }
             }
@@ -379,21 +444,16 @@ object TrackDownloader {
         context: Context,
         song: Song,
         format: DownloadFormat = DownloadFormat.M4A,
+        subfolder: String? = null,
         onProgress: ((String) -> Unit)? = null
     ): Boolean {
         if (isCancelled || Thread.currentThread().isInterrupted) {
             throw CancellationException("Download cancelled")
         }
 
+        var resolvedSong = song
         var audioUrl = song.downloadUrl?.lastOrNull()?.url ?: ""
         var imageUrl = song.image?.lastOrNull()?.url ?: ""
-        val title = song.name()
-        val safeTitle = sanitizeFilename(title)
-        val artist = song.artists?.primary?.firstOrNull()?.name() ?: ""
-        val albumArtist = song.artists?.all?.mapNotNull { it?.name() }
-            ?.joinToString(", ") ?: artist
-        val album = song.album?.name() ?: ""
-        val duration = song.duration?.toInt() ?: -1
 
         // If audioUrl is blank and song id is available, resolve it synchronously
         if (audioUrl.isBlank() && !song.id.isNullOrBlank()) {
@@ -406,6 +466,7 @@ object TrackDownloader {
                 val fetchedResponse = Gson().fromJson(json, SongResponse::class.java)
                 val fetchedSong = fetchedResponse.data?.firstOrNull()
                 if (fetchedSong != null) {
+                    resolvedSong = fetchedSong
                     audioUrl = fetchedSong.downloadUrl?.lastOrNull()?.url ?: ""
                     if (imageUrl.isBlank()) {
                         imageUrl = fetchedSong.image?.lastOrNull()?.url ?: ""
@@ -413,6 +474,14 @@ object TrackDownloader {
                 }
             }
         }
+
+        val title = resolvedSong.name()
+        val safeTitle = sanitizeFilename(title)
+        val artist = resolvedSong.artists?.primary?.firstOrNull()?.name() ?: ""
+        val albumArtist = resolvedSong.artists?.all?.mapNotNull { it?.name() }
+            ?.joinToString(", ") ?: artist
+        val album = resolvedSong.album?.name() ?: ""
+        val duration = resolvedSong.duration?.toInt() ?: -1
 
         if (audioUrl.isBlank()) {
             throw IllegalStateException("Audio URL not found for song: $title")
@@ -448,7 +517,7 @@ object TrackDownloader {
 
             // Step 2: Fetch lyrics
             onProgress?.invoke("Fetching lyrics...")
-            val plainLyrics: String? = song.lyrics?.lyrics()?.takeIf { it.isNotBlank() }
+            val plainLyrics: String? = resolvedSong.lyrics?.lyrics()?.takeIf { it.isNotBlank() }
             val lrcLyrics: String? = runCatching {
                 runBlocking {
                     LrcLib.getLyrics(title = title, artist = artist, duration = duration).getOrNull()
@@ -494,7 +563,7 @@ object TrackDownloader {
                         artist = artist,
                         albumArtist = albumArtist,
                         album = album,
-                        song = song,
+                        song = resolvedSong,
                         artworkFile = artworkFile,
                         lyrics = lyricsToEmbed
                     )
@@ -523,7 +592,7 @@ object TrackDownloader {
                         artist = artist,
                         albumArtist = albumArtist,
                         album = album,
-                        song = song,
+                        song = resolvedSong,
                         artworkFile = artworkFile,
                         lyrics = lyricsToEmbed
                     )
@@ -551,7 +620,7 @@ object TrackDownloader {
                         artist = artist,
                         albumArtist = albumArtist,
                         album = album,
-                        song = song,
+                        song = resolvedSong,
                         artworkFile = artworkFile,
                         lyrics = lyricsToEmbed
                     )
@@ -565,7 +634,7 @@ object TrackDownloader {
 
             // Step 5: Save to MediaStore
             onProgress?.invoke("Saving to storage...")
-            val values = getContentValues(safeTitle, title, artist, album, song.id, format)
+            val values = getContentValues(safeTitle, title, artist, album, resolvedSong.id, format, subfolder)
             val resolver = context.contentResolver
             val audioCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
@@ -610,6 +679,16 @@ object TrackDownloader {
         format: DownloadFormat = DownloadFormat.M4A,
         listener: TrackDownloadListener
     ) {
+        downloadAndEmbedMetadata(context, song, format, null, listener)
+    }
+
+    fun downloadAndEmbedMetadata(
+        context: Context,
+        song: Song,
+        format: DownloadFormat = DownloadFormat.M4A,
+        subfolder: String? = null,
+        listener: TrackDownloadListener
+    ) {
         isCancelled = false
         val thread = Thread {
             Handler(Looper.getMainLooper()).post { listener.onStarted() }
@@ -618,12 +697,17 @@ object TrackDownloader {
             updateDownloadProgressNotification(context, "Downloading $title", "Downloading audio...", 0, 0, true)
 
             try {
-                val success = downloadSingleTrackSync(context, song, format) { status ->
+                val success = downloadSingleTrackSync(context, song, format, subfolder) { status ->
                     updateDownloadProgressNotification(context, "Downloading $title", status, 0, 0, true)
                 }
 
                 if (success) {
-                    showDownloadCompletedNotification(context, "Download Complete", "$title saved to Music/Melotune")
+                    val destText = if (!subfolder.isNullOrBlank()) {
+                        "Music/Melotune/${sanitizeFilename(subfolder)}"
+                    } else {
+                        "Music/Melotune"
+                    }
+                    showDownloadCompletedNotification(context, "Download Complete", "$title saved to $destText")
                     Handler(Looper.getMainLooper()).post { listener.onFinished() }
                 } else {
                     if (isCancelled) {
@@ -661,13 +745,15 @@ object TrackDownloader {
     ) {
         if (songs.isEmpty()) {
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(context, "No songs to download in album", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "No songs to download in collection", Toast.LENGTH_SHORT).show()
                 listener?.onError("Empty songs list")
             }
             return
         }
 
         isCancelled = false
+        val safeAlbumFolder = sanitizeFilename(albumTitle).ifBlank { "Collection" }
+
         val thread = Thread {
             Handler(Looper.getMainLooper()).post {
                 listener?.onAlbumStarted(songs.size)
@@ -678,8 +764,8 @@ object TrackDownloader {
 
             updateDownloadProgressNotification(
                 context,
-                "Downloading Album: $albumTitle",
-                "Starting album download (0/$total)...",
+                "Downloading: $albumTitle",
+                "Starting download (0/$total)...",
                 total,
                 0,
                 false
@@ -695,7 +781,7 @@ object TrackDownloader {
                 }
                 updateDownloadProgressNotification(
                     context,
-                    "Downloading Album: $albumTitle (${index + 1}/$total)",
+                    "Downloading: $albumTitle (${index + 1}/$total)",
                     songTitle,
                     total,
                     index,
@@ -703,21 +789,26 @@ object TrackDownloader {
                 )
 
                 try {
-                    if (isAlreadyDownloaded(songTitle)) {
+                    if (isAlreadyDownloaded(songTitle, safeAlbumFolder)) {
                         downloaded++
                         continue
                     }
-                    val success = downloadSingleTrackSync(context, song, format)
+                    val success = downloadSingleTrackSync(
+                        context = context,
+                        song = song,
+                        format = format,
+                        subfolder = safeAlbumFolder
+                    )
                     if (success) {
                         downloaded++
                     } else {
                         failed++
                     }
                 } catch (e: CancellationException) {
-                    Log.d(TAG, "Album download cancelled at track: $songTitle")
+                    Log.d(TAG, "Collection download cancelled at track: $songTitle")
                     break
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed downloading track $songTitle in album: ${e.message}")
+                    Log.e(TAG, "Failed downloading track $songTitle in collection: ${e.message}")
                     failed++
                 }
             }
@@ -730,14 +821,14 @@ object TrackDownloader {
             } else {
                 showDownloadCompletedNotification(
                     context,
-                    "Album Download Complete",
-                    "$albumTitle: $downloaded downloaded" + if (failed > 0) ", $failed failed" else ""
+                    "Download Complete",
+                    "$albumTitle: $downloaded downloaded to Melotune/$safeAlbumFolder" + if (failed > 0) ", $failed failed" else ""
                 )
                 Handler(Looper.getMainLooper()).post {
                     listener?.onAlbumCompleted(downloaded, failed)
                     Toast.makeText(
                         context,
-                        "Album \"$albumTitle\" downloaded ($downloaded/$total songs)",
+                        "\"$albumTitle\" downloaded to Melotune/$safeAlbumFolder ($downloaded/$total songs)",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -749,6 +840,16 @@ object TrackDownloader {
         }
         currentDownloadThread = thread
         thread.start()
+    }
+
+    fun downloadCollection(
+        context: Context,
+        collectionTitle: String,
+        songs: List<Song>,
+        format: DownloadFormat = DownloadFormat.M4A,
+        listener: AlbumDownloadListener? = null
+    ) {
+        downloadAlbum(context, collectionTitle, songs, format, listener)
     }
 
     private fun embedTagsIntoM4a(
@@ -824,7 +925,8 @@ object TrackDownloader {
         artist: String?,
         album: String?,
         id: String?,
-        format: DownloadFormat = DownloadFormat.M4A
+        format: DownloadFormat = DownloadFormat.M4A,
+        subfolder: String? = null
     ): ContentValues {
         val values = ContentValues()
         values.put(MediaStore.Audio.Media.DISPLAY_NAME, "$displayName.${format.extension}")
@@ -833,7 +935,29 @@ object TrackDownloader {
         values.put(MediaStore.Audio.Media.TITLE, title)
         values.put(MediaStore.Audio.Media.ARTIST, artist)
         values.put(MediaStore.Audio.Media.ALBUM, album)
-        values.put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_MUSIC + "/Melotune")
+
+        val folderName = if (!subfolder.isNullOrBlank()) {
+            "Melotune/${sanitizeFilename(subfolder)}"
+        } else {
+            "Melotune"
+        }
+
+        val targetDir = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC),
+            folderName
+        )
+        runCatching {
+            if (!targetDir.exists()) {
+                targetDir.mkdirs()
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            values.put(MediaStore.Audio.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MUSIC}/$folderName/")
+        } else {
+            val destFile = File(targetDir, "$displayName.${format.extension}")
+            values.put(MediaStore.Audio.Media.DATA, destFile.absolutePath)
+        }
         return values
     }
 

@@ -198,7 +198,8 @@ class ListActivity : AppCompatActivity() {
             _binding.downloadAlbum?.iconImageView?.setImageResource(R.drawable.round_done_24)
             _binding.downloadAlbum?.iconImageView?.imageTintList = ColorStateList.valueOf(primaryColor)
         } else {
-            _binding.downloadAlbum?.titleTextView?.text = "Download Album"
+            val label = if (isAlbum) "Download Album" else "Download Playlist"
+            _binding.downloadAlbum?.titleTextView?.text = label
             _binding.downloadAlbum?.iconImageView?.setImageResource(R.drawable.baseline_download_for_offline_24)
             _binding.downloadAlbum?.iconImageView?.imageTintList = ColorStateList.valueOf(textMainColor)
         }
@@ -485,6 +486,35 @@ class ListActivity : AppCompatActivity() {
             Glide.with(binding!!.albumCover).load(library.image).into(binding!!.albumCover)
 
             val songs = library.songs ?: mutableListOf()
+            loadedSongs.clear()
+            for (s in songs) {
+                if (s != null && !s.id.isNullOrBlank()) {
+                    val convertedSong = Song(
+                        id = s.id,
+                        name = s.title,
+                        type = null,
+                        year = null,
+                        releaseDate = null,
+                        duration = null,
+                        label = null,
+                        explicitContent = false,
+                        playCount = null,
+                        language = null,
+                        hasLyrics = false,
+                        lyricsId = null,
+                        lyrics = null,
+                        url = null,
+                        copyright = null,
+                        album = null,
+                        artists = null,
+                        image = null,
+                        downloadUrl = null
+                    )
+                    loadedSongs.add(convertedSong)
+                }
+            }
+            updateAlbumDownloadUI()
+
             binding!!.recyclerView.setAdapter(
                 UserCreatedSongsListAdapter(
                     songs.filterNotNull().toMutableList()
@@ -627,8 +657,9 @@ class ListActivity : AppCompatActivity() {
     )
 
     private fun isAlbumDownloaded(): Boolean {
+        val title = binding?.albumTitle?.text?.toString()
         return loadedSongs.isNotEmpty() && loadedSongs.all { song ->
-            TrackDownloader.isAlreadyDownloaded(song.name())
+            TrackDownloader.isAlreadyDownloaded(song.name(), title)
         }
     }
 
@@ -636,14 +667,15 @@ class ListActivity : AppCompatActivity() {
         val downloaded = isAlbumDownloaded()
         val primaryColor = ThemeManager.getPrimaryColor(this)
         val textMainColor = resources.getColor(R.color.textMain, null)
+        val collectionType = if (isAlbum) "Album" else "Playlist"
         if (downloaded) {
             binding?.downloadAlbumIcon?.setImageResource(R.drawable.round_done_24)
             binding?.downloadAlbumIcon?.imageTintList = ColorStateList.valueOf(primaryColor)
-            binding?.downloadAlbumIcon?.contentDescription = "Album Downloaded"
+            binding?.downloadAlbumIcon?.contentDescription = "$collectionType Downloaded"
         } else {
             binding?.downloadAlbumIcon?.setImageResource(R.drawable.baseline_download_for_offline_24)
             binding?.downloadAlbumIcon?.imageTintList = ColorStateList.valueOf(textMainColor)
-            binding?.downloadAlbumIcon?.contentDescription = "Download Album"
+            binding?.downloadAlbumIcon?.contentDescription = "Download $collectionType"
         }
     }
 
@@ -652,10 +684,11 @@ class ListActivity : AppCompatActivity() {
             Toast.makeText(this, "No songs available to download", Toast.LENGTH_SHORT).show()
             return
         }
-        val title = binding?.albumTitle?.text?.toString() ?: "Album"
+        val title = binding?.albumTitle?.text?.toString() ?: if (isAlbum) "Album" else "Playlist"
+        val collectionType = if (isAlbum) "Album" else "Playlist"
         if (isAlbumDownloaded()) {
             MaterialAlertDialogBuilder(this)
-                .setTitle("Album Downloaded")
+                .setTitle("$collectionType Downloaded")
                 .setMessage("All songs from \"$title\" are downloaded on this device.")
                 .setPositiveButton("Open Downloads") { _, _ ->
                     startActivity(Intent(this, DownloadManagerActivity::class.java))
@@ -669,27 +702,27 @@ class ListActivity : AppCompatActivity() {
         val format = TrackDownloader.DownloadFormat.fromExtension(settingsMgr.downloadFormat)
 
         MaterialAlertDialogBuilder(this)
-            .setTitle("Download Collection")
-            .setMessage("Download all ${loadedSongs.size} tracks from \"$title\" (${format.label})?")
+            .setTitle("Download $collectionType")
+            .setMessage("Download all ${loadedSongs.size} tracks from \"$title\" (${format.label}) into \"Melotune/$title\"?")
             .setPositiveButton("Download") { _, _ ->
                 val progressDialog = ProgressDialog(this@ListActivity)
-                progressDialog.setTitle("Downloading Album")
+                progressDialog.setTitle("Downloading $collectionType")
                 progressDialog.setMessage("Downloading ${loadedSongs.size} songs from \"$title\"...")
                 progressDialog.setCancelable(true)
                 progressDialog.setCanceledOnTouchOutside(true)
                 progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel") { _, _ ->
                     TrackDownloader.cancelDownload(this@ListActivity)
-                    Toast.makeText(this@ListActivity, "Album download cancelled", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ListActivity, "$collectionType download cancelled", Toast.LENGTH_SHORT).show()
                 }
                 progressDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Download in Background") { dialog, _ ->
                     dialog.dismiss()
-                    Snackbar.make(binding!!.root, "Downloading album in background. Check notifications.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(binding!!.root, "Downloading $collectionType in background. Check notifications.", Snackbar.LENGTH_LONG)
                         .setAction("Cancel") {
                             TrackDownloader.cancelDownload(this@ListActivity)
                         }.show()
                 }
                 progressDialog.setOnCancelListener {
-                    Snackbar.make(binding!!.root, "Downloading album in background. Check notifications.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(binding!!.root, "Downloading $collectionType in background. Check notifications.", Snackbar.LENGTH_LONG)
                         .setAction("Cancel") {
                             TrackDownloader.cancelDownload(this@ListActivity)
                         }.show()
@@ -719,7 +752,7 @@ class ListActivity : AppCompatActivity() {
                             }
                             Toast.makeText(
                                 this@ListActivity,
-                                "Successfully downloaded $downloadedCount tracks.",
+                                "Successfully downloaded $downloadedCount tracks into \"Melotune/$title\".",
                                 Toast.LENGTH_SHORT
                             ).show()
                             updateAlbumDownloadUI()
@@ -729,6 +762,7 @@ class ListActivity : AppCompatActivity() {
                             if (progressDialog.isShowing) {
                                 progressDialog.dismiss()
                             }
+                            Toast.makeText(this@ListActivity, "$collectionType download cancelled", Toast.LENGTH_SHORT).show()
                             updateAlbumDownloadUI()
                         }
 

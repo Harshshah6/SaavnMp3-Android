@@ -360,7 +360,7 @@ class ApiManager(context: Context?) {
     }
 
     companion object {
-        const val BASE_URL = "https://melotune.lulli.qzz.io/api/"
+        const val BASE_URL = "https://melotune.harshbits.com/api/"
         val SEARCH_URL: String = BASE_URL + "search"
         const val SONGS = "/songs"
         const val ALBUMS = "/albums"

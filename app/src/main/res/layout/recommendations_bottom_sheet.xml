@@ -21,12 +21,16 @@
     <!-- Header Section -->
     <LinearLayout
         android:id="@+id/header_layout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_10sdp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="@dimen/_14sdp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintWidth_max="560dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/drag_handle">
 
         <LinearLayout
@@ -105,7 +109,7 @@
 
     <TextView
         android:id="@+id/empty_text"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_20sdp"
         android:layout_marginBottom="@dimen/_20sdp"
@@ -115,18 +119,27 @@
         android:textColor="@color/textSec"
         android:textSize="@dimen/_11ssp"
         android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintWidth_max="560dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/header_layout" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rec_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/_260sdp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginTop="@dimen/_8sdp"
         android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingBottom="@dimen/_8sdp"
         android:visibility="gone"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintHeight_default="wrap"
+        app:layout_constraintHeight_max="340dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintWidth_max="560dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

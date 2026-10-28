@@ -17,34 +17,47 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:background="@drawable/m3_bottom_sheet_drag_handle"/>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintWidth_max="560dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bar"
-        android:layout_marginTop="@dimen/_10sdp"
-        android:orientation="vertical">
+        android:layout_marginTop="@dimen/_10sdp">
 
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/lyrics_title"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_marginBottom="@dimen/_10sdp"
             android:text="Lyrics"
             android:fontFamily="@font/avenir_next_bold"
             android:textColor="@color/textMain"
-            android:textSize="@dimen/_18ssp" />
+            android:textSize="@dimen/_18ssp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/lyrics_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_default="wrap"
+            app:layout_constraintHeight_max="340dp"
+            app:layout_constrainedHeight="true"
             android:paddingHorizontal="@dimen/_16sdp"
             android:clipToPadding="false"
-            android:paddingBottom="@dimen/_80sdp"/>
-    </LinearLayout>
+            android:paddingBottom="@dimen/_80sdp"
+            app:layout_constraintTop_toBottomOf="@id/lyrics_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

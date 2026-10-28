@@ -158,6 +158,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        isActivityRecreated = false
         showData()
     }
 
@@ -786,7 +787,16 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 }
             }
 
-        if (intent.extras!!.getString("type", "") == "clear") {
+        val isSameSongActive = (MusicPlayerManager.MUSIC_ID == ID || MusicPlayerManager.currentlyPlayingTrackId == ID)
+                && MusicPlayerManager.player != null
+                && !MusicPlayerManager.trackQueue.isNullOrEmpty()
+
+        val shouldClearQueue = !isActivityRecreated && !isSameSongActive && intent.extras?.getString("type", "") == "clear"
+
+        if (shouldClearQueue) {
+            MusicPlayerManager.trackQueue = ArrayList(mutableListOf<String?>(ID))
+            intent.removeExtra("type")
+        } else if (MusicPlayerManager.trackQueue.isNullOrEmpty() && ID.isNotEmpty()) {
             MusicPlayerManager.trackQueue = ArrayList(mutableListOf<String?>(ID))
         }
         if ((ID.startsWith("http") || ID.startsWith("www")) && ID.contains("jiosaavn.com")) {

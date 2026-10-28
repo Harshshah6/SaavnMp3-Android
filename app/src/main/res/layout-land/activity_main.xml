@@ -13,7 +13,7 @@
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/play_bar_background"
+        app:layout_constraintBottom_toTopOf="@+id/mini_player"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -86,6 +86,140 @@
 
                 </LinearLayout>
 
+                <!-- Language Filter Chips -->
+                <HorizontalScrollView
+                    android:id="@+id/language_scroll_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:overScrollMode="never"
+                    android:paddingTop="@dimen/_6sdp"
+                    android:paddingBottom="@dimen/_4sdp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/language_chip_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/_10sdp"
+                        app:checkedChip="@id/chip_lang_all"
+                        app:singleSelection="true"
+                        app:singleLine="true"
+                        app:selectionRequired="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_all"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="All"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_hindi"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Hindi"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_english"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="English"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_punjabi"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Punjabi"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_tamil"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tamil"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_telugu"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Telugu"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_malayalam"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Malayalam"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_kannada"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Kannada"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_bhojpuri"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Bhojpuri"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_gujarati"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Gujarati"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_marathi"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Marathi"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_lang_bengali"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Bengali"
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:checkable="true" />
+
+                    </com.google.android.material.chip.ChipGroup>
+                </HorizontalScrollView>
+
                 <LinearLayout
                     android:id="@+id/recently_played_section"
                     android:layout_width="match_parent"
@@ -93,7 +227,10 @@
                     android:layout_marginTop="@dimen/_12sdp"
                     android:orientation="vertical"
                     android:visibility="gone"
-                    tools:visibility="visible">
+                    tools:visibility="visible"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/language_scroll_view">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -122,7 +259,10 @@
                     android:layout_marginTop="@dimen/_12sdp"
                     android:orientation="vertical"
                     android:visibility="gone"
-                    tools:visibility="visible">
+                    tools:visibility="visible"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/recently_played_section">
 
                     <TextView
                         android:id="@+id/recommended_title"
@@ -164,7 +304,8 @@
                     android:layout_marginTop="@dimen/_12sdp"
                     android:orientation="vertical"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/toolbar">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/recommended_for_you_section">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -312,94 +453,14 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <LinearLayout
-        android:id="@+id/play_bar_background"
+    <!-- Floating Mini Player -->
+    <include
+        android:id="@+id/mini_player"
+        layout="@layout/layout_mini_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginHorizontal="@dimen/_12sdp"
-        android:layout_marginVertical="@dimen/_8sdp"
-        android:padding="@dimen/_8sdp"
-        android:gravity="center_vertical"
-        android:background="@drawable/play_bar_background"
-        android:elevation="@dimen/_24sdp">
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="@dimen/_8sdp"
-            app:strokeWidth="0dp">
-
-            <ImageView
-                android:id="@+id/play_bar_cover_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/spotify_dark_green" />
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginStart="@dimen/_8sdp"
-            android:layout_weight="1">
-
-            <TextView
-                android:id="@+id/play_bar_music_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:text="@string/app_name"
-                android:textStyle="bold"
-                android:textSize="@dimen/_14ssp" />
-
-            <TextView
-                android:id="@+id/play_bar_music_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:text="@string/app_name"
-                android:textSize="@dimen/_11ssp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/play_bar_prev_icon"
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:focusable="true"
-                android:src="@drawable/skip_previous_24px"
-                android:clickable="true"
-                android:padding="@dimen/_6sdp" />
-
-            <ImageView
-                android:id="@+id/play_bar_play_pause_icon"
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:src="@drawable/play_arrow_24px"
-                android:padding="@dimen/_6sdp" />
-
-            <ImageView
-                android:id="@+id/play_bar_next_icon"
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:focusable="true"
-                android:src="@drawable/skip_next_24px"
-                android:clickable="true"
-                android:padding="@dimen/_6sdp" />
-
-        </LinearLayout>
-
-    </LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

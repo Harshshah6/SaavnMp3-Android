@@ -14,7 +14,9 @@ import android.widget.TextView
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -90,9 +92,9 @@ class SearchActivity : AppCompatActivity() {
         val history = loadHistory()
         val chipGroup = binding!!.historyChipGroup
         val container = binding!!.searchHistoryContainer
-        chipGroup?.removeAllViews()
+        chipGroup.removeAllViews()
         if (history.isEmpty()) {
-            container?.visibility = View.GONE
+            container.visibility = View.GONE
             return
         }
         history.forEach { query ->
@@ -105,11 +107,11 @@ class SearchActivity : AppCompatActivity() {
                 hideHistoryPanel()
                 showData(query)
             }
-            chipGroup?.addView(chip)
+            chipGroup.addView(chip)
         }
         // Only show if the edit field is currently empty and focused
         val isEmpty = binding!!.edittext.text.isNullOrEmpty()
-        container?.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        container.visibility = if (isEmpty) View.VISIBLE else View.GONE
     }
 
     private fun showHistoryPanel() {
@@ -117,7 +119,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideHistoryPanel() {
-        binding!!.searchHistoryContainer?.visibility = View.GONE
+        binding!!.searchHistoryContainer.visibility = View.GONE
     }
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -129,7 +131,13 @@ class SearchActivity : AppCompatActivity() {
         MiniPlayerHelper.initMiniPlayer(this)
 
         OverScrollDecoratorHelper.setUpOverScroll(binding!!.hscrollview)
-        binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
+        val widthDp = resources.configuration.screenWidthDp
+        val spanCount = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE || widthDp >= 600) {
+            maxOf(2, if (widthDp > 0) widthDp / 320 else 2)
+        } else {
+            1
+        }
+        binding!!.recyclerView.setLayoutManager(GridLayoutManager(this, spanCount))
 
         binding!!.edittext.requestFocus()
 
@@ -143,7 +151,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         // Clear all history
-        binding!!.clearHistoryBtn?.setOnClickListener {
+        binding!!.clearHistoryBtn.setOnClickListener {
             clearHistory()
             hideHistoryPanel()
         }

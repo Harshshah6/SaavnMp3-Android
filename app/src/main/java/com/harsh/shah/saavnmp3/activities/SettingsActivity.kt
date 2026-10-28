@@ -31,6 +31,7 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
         MiniPlayerHelper.initMiniPlayer(this)
+        binding!!.toolbar.setNavigationOnClickListener { finish() }
         val settingsSharedPrefManager = SettingsSharedPrefManager(this)
         val sharedPreferenceManager: SharedPreferenceManager =
             SharedPreferenceManager.getInstance(this)
@@ -287,6 +288,10 @@ class SettingsActivity : AppCompatActivity() {
 
     fun backPress(view: View?) {
         finish()
+    }
+
+    private fun View.setNavigationOnClickListener(listener: View.OnClickListener) {
+        (this as? com.google.android.material.appbar.MaterialToolbar)?.setNavigationOnClickListener(listener)
     }
 
     class SettingsSharedPrefManager(context: Context) {

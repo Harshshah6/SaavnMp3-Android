@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.content.res.Configuration
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -119,7 +121,13 @@ class SavedLibrariesActivity : AppCompatActivity() {
         setContentView(binding!!.getRoot())
         MiniPlayerHelper.initMiniPlayer(this)
 
-        binding!!.recyclerView.setLayoutManager(LinearLayoutManager(this))
+        val widthDp = resources.configuration.screenWidthDp
+        val spanCount = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE || widthDp >= 600) {
+            maxOf(2, if (widthDp > 0) widthDp / 320 else 2)
+        } else {
+            1
+        }
+        binding!!.recyclerView.setLayoutManager(GridLayoutManager(this, spanCount))
         OverScrollDecoratorHelper.setUpOverScroll(
             binding!!.recyclerView,
             OverScrollDecoratorHelper.ORIENTATION_VERTICAL

@@ -1,9 +1,11 @@
 package com.harsh.shah.saavnmp3.activities
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.harsh.shah.saavnmp3.adapters.ActivitySeeMoreAlbumListAdapter
@@ -29,8 +31,14 @@ class SeeMoreActivity : AppCompatActivity() {
         binding = ActivitySeeMoreBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
         MiniPlayerHelper.initMiniPlayer(this)
-        
-        binding!!.recyclerView.layoutManager = LinearLayoutManager(this)
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val screenWidthDp = resources.configuration.screenWidthDp
+        val spanCount = when {
+            screenWidthDp >= 900 -> maxOf(2, screenWidthDp / 320)
+            isLandscape || screenWidthDp >= 600 -> 2
+            else -> 1
+        }
+        binding!!.recyclerView.layoutManager = GridLayoutManager(this, spanCount)
 
         // Set adapter before Paginate initialization to avoid "Adapter needs to be set!" exception
         showData()

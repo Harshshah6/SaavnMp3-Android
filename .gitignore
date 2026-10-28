@@ -18,3 +18,4 @@
 local.properties
 google-services.json
 .kotlin
+.agents

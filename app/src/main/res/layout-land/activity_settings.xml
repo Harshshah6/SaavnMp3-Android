@@ -32,7 +32,7 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toTopOf="@+id/mini_player">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -114,12 +114,49 @@
                             android:background="?attr/colorOutlineVariant" />
 
                         <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                            android:id="@+id/play_in_background"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:textHead="Play in Background"
+                            app:textOff="Music stops when you clear the app from recents."
+                            app:textOn="Music playback continues in background." />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:background="?attr/colorOutlineVariant" />
+
+                        <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
                             android:id="@+id/explicit"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             app:textHead="Allow explicit tracks"
                             app:textOff="Explicit 18+ tracks are blocked from playing."
                             app:textOn="Explicit 18+ songs are allowed to play." />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:background="?attr/colorOutlineVariant" />
+
+                        <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
+                            android:id="@+id/autoplay_switch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:textHead="Autoplay Similar Tracks"
+                            app:textOff="Playback stops when current queue finishes."
+                            app:textOn="Keep the music going! Automatically plays recommendations when queue ends." />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:background="?attr/colorOutlineVariant" />
 
                         <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
                             android:id="@+id/player_gestures"
@@ -129,6 +166,13 @@
                             app:textOff="Gestures disabled in music player."
                             app:textOn="Swipe left/right for tracks, drag down to minimize." />
 
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:background="?attr/colorOutlineVariant" />
+
                         <com.harsh.shah.saavnmp3.utils.customview.MaterialCustomSwitch
                             android:id="@+id/tap_album_lyrics_toggle"
                             android:layout_width="match_parent"
@@ -136,6 +180,60 @@
                             app:textHead="Tap Album to Toggle Lyrics"
                             app:textOff="Tapping album cover will not toggle lyrics."
                             app:textOn="Tap album cover art to quickly view synchronized lyrics." />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:background="?attr/colorOutlineVariant" />
+
+                        <LinearLayout
+                            android:id="@+id/sleep_timer_setting"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="@dimen/_14sdp"
+                            android:paddingVertical="@dimen/_10sdp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Sleep Timer"
+                                    android:fontFamily="@font/avenir_next_bold"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="@dimen/_13ssp" />
+
+                                <TextView
+                                    android:id="@+id/sleep_timer_status_text"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Automatically stop music when you fall asleep."
+                                    android:fontFamily="@font/avenir_next_regular"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="@dimen/_10ssp"
+                                    android:layout_marginTop="2dp" />
+
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="@dimen/_20sdp"
+                                android:layout_height="@dimen/_20sdp"
+                                android:src="@drawable/ic_sleep_timer"
+                                app:tint="?attr/colorPrimary"
+                                android:contentDescription="Sleep Timer" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -391,10 +489,110 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Downloads Card -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Downloads"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="13sp" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="?attr/colorOutlineVariant"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingVertical="@dimen/_10sdp"
+                        android:paddingHorizontal="@dimen/_14sdp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Download Format"
+                            android:fontFamily="@font/avenir_next_bold"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="@dimen/_13ssp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Choose audio format for downloaded songs."
+                            android:fontFamily="@font/avenir_next_regular"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="@dimen/_10ssp"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="@dimen/_8sdp" />
+
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:scrollbars="none"
+                            android:overScrollMode="never">
+
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/download_format_chip_group"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:singleSelection="true"
+                                app:selectionRequired="true">
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/format_mp3"
+                                    style="@style/Widget.Material3.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="MP3"
+                                    android:checkable="true" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/format_m4a"
+                                    style="@style/Widget.Material3.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="M4A"
+                                    android:checkable="true" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/format_ogg"
+                                    style="@style/Widget.Material3.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="OGG"
+                                    android:checkable="true" />
+
+                            </com.google.android.material.chip.ChipGroup>
+
+                        </HorizontalScrollView>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Floating Mini Player -->
+    <include
+        android:id="@+id/mini_player"
+        layout="@layout/layout_mini_player"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

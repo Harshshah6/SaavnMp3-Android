@@ -5,7 +5,7 @@
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:navigationBarColor">@color/background</item>
-        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
 
         <!-- Material 3 Surface hierarchy -->
         <item name="android:colorBackground">@color/m3_surface_dark</item>

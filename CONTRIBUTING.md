@@ -2,7 +2,8 @@
 
 Thanks for helping make **SaavnMp3‑Android** better! We welcome all kinds of contributions — bug fixes, new features, documentation improvements, and more.
 
-This project is a clean, ad‑free Android music streaming app built in **Java** using the unofficial JioSaavn API.
+This project is an ad-free Android music streaming app built with **Kotlin**,
+targeting Java 17, and using the unofficial JioSaavn API.
 
 ---
 
@@ -12,11 +13,10 @@ This project is a clean, ad‑free Android music streaming app built in **Java**
 
 Before contributing, ensure your development environment is ready:
 
-- Java (version used by project; latest stable is advisable)  
-- Android Studio  
-- Android SDK (with required API levels)  
-- Emulator or Android device for testing  
-- Git  
+- JDK 17
+- Android Studio and the Android SDK for API 37
+- Android 7.0 (API 24) or later emulator/device for manual testing
+- Git
 
 ### Forking & Cloning
 
@@ -36,10 +36,10 @@ Before contributing, ensure your development environment is ready:
 
 ### Setting Up Locally
 
-* Open the project in Android Studio (File → Open) and point to the cloned folder.
-* Allow Gradle to sync.
-* Make sure you can build and run the app on emulator or device.
-* If there are configuration files (API keys, local settings), ensure they are untracked (e.g. via `.gitignore`) and provide a template or guide for contributors.
+* Open the cloned project in Android Studio and allow Gradle to sync.
+* Build with `./gradlew assembleDebug` (on Windows, `gradlew.bat assembleDebug`).
+* Run unit tests with `./gradlew testDebugUnitTest`.
+* Run the app on an emulator or device for changes that affect runtime behavior.
 
 ---
 
@@ -105,12 +105,11 @@ For new features or improvements:
 
 ### Style & Formatting
 
-* Follow standard Java/Android naming conventions (e.g. `camelCase` for methods, `PascalCase` for classes).
-* Keep methods short and single‑purpose.
+* Follow Kotlin and Android naming conventions (`camelCase` for properties and functions, `PascalCase` for classes).
+* Keep methods short and single-purpose.
 * Avoid magic numbers — use constants or resource files.
-* Use resource files (`strings.xml`, `colors.xml`, `dimens.xml`) rather than hardcoded values.
-* Include Javadoc-style comments for public classes/methods.
-* Use `@Nullable`, `@NonNull` annotations where appropriate.
+* Use resource files (`strings.xml`, `colors.xml`, `dimens.xml`) for user-facing UI text and shared design values.
+* Add concise KDoc or comments when public APIs or non-obvious behavior need explanation.
 * Keep UI responsive — avoid doing heavy tasks on the main thread.
 * Use Android best practices (if applicable).
 

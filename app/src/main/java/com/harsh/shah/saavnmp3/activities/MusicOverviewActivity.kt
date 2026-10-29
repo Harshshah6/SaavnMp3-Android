@@ -1544,6 +1544,7 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
             .show()
     }
 
+    @OptIn(UnstableApi::class)
     private fun openEqualizer() {
         try {
             val sessionId = MusicPlayerManager.player?.audioSessionId ?: 0

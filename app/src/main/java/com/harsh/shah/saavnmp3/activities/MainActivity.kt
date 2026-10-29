@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -92,6 +93,7 @@ class MainActivity : AppCompatActivity() {
             .withContentClickableWhenMenuOpened(false)
             .withDragDistance(250)
             .inject()
+        registerBackNavigation()
 
         // Set version text in the drawer layout
         updateVersionTextInDrawer()
@@ -367,9 +369,21 @@ class MainActivity : AppCompatActivity() {
         MiniPlayerHelper.onActivityPause(this)
     }
 
-    override fun onBackPressed() {
-        if (slidingRootNavBuilder!!.isMenuOpened) slidingRootNavBuilder!!.closeMenu()
-        else super.onBackPressed()
+    private fun registerBackNavigation() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (slidingRootNavBuilder!!.isMenuOpened) {
+                    slidingRootNavBuilder!!.closeMenu()
+                } else {
+                    isEnabled = false
+                    try {
+                        onBackPressedDispatcher.onBackPressed()
+                    } finally {
+                        isEnabled = true
+                    }
+                }
+            }
+        })
     }
 
     override fun onDestroy() {

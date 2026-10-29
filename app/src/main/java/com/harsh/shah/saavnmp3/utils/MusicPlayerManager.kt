@@ -49,6 +49,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import java.io.File
 
+@OptIn(UnstableApi::class)
 object MusicPlayerManager {
     private const val TAG = "MusicPlayerManager"
 

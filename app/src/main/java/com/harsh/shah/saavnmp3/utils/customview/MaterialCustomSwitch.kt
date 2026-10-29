@@ -1,7 +1,10 @@
 package com.harsh.shah.saavnmp3.utils.customview
 
 import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
+import android.util.SparseArray
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.LinearLayout
@@ -37,9 +40,7 @@ class MaterialCustomSwitch : LinearLayout {
         init(attrs, defStyle)
     }
 
-
     private fun init(attrs: AttributeSet?, defStyle: Int) {
-        isSaveEnabled = false
         inflate(context, R.layout.material_custom_switch, this)
 
         textHeadView = findViewById(R.id.text_head)
@@ -52,6 +53,7 @@ class MaterialCustomSwitch : LinearLayout {
         }
 
         materialSwitch!!.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            checked = isChecked
             textDescView!!.text = if (isChecked) textOn else textOff
             if (onCheckChangedListener != null) onCheckChangedListener!!.onCheckChanged(isChecked)
         }
@@ -72,20 +74,25 @@ class MaterialCustomSwitch : LinearLayout {
         }
     }
 
-    override fun dispatchSaveInstanceState(container: android.util.SparseArray<android.os.Parcelable>?) {
-        // Do not save state of child views to prevent stale switch restoration
+    override fun dispatchSaveInstanceState(container: SparseArray<Parcelable>?) {
+        super.dispatchSaveInstanceState(container)
     }
 
-    override fun dispatchRestoreInstanceState(container: android.util.SparseArray<android.os.Parcelable>?) {
-        // Do not restore state of child views
+    override fun dispatchRestoreInstanceState(container: SparseArray<Parcelable>?) {
+        super.dispatchRestoreInstanceState(container)
     }
 
-    override fun onSaveInstanceState(): android.os.Parcelable? {
-        return null
+    override fun onSaveInstanceState(): Parcelable? {
+        return SavedState(super.onSaveInstanceState(), materialSwitch?.isChecked ?: checked)
     }
 
-    override fun onRestoreInstanceState(state: android.os.Parcelable?) {
-        // Do not restore state
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state is SavedState) {
+            super.onRestoreInstanceState(state.superState)
+            setChecked(state.checked)
+        } else {
+            super.onRestoreInstanceState(state)
+        }
     }
 
     fun setOnCheckChangeListener(onCheckChangedListener: OnCheckChangeListener?) {
@@ -93,6 +100,7 @@ class MaterialCustomSwitch : LinearLayout {
     }
 
     fun setChecked(checked: Boolean) {
+        this.checked = checked
         textDescView?.text = if (checked) textOn else textOff
         if (materialSwitch?.isChecked != checked) {
             val listener = onCheckChangedListener
@@ -104,5 +112,32 @@ class MaterialCustomSwitch : LinearLayout {
 
     interface OnCheckChangeListener {
         fun onCheckChanged(isChecked: Boolean)
+    }
+
+    private class SavedState : View.BaseSavedState {
+        val checked: Boolean
+
+        constructor(superState: Parcelable?, checked: Boolean) : super(superState) {
+            this.checked = checked
+        }
+
+        constructor(source: Parcel) : super(source) {
+            checked = source.readInt() != 0
+        }
+
+        override fun writeToParcel(destination: Parcel, flags: Int) {
+            super.writeToParcel(destination, flags)
+            destination.writeInt(if (checked) 1 else 0)
+        }
+
+        companion object {
+            @JvmField
+            val CREATOR: Parcelable.Creator<SavedState> =
+                object : Parcelable.Creator<SavedState> {
+                    override fun createFromParcel(source: Parcel): SavedState = SavedState(source)
+
+                    override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
+                }
+        }
     }
 }

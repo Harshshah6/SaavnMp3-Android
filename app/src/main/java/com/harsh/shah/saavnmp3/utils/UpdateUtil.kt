@@ -35,7 +35,7 @@ object UpdateUtil {
                                     val htmlUrl = jsonObject.optString("html_url", "")
                                     if (htmlUrl.isNotEmpty()) {
                                         val intent = Intent(Intent.ACTION_VIEW)
-                                        intent.data = htmlUrl.toUri()
+                                        intent.data = htmlUrl.withUtmParameters("update", "release_page").toUri()
                                         context.startActivity(intent)
                                     }
                                 }

@@ -309,12 +309,12 @@
                                 android:background="?attr/colorOutlineVariant" />
 
                             <com.harsh.shah.saavnmp3.utils.customview.BottomSheetItemView
-                                android:id="@+id/discord"
+                                android:id="@+id/website"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/discord"
+                                android:src="@drawable/website"
                                 app:srcPadding="8dp"
-                                app:title="Discord Community" />
+                                app:title="Website" />
 
                             <View
                                 android:layout_width="match_parent"

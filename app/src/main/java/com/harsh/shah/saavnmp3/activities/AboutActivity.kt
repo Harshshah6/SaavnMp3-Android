@@ -8,6 +8,7 @@ import androidx.core.net.toUri
 import com.google.gson.Gson
 import org.json.JSONObject
 import com.harsh.shah.saavnmp3.utils.ThemeManager
+import com.harsh.shah.saavnmp3.utils.withUtmParameters
 import com.harsh.shah.saavnmp3.utils.UpdateUtil
 import com.harsh.shah.saavnmp3.BuildConfig
 import com.harsh.shah.saavnmp3.databinding.ActivityAboutBinding
@@ -42,14 +43,14 @@ class AboutActivity : AppCompatActivity() {
         binding!!.sourceCode.setOnClickListener {
             openUrl(
                 "https://github.com/harshshah6/SaavnMp3-Android"
+                    .withUtmParameters("about", "source_code")
             )
         }
-        binding!!.discord.setOnClickListener {
-            Toast.makeText(
-                this@AboutActivity,
-                "Oops, No Discord Server found.",
-                Toast.LENGTH_SHORT
-            ).show()
+        binding!!.website.setOnClickListener {
+            openUrl(
+                "https://harshshah6.github.io/melotune-web/"
+                    .withUtmParameters("about", "website")
+            )
         }
         binding!!.instagram.setOnClickListener {
             openUrl(
@@ -58,12 +59,13 @@ class AboutActivity : AppCompatActivity() {
         }
         binding!!.telegram.setOnClickListener {
             openUrl(
-                "https://t.me/legendary_streamer_official"
+                "https://t.me/mel0tune"
             )
         }
         binding!!.rate.setOnClickListener {
             openUrl(
                 "https://github.com/harshshah6/SaavnMp3-Android"
+                    .withUtmParameters("about", "rate")
             )
         }
 
@@ -93,7 +95,9 @@ class AboutActivity : AppCompatActivity() {
                                 contributor.avatar_url ?: "",
                                 ""
                             )
-                            item.setOnClickListener { openUrl(contributor.html_url) }
+                            item.setOnClickListener {
+                                openUrl(contributor.html_url?.withUtmParameters("about", "contributor"))
+                            }
                             binding!!.layoutContributors.addView(item)
                         }
                     }

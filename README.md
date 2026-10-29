@@ -8,6 +8,7 @@ is required.
 [![Latest GitHub release](https://img.shields.io/github/v/release/Harshshah6/SaavnMp3-Android)](https://github.com/Harshshah6/SaavnMp3-Android/releases)
 [![Get it at IzzyOnDroid](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/com.harsh.shah.saavnmp3)](https://apt.izzysoft.de/packages/com.harsh.shah.saavnmp3)
 [![GitHub downloads](https://img.shields.io/github/downloads/Harshshah6/SaavnMp3-Android/total?label=GitHub%20downloads)](https://github.com/Harshshah6/SaavnMp3-Android/releases)
+[![IzzyOnDroid Downloads](https://img.shields.io/badge/dynamic/json?url=https://dlstats.izzyondroid.org/iod-stats-collector/stats/basic/yearly/rolling.json&query=$.['com.harsh.shah.saavnmp3']&label=IzzyOnDroid%20Downloads&style=)](https://apt.izzysoft.de/packages/com.harsh.shah.saavnmp3)
 
 **Website:** [Melotune](https://harshshah6.github.io/melotune-web/)
 · **Downloads:** [GitHub Releases](https://github.com/Harshshah6/SaavnMp3-Android/releases)

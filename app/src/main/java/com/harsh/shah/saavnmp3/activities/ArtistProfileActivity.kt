@@ -77,7 +77,7 @@ class ArtistProfileActivity : AppCompatActivity() {
                     .putExtra("artist_name", binding!!.artistName.text.toString())
             )
         }
-        binding!!.topSongsSort?.setOnClickListener {
+        binding!!.topSongsSort.setOnClickListener {
             showSongSortDialog()
         }
         binding!!.topAlbumsSeeMore.setOnClickListener {

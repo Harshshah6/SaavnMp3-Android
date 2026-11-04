@@ -361,14 +361,14 @@ class ApiManager(context: Context?) {
 
     companion object {
         const val BASE_URL = "https://melotune.harshbits.com/api/"
-        val SEARCH_URL: String = BASE_URL + "search"
+        const val SEARCH_URL: String = BASE_URL + "search"
         const val SONGS = "/songs"
         const val ALBUMS = "/albums"
         const val ARTISTS = "/artists"
         const val PLAYLISTS = "/playlists"
-        val SONGS_URL: String = BASE_URL + "songs"
-        val ALBUMS_URL: String = BASE_URL + "albums"
-        val ARTISTS_URL: String = BASE_URL + "artists"
-        val PLAYLISTS_URL: String = BASE_URL + "playlists"
+        const val SONGS_URL: String = BASE_URL + "songs"
+        const val ALBUMS_URL: String = BASE_URL + "albums"
+        const val ARTISTS_URL: String = BASE_URL + "artists"
+        const val PLAYLISTS_URL: String = BASE_URL + "playlists"
     }
 }

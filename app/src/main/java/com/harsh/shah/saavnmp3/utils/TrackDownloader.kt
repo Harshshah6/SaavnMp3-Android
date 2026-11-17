@@ -16,8 +16,6 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import com.arthenica.ffmpegkit.FFmpegKit
-import com.arthenica.ffmpegkit.ReturnCode
 import com.google.gson.Gson
 import com.harsh.shah.saavnmp3.R
 import com.harsh.shah.saavnmp3.network.ApiManager
@@ -43,42 +41,13 @@ object TrackDownloader {
     const val DOWNLOAD_NOTIFICATION_ID = 2001
     const val ACTION_CANCEL_DOWNLOAD = "com.harsh.shah.saavnmp3.CANCEL_DOWNLOAD"
 
+    private val SUPPORTED_AUDIO_EXTENSIONS = listOf("m4a", "mp4", "mp3", "ogg")
+
     @Volatile
     var isCancelled: Boolean = false
     @Volatile
     private var currentDownloadThread: Thread? = null
     private val activeTempFiles = Collections.synchronizedList(mutableListOf<File>())
-
-    enum class DownloadFormat(
-        val label: String,
-        val extension: String,
-        val mimeType: String,
-        val description: String
-    ) {
-        M4A(
-            label = "M4A (AAC)",
-            extension = "m4a",
-            mimeType = "audio/mp4",
-            description = "Native format — best quality, no conversion needed"
-        ),
-        MP3(
-            label = "MP3",
-            extension = "mp3",
-            mimeType = "audio/mpeg",
-            description = "Most compatible — works on all car players & old devices"
-        ),
-        OGG(
-            label = "OGG (Vorbis)",
-            extension = "ogg",
-            mimeType = "audio/ogg",
-            description = "Open format — good quality & smaller file size"
-        );
-
-        companion object {
-            fun fromExtension(ext: String?): DownloadFormat =
-                values().firstOrNull { it.extension.equals(ext, ignoreCase = true) } ?: M4A
-        }
-    }
 
     fun sanitizeFilename(name: String): String {
         val sanitized = name.replace(Regex("[\\\\/:*?\"<>|]"), "_")
@@ -95,25 +64,24 @@ object TrackDownloader {
         )
         if (!musicDir.exists()) return false
         val safeTitle = sanitizeFilename(title)
-        val validFormats = DownloadFormat.values()
 
         // 1. If a specific subfolder (e.g. album/playlist) is passed, check inside that subfolder first
         if (!subfolder.isNullOrBlank()) {
             val safeSubfolder = sanitizeFilename(subfolder)
             val subDir = File(musicDir, safeSubfolder)
             if (subDir.exists() && subDir.isDirectory) {
-                val foundInSubDir = validFormats.any { fmt ->
-                    File(subDir, "$safeTitle.${fmt.extension}").exists() ||
-                    File(subDir, "$title.${fmt.extension}").exists()
+                val foundInSubDir = SUPPORTED_AUDIO_EXTENSIONS.any { ext ->
+                    File(subDir, "$safeTitle.$ext").exists() ||
+                    File(subDir, "$title.$ext").exists()
                 }
                 if (foundInSubDir) return true
             }
         }
 
         // 2. Check directly in the root Melotune directory
-        val foundInRoot = validFormats.any { fmt ->
-            File(musicDir, "$safeTitle.${fmt.extension}").exists() ||
-            File(musicDir, "$title.${fmt.extension}").exists()
+        val foundInRoot = SUPPORTED_AUDIO_EXTENSIONS.any { ext ->
+            File(musicDir, "$safeTitle.$ext").exists() ||
+            File(musicDir, "$title.$ext").exists()
         }
         if (foundInRoot) return true
 
@@ -121,9 +89,9 @@ object TrackDownloader {
         val subdirs = musicDir.listFiles { f -> f.isDirectory }
         if (subdirs != null) {
             for (dir in subdirs) {
-                val foundInAnySub = validFormats.any { fmt ->
-                    File(dir, "$safeTitle.${fmt.extension}").exists() ||
-                    File(dir, "$title.${fmt.extension}").exists()
+                val foundInAnySub = SUPPORTED_AUDIO_EXTENSIONS.any { ext ->
+                    File(dir, "$safeTitle.$ext").exists() ||
+                    File(dir, "$title.$ext").exists()
                 }
                 if (foundInAnySub) return true
             }
@@ -140,7 +108,7 @@ object TrackDownloader {
         )
         if (!musicDir.exists()) return data
 
-        val audioExtensions = DownloadFormat.values().map { it.extension.lowercase() }.toSet()
+        val audioExtensions = SUPPORTED_AUDIO_EXTENSIONS.toSet()
         val files = musicDir.walkTopDown().maxDepth(3).filter { file ->
             file.isFile && !file.name.startsWith(".") && file.extension.lowercase() in audioExtensions
         }.sortedByDescending { it.lastModified() }.toList()
@@ -188,7 +156,6 @@ object TrackDownloader {
                         }
                     }
 
-                    // For MP3 and OGG, also check COMMENT
                     if (trackUID.isNullOrEmpty()) {
                         val comment = tag.getFirst(FieldKey.COMMENT)
                         if (!comment.isNullOrEmpty()) {
@@ -263,16 +230,16 @@ object TrackDownloader {
         val safeTitle = sanitizeFilename(songTitle)
         var anyDeleted = false
         val filesToCheck = mutableListOf<File>()
-        for (fmt in DownloadFormat.values()) {
-            filesToCheck.add(File(musicDir, "$safeTitle.${fmt.extension}"))
-            filesToCheck.add(File(musicDir, "$songTitle.${fmt.extension}"))
+        for (ext in SUPPORTED_AUDIO_EXTENSIONS) {
+            filesToCheck.add(File(musicDir, "$safeTitle.$ext"))
+            filesToCheck.add(File(musicDir, "$songTitle.$ext"))
         }
         val subdirs = musicDir.listFiles { f -> f.isDirectory }
         if (subdirs != null) {
             for (dir in subdirs) {
-                for (fmt in DownloadFormat.values()) {
-                    filesToCheck.add(File(dir, "$safeTitle.${fmt.extension}"))
-                    filesToCheck.add(File(dir, "$songTitle.${fmt.extension}"))
+                for (ext in SUPPORTED_AUDIO_EXTENSIONS) {
+                    filesToCheck.add(File(dir, "$safeTitle.$ext"))
+                    filesToCheck.add(File(dir, "$songTitle.$ext"))
                 }
             }
         }
@@ -443,7 +410,6 @@ object TrackDownloader {
     fun downloadSingleTrackSync(
         context: Context,
         song: Song,
-        format: DownloadFormat = DownloadFormat.M4A,
         subfolder: String? = null,
         onProgress: ((String) -> Unit)? = null
     ): Boolean {
@@ -488,16 +454,14 @@ object TrackDownloader {
         }
 
         onProgress?.invoke("Downloading audio...")
-        val tempM4aFile = File(context.cacheDir, "${safeTitle}_raw_${System.currentTimeMillis()}.mp4")
+        val tempM4aFile = File(context.cacheDir, "${safeTitle}_raw_${System.currentTimeMillis()}.m4a")
         activeTempFiles.add(tempM4aFile)
 
         val artworkFile = File(context.cacheDir, "${safeTitle}_artwork_${System.currentTimeMillis()}.jpg")
         activeTempFiles.add(artworkFile)
 
-        var convertedFile: File? = null
-
         try {
-            // Step 1: Download raw audio
+            // Step 1: Download raw audio (AAC / M4A stream)
             URL(audioUrl).openStream().use { inp ->
                 FileOutputStream(tempM4aFile).use { out ->
                     val buffer = ByteArray(8192)
@@ -552,81 +516,19 @@ object TrackDownloader {
                 throw CancellationException("Download cancelled")
             }
 
-            // Step 4: Transcode / Tagging
-            onProgress?.invoke("Embedding metadata (${format.label})...")
-            val taggedFile: File = when (format) {
-                DownloadFormat.M4A -> {
-                    embedTagsIntoM4a(
-                        context = context,
-                        file = tempM4aFile,
-                        title = title,
-                        artist = artist,
-                        albumArtist = albumArtist,
-                        album = album,
-                        song = resolvedSong,
-                        artworkFile = artworkFile,
-                        lyrics = lyricsToEmbed
-                    )
-                    tempM4aFile
-                }
-                DownloadFormat.MP3 -> {
-                    val mp3File = File(context.cacheDir, "${safeTitle}_${System.currentTimeMillis()}.mp3")
-                    convertedFile = mp3File
-                    activeTempFiles.add(mp3File)
-                    val session = FFmpegKit.executeWithArguments(
-                        arrayOf(
-                            "-i", tempM4aFile.absolutePath,
-                            "-codec:a", "libmp3lame",
-                            "-qscale:a", "0",
-                            "-id3v2_version", "3",
-                            "-y", mp3File.absolutePath
-                        )
-                    )
-                    if (!ReturnCode.isSuccess(session.returnCode)) {
-                        throw RuntimeException("FFmpeg MP3 transcoding failed: ${session.failStackTrace ?: session.logsAsString}")
-                    }
-                    tempM4aFile.delete()
-                    embedTagsIntoMp3OrOgg(
-                        file = mp3File,
-                        title = title,
-                        artist = artist,
-                        albumArtist = albumArtist,
-                        album = album,
-                        song = resolvedSong,
-                        artworkFile = artworkFile,
-                        lyrics = lyricsToEmbed
-                    )
-                    mp3File
-                }
-                DownloadFormat.OGG -> {
-                    val oggFile = File(context.cacheDir, "${safeTitle}_${System.currentTimeMillis()}.ogg")
-                    convertedFile = oggFile
-                    activeTempFiles.add(oggFile)
-                    val session = FFmpegKit.executeWithArguments(
-                        arrayOf(
-                            "-i", tempM4aFile.absolutePath,
-                            "-codec:a", "libvorbis",
-                            "-qscale:a", "6",
-                            "-y", oggFile.absolutePath
-                        )
-                    )
-                    if (!ReturnCode.isSuccess(session.returnCode)) {
-                        throw RuntimeException("FFmpeg OGG transcoding failed: ${session.failStackTrace ?: session.logsAsString}")
-                    }
-                    tempM4aFile.delete()
-                    embedTagsIntoMp3OrOgg(
-                        file = oggFile,
-                        title = title,
-                        artist = artist,
-                        albumArtist = albumArtist,
-                        album = album,
-                        song = resolvedSong,
-                        artworkFile = artworkFile,
-                        lyrics = lyricsToEmbed
-                    )
-                    oggFile
-                }
-            }
+            // Step 4: Embed metadata & lyrics directly via pure-Java jaudiotagger
+            onProgress?.invoke("Embedding metadata...")
+            embedTagsIntoM4a(
+                context = context,
+                file = tempM4aFile,
+                title = title,
+                artist = artist,
+                albumArtist = albumArtist,
+                album = album,
+                song = resolvedSong,
+                artworkFile = artworkFile,
+                lyrics = lyricsToEmbed
+            )
 
             if (isCancelled || Thread.currentThread().isInterrupted) {
                 throw CancellationException("Download cancelled")
@@ -634,7 +536,7 @@ object TrackDownloader {
 
             // Step 5: Save to MediaStore
             onProgress?.invoke("Saving to storage...")
-            val values = getContentValues(safeTitle, title, artist, album, resolvedSong.id, format, subfolder)
+            val values = getContentValues(safeTitle, title, artist, album, resolvedSong.id, subfolder)
             val resolver = context.contentResolver
             val audioCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
@@ -643,7 +545,7 @@ object TrackDownloader {
             val newUri = resolver.insert(audioCollection, values)
                 ?: throw RuntimeException("Failed to insert into MediaStore")
 
-            URL("file://${taggedFile.absolutePath}").openStream().use { inp ->
+            URL("file://${tempM4aFile.absolutePath}").openStream().use { inp ->
                 resolver.openOutputStream(newUri).use { out ->
                     val buffer = ByteArray(8192)
                     var bytesRead: Int
@@ -664,10 +566,6 @@ object TrackDownloader {
         } finally {
             activeTempFiles.remove(tempM4aFile)
             activeTempFiles.remove(artworkFile)
-            if (convertedFile != null) {
-                activeTempFiles.remove(convertedFile)
-                if (convertedFile.exists()) convertedFile.delete()
-            }
             if (tempM4aFile.exists()) tempM4aFile.delete()
             if (artworkFile.exists()) artworkFile.delete()
         }
@@ -676,16 +574,6 @@ object TrackDownloader {
     fun downloadAndEmbedMetadata(
         context: Context,
         song: Song,
-        format: DownloadFormat = DownloadFormat.M4A,
-        listener: TrackDownloadListener
-    ) {
-        downloadAndEmbedMetadata(context, song, format, null, listener)
-    }
-
-    fun downloadAndEmbedMetadata(
-        context: Context,
-        song: Song,
-        format: DownloadFormat = DownloadFormat.M4A,
         subfolder: String? = null,
         listener: TrackDownloadListener
     ) {
@@ -693,11 +581,11 @@ object TrackDownloader {
         val thread = Thread {
             Handler(Looper.getMainLooper()).post { listener.onStarted() }
             val title = song.name()
-            Log.d(TAG, "Downloading [${format.label}] and embedding metadata...")
+            Log.d(TAG, "Downloading audio and embedding metadata...")
             updateDownloadProgressNotification(context, "Downloading $title", "Downloading audio...", 0, 0, true)
 
             try {
-                val success = downloadSingleTrackSync(context, song, format, subfolder) { status ->
+                val success = downloadSingleTrackSync(context, song, subfolder) { status ->
                     updateDownloadProgressNotification(context, "Downloading $title", status, 0, 0, true)
                 }
 
@@ -740,7 +628,6 @@ object TrackDownloader {
         context: Context,
         albumTitle: String,
         songs: List<Song>,
-        format: DownloadFormat = DownloadFormat.M4A,
         listener: AlbumDownloadListener? = null
     ) {
         if (songs.isEmpty()) {
@@ -796,7 +683,6 @@ object TrackDownloader {
                     val success = downloadSingleTrackSync(
                         context = context,
                         song = song,
-                        format = format,
                         subfolder = safeAlbumFolder
                     )
                     if (success) {
@@ -846,10 +732,9 @@ object TrackDownloader {
         context: Context,
         collectionTitle: String,
         songs: List<Song>,
-        format: DownloadFormat = DownloadFormat.M4A,
         listener: AlbumDownloadListener? = null
     ) {
-        downloadAlbum(context, collectionTitle, songs, format, listener)
+        downloadAlbum(context, collectionTitle, songs, listener)
     }
 
     private fun embedTagsIntoM4a(
@@ -886,51 +771,17 @@ object TrackDownloader {
         audioFile.commit()
     }
 
-    private fun embedTagsIntoMp3OrOgg(
-        file: File,
-        title: String,
-        artist: String,
-        albumArtist: String,
-        album: String,
-        song: Song,
-        artworkFile: File,
-        lyrics: String?
-    ) {
-        val audioFile = AudioFileIO.read(file)
-        val tag = audioFile.getTagOrCreateAndSetDefault()
-        tag.setField(FieldKey.TITLE, title)
-        tag.setField(FieldKey.ARTIST, artist)
-        if (albumArtist.isNotBlank()) tag.setField(FieldKey.ALBUM_ARTIST, albumArtist)
-        tag.setField(FieldKey.ALBUM, album)
-        if (!song.year.isNullOrBlank()) tag.setField(FieldKey.YEAR, song.year)
-        if (!song.language.isNullOrBlank()) tag.setField(FieldKey.LANGUAGE, song.language)
-        if (!song.label.isNullOrBlank()) tag.setField(FieldKey.RECORD_LABEL, song.label)
-        if (!song.copyright.isNullOrBlank()) tag.setField(FieldKey.COPYRIGHT, song.copyright)
-        if (!lyrics.isNullOrBlank()) tag.setField(FieldKey.LYRICS, lyrics)
-        if (!song.id.isNullOrBlank()) {
-            tag.setField(FieldKey.COMMENT, "TrackUID:${song.id}")
-        }
-        if (artworkFile.exists()) {
-            val artwork = ArtworkFactory.createArtworkFromFile(artworkFile)
-            tag.deleteArtworkField()
-            tag.setField(artwork)
-        }
-        audioFile.setTag(tag)
-        audioFile.commit()
-    }
-
     private fun getContentValues(
         displayName: String,
         title: String?,
         artist: String?,
         album: String?,
         id: String?,
-        format: DownloadFormat = DownloadFormat.M4A,
         subfolder: String? = null
     ): ContentValues {
         val values = ContentValues()
-        values.put(MediaStore.Audio.Media.DISPLAY_NAME, "$displayName.${format.extension}")
-        values.put(MediaStore.Audio.Media.MIME_TYPE, format.mimeType)
+        values.put(MediaStore.Audio.Media.DISPLAY_NAME, "$displayName.m4a")
+        values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp4")
         values.put(MediaStore.Audio.Media.IS_MUSIC, true)
         values.put(MediaStore.Audio.Media.TITLE, title)
         values.put(MediaStore.Audio.Media.ARTIST, artist)
@@ -955,7 +806,7 @@ object TrackDownloader {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             values.put(MediaStore.Audio.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MUSIC}/$folderName/")
         } else {
-            val destFile = File(targetDir, "$displayName.${format.extension}")
+            val destFile = File(targetDir, "$displayName.m4a")
             values.put(MediaStore.Audio.Media.DATA, destFile.absolutePath)
         }
         return values

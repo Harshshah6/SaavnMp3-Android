@@ -75,7 +75,6 @@ signing credentials are configured; do not distribute such a build.
 *   [Java 17](https://openjdk.org/projects/jdk/17/) & [Kotlin](https://kotlinlang.org/) - Programming languages.
 *   [saavn.sumit.co](https://github.com/sumitkolhe/jiosaavn-api) - The unofficial JioSaavn API for music search, metadata, and streams.
 *   [Media3 ExoPlayer](https://developer.android.com/media/media3/exoplayer) - Audio playback engine for streaming and caching.
-*   [FFmpegKit (Maintained)](https://github.com/arthenica/ffmpeg-kit) - Audio transcoding engine for converting downloads into MP3 (LAME) and OGG (Vorbis).
 *   [JAudioTagger](https://github.com/RouHim/jaudiotagger) - Audio metadata tagging library for ID3v2, MP4, and Vorbis tags, lyrics, and album art.
 *   [LrcLib](https://lrclib.net/) - Client for fetching synchronized LRC and plain lyrics.
 *   [Room Database](https://developer.android.com/training/data-storage/room) - Local SQLite persistence for offline caching.

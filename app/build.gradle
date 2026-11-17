@@ -12,8 +12,8 @@ android {
         applicationId "com.harsh.shah.saavnmp3"
         minSdk 24
         targetSdk 36
-        versionCode 16
-        versionName '1.0.22'
+        versionCode 17
+        versionName '1.0.23'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //Universal APK Supporting All ABIs
@@ -61,16 +61,6 @@ android {
 
     kotlinOptions {
         jvmTarget = '17'
-    }
-
-    packaging {
-        jniLibs {
-            // Avoid duplicate native library conflicts from ffmpeg-kit
-            pickFirsts += ['lib/armeabi-v7a/libavcodec.so',
-                           'lib/arm64-v8a/libavcodec.so',
-                           'lib/x86/libavcodec.so',
-                           'lib/x86_64/libavcodec.so']
-        }
     }
 
     applicationVariants.configureEach { variant ->
@@ -138,13 +128,6 @@ dependencies {
     // LOCAL DATABASE FOR CACHING DATA
     implementation libs.room.runtime
     kapt libs.room.compiler
-
-    // FFMPEG FOR AUDIO TRANSCODING (MP3/OGG conversion)
-    // NOTE: The maintained AAR only ships 64-bit native libraries (arm64-v8a,
-    // x86_64). The 32-bit (armeabi-v7a, x86) libraries required by older devices
-    // such as Android 10 car head units are checked in under src/main/jniLibs.
-    // See app/src/main/jniLibs/README.md before changing this dependency.
-    implementation libs.ffmpeg.kit.audio
 
     // COROUTINES (for runBlocking in TrackDownloader lyrics fetch)
     implementation libs.kotlinx.coroutines.android

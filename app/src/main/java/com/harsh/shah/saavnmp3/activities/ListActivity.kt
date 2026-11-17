@@ -698,12 +698,9 @@ class ListActivity : AppCompatActivity() {
             return
         }
 
-        val settingsMgr = SettingsActivity.SettingsSharedPrefManager(this)
-        val format = TrackDownloader.DownloadFormat.fromExtension(settingsMgr.downloadFormat)
-
         MaterialAlertDialogBuilder(this)
             .setTitle("Download $collectionType")
-            .setMessage("Download all ${loadedSongs.size} tracks from \"$title\" (${format.label}) into \"Melotune/$title\"?")
+            .setMessage("Download all ${loadedSongs.size} tracks from \"$title\" into \"Melotune/$title\"?")
             .setPositiveButton("Download") { _, _ ->
                 val progressDialog = ProgressDialog(this@ListActivity)
                 progressDialog.setTitle("Downloading $collectionType")
@@ -732,8 +729,7 @@ class ListActivity : AppCompatActivity() {
                     this@ListActivity,
                     title,
                     loadedSongs,
-                    format,
-                    object : TrackDownloader.AlbumDownloadListener {
+                    listener = object : TrackDownloader.AlbumDownloadListener {
                         override fun onAlbumStarted(totalTracks: Int) {
                             if (!isFinishing && !isDestroyed) {
                                 progressDialog.show()

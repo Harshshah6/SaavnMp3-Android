@@ -1109,15 +1109,10 @@ class MusicOverviewActivity : AppCompatActivity(), ActionPlaying, ServiceConnect
                 }.show()
         }
 
-        val settingsMgr = SettingsSharedPrefManager(this@MusicOverviewActivity)
-        val downloadFormat = TrackDownloader.DownloadFormat.fromExtension(
-            settingsMgr.downloadFormat
-        )
         TrackDownloader.downloadAndEmbedMetadata(
             this@MusicOverviewActivity,
             song,
-            downloadFormat,
-            object : TrackDownloadListener {
+            listener = object : TrackDownloadListener {
                 override fun onStarted() {
                     if (!isFinishing && !isDestroyed) {
                         progressDialog.show()
